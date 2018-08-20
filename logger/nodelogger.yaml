@@ -37,8 +37,8 @@ spec:
         - name: results 
           hostPath: 
             path: /mnt
-            type: Directory
+            type: "" 
         - name: root 
           hostPath: 
             path: /
-            type: Directory
+            type: ""

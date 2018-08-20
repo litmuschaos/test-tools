@@ -19,10 +19,14 @@ Usage : $(basename "$0") -h help
         $(basename "$0") -r <string>
 
 -h  	Display this help and exit
--d      Duration for log collection in minutes, ex: 10
+-d      Duration for log collection in minutes, ex: 10, or name of container for whose duration logs are collected
 -r      Comma-separated string with starting literals of pod names, ex: pvc,maya
 
-Example: ./logger.sh -d 10 -r pvc,maya,openebs
+Examples: 
+
+./logger.sh -d 10 -r pvc,maya,openebs 
+./logger.sh -d ansibletest -r pvc,maya,openebs,litmus
+
 EOF
 }
 
@@ -140,9 +144,26 @@ for i in $podregex; do
 done 
 
 # Collect logs in the background for specified duration
-sleep $(($logtime*60)) 
+if [[ $logtime =~ ^[0-9]+$ ]]; then
+    sleep $(($logtime*60)) 
+
+elif [[ (! -z "${MY_POD_NAME}") && (! -z "${MY_POD_NAMESPACE}") ]]; then
+   cmd="kubectl get pod ${MY_POD_NAME} -n ${MY_POD_NAMESPACE} -o jsonpath='{.status.containerStatuses[?(@.name==\"$logtime\")].state}'"
+   while [[ ! $(eval $cmd) =~ 'terminated' ]]; do
+       sleep 1 
+   done 
+   echo "specified container has completed its run"
+
+else 
+    echo "Duration argument is set incorrectly"; exit 1
+fi  
 
 #%% STEP3: Get Node Logs %%#
+
+# Update the nodelogger.yaml with hostpath from job 
+if [[ ! -z "${MY_POD_HOSTPATH}" ]]; then
+    sed -i "s|/mnt[^ \"]*|$MY_POD_HOSTPATH|g" nodelogger.yaml
+fi 
 
 # Deploy the node-logger daemonset
 kubectl apply -f nodelogger.yaml
