@@ -38,6 +38,7 @@ def connect():
         return 1
     except (Exception, psycopg2.DatabaseError) as error:
         print('Liveness Failed')
+        sys.stdout.flush()
         return 0
     finally:
         if conn is not None:
@@ -49,9 +50,11 @@ def database_check():
         x=connect()
         if x==0:
             connect()
-            print("fail",flush=True)
+            print("fail" )
+            sys.stdout.flush()
         else:
-            print("pass", x,flush=True)
+            print("pass", x )
+            sys.stdout.flush()
             break
         time.sleep(int(i_w_d))
 
@@ -71,11 +74,11 @@ def liveness_check():
             conn = psycopg2.connect(host=url, database=db, port=port, user=user, password=password)
             # create a cursor
             cur = conn.cursor()
-            print("liveness Running",flush=True)
-            # sys.stdout.flush()
+            print("liveness Running")
+            sys.stdout.flush()
         except Exception as error:
-            print("liveness Failed" ,flush=True)
-            # sys.stdout.flush()
+            print("liveness Failed")
+            sys.stdout.flush()
             z=retry_connection()
             if z==0:
                 break   
