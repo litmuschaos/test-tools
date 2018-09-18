@@ -23,8 +23,8 @@ def db_init_check(db):
         sys.stdout.flush()
         return 1
     except Exception as e:
-        print("connection lost",flush=True)
-        # sys.stdout.flush()
+        print("connection lost")
+        sys.stdout.flush()
         return 0
 
 #checking the database status
@@ -34,11 +34,11 @@ def database_check(db):
         x=db_init_check(db)
         if x==0:
             db_init_check
-            print("fail", flush=True)
-            # sys.stdout.flush()
+            print("fail")
+            sys.stdout.flush()
         else:
-            print("pass", x,flush=True)
-            # sys.stdout.flush()
+            print("pass", x)
+            sys.stdout.flush()
             break
         time.sleep(int(i_w_d))
 
@@ -56,11 +56,11 @@ def liveness_check(db):
     while True:
         try:
             serverStatusResult=db.command("serverStatus")
-            print("liveness Running",flush=True)
-            # sys.stdout.flush()
+            print("liveness Running")
+            sys.stdout.flush()
         except Exception as e:
-            print("liveness Failed", e,flush=True)
-            # sys.stdout.flush()
+            print("liveness Failed", e)
+            sys.stdout.flush()
             z=retry_connection(db)
             if z==0:
                 break   
