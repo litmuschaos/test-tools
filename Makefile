@@ -122,10 +122,10 @@ mongo-client: deps _build_tests_mongo_client_image _push_tests_mongo_client_imag
 
 _build_tests_postgres_client_image:
 	@echo "INFO: Building container image for postgres-client"
-	cd postgres-client && docker build -t openebs/tests-postgres-client .
+	cd postgres-client && docker build -t openebs/tests-postgresql-client .
 
 _push_tests_postgres_client_image:
-	@echo "INFO: Publish container (openebs/tests-postgres-client)"
+	@echo "INFO: Publish container (openebs/tests-postgresql-client)"
 	cd postgres-client/buildscripts && ./push
 
 postgres-client: deps _build_tests_postgres_client_image _push_tests_postgres_client_image
