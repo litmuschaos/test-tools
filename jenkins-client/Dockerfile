@@ -1,6 +1,6 @@
 FROM python:3
 
-ADD job.py ./
+ADD jenkins-load-simulator.py ./
 
 
 RUN pip install python-jenkins

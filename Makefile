@@ -80,45 +80,75 @@ _push_tests_tpcc_client_image:
 
 tpcc-client: deps _build_tests_tpcc_client_image _push_tests_tpcc_client_image
 
-_build_tests_custom_percona_image:
-	@echo "INFO: Building container image for integrating pmm with percona"
-	cd custom-percona && docker build -t openebs/tests-custom-percona .
+#_build_tests_custom_percona_image:
+#	@echo "INFO: Building container image for integrating pmm with percona"
+#	cd custom-percona && docker build -t openebs/tests-custom-percona .
 
-_push_tests_custom_percona_image:
-	@echo "INFO: Publish container (openebs/tests-custom-percona)"
-	cd custom-percona/buildscripts && ./push
+#_push_tests_custom_percona_image:
+#	@echo "INFO: Publish container (openebs/tests-custom-percona)"
+#	cd custom-percona/buildscripts && ./push
 
-custom-percona: deps _build_tests_custom_percona_image _push_tests_custom_percona_image
+#custom-percona: deps _build_tests_custom_percona_image _push_tests_custom_percona_image
 
-_build_tests_mysql_master_image:
-	@echo "INFO: Building container image for mysql-master"
-	cd mysql-master && docker build -t openebs/tests-mysql-master .
+#_build_tests_mysql_master_image:
+#	@echo "INFO: Building container image for mysql-master"
+#	cd mysql-master && docker build -t openebs/tests-mysql-master .
 
-_push_tests_mysql_master_image:
-	@echo "INFO: Publish container (openebs/tests-mysql-master)"
-	cd mysql-master/buildscripts && ./push
+#_push_tests_mysql_master_image:
+#	@echo "INFO: Publish container (openebs/tests-mysql-master)"
+#	cd mysql-master/buildscripts && ./push
 
-mysql-master: deps _build_tests_mysql_master_image _push_tests_mysql_master_image
+#mysql-master: deps _build_tests_mysql_master_image _push_tests_mysql_master_image
 
-_build_tests_mysql_slave_image:
-	@echo "INFO: Building container image for mysql-slave"
-	cd mysql-slave && docker build -t openebs/tests-mysql-slave .
+#_build_tests_mysql_slave_image:
+#	@echo "INFO: Building container image for mysql-slave"
+#	cd mysql-slave && docker build -t openebs/tests-mysql-slave .
 
-_push_tests_mysql_slave_image:
-	@echo "INFO: Publish container (openebs/tests-mysql-slave)"
-	cd mysql-slave/buildscripts && ./push
+#_push_tests_mysql_slave_image:
+#	@echo "INFO: Publish container (openebs/tests-mysql-slave)"
+#	cd mysql-slave/buildscripts && ./push
 
-mysql-slave: deps _build_tests_mysql_slave_image _push_tests_mysql_slave_image
+#mysql-slave: deps _build_tests_mysql_slave_image _push_tests_mysql_slave_image
 
-_build_tests_sysbench_mongo_image:
-	@echo "INFO: Building container image for sysbench-mongo"
-	cd sysbench-mongo && docker build -t openebs/tests-sysbench-mongo .
+_build_tests_mongo_client_image:
+	@echo "INFO: Building container image for mongo-client"
+	cd mongo-client && docker build -t openebs/tests-mongo-client .
 
-_push_tests_sysbench_mongo_image:
-	@echo "INFO: Publish container (openebs/tests-sysbench-mongo)"
-	cd sysbench-mongo/buildscripts && ./push
+_push_tests_mongo_client_image:
+	@echo "INFO: Publish container (openebs/tests-mongo-client)"
+	cd mongo-client/buildscripts && ./push
 
-sysbench-mongo: deps _build_tests_sysbench_mongo_image _push_tests_sysbench_mongo_image
+mongo-client: deps _build_tests_mongo_client_image _push_tests_mongo_client_image
+
+_build_tests_postgres_client_image:
+	@echo "INFO: Building container image for postgres-client"
+	cd postgres-client && docker build -t openebs/tests-postgres-client .
+
+_push_tests_postgres_client_image:
+	@echo "INFO: Publish container (openebs/tests-postgres-client)"
+	cd postgres-client/buildscripts && ./push
+
+postgres-client: deps _build_tests_postgres_client_image _push_tests_postgres_client_image
+
+_build_tests_custom_client_image:
+	@echo "INFO: Building container image for custom-client"
+	cd custom-client && docker build -t openebs/tests-custom-client .
+
+_push_tests_custom_client_image:
+	@echo "INFO: Publish container (openebs/tests-custom-client)"
+	cd custom-client/buildscripts && ./push
+
+custom-client: deps _build_tests_custom_client_image _push_tests_custom_client_image
+
+_build_tests_jenkins_client_image:
+	@echo "INFO: Building container image for jenkins-client"
+	cd jenkins-client && docker build -t openebs/tests-jenkins-client .
+
+_push_tests_jenkins_client_image:
+	@echo "INFO: Publish container (openebs/tests-jenkins-client)"
+	cd jenkins-client/buildscripts && ./push
+
+jenkins-client: deps _build_tests_jenkins_client_image _push_tests_jenkins_client_image
 
 _build_tests_libiscsi_image:
 	@echo "INFO: Building container image for libiscsi"
@@ -140,7 +170,7 @@ _push_logger_image:
 
 logger: deps _build_logger_image _push_logger_image
 
-build: deps vdbench fio iometer mysql-client tpcc-client custom-percona mysql-master mysql-slave sysbench-mongo libiscsi logger 
+build: deps vdbench fio iometer mysql-client tpcc-client mongo-client jenkins-client postgres-client custom-client libiscsi logger 
 
 
 # This is done to avoid conflict with a file of same name as the targets
