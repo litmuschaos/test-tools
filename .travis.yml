@@ -11,8 +11,49 @@ before_install:
 jobs:
   include:
     - stage: build docker images
+      name: build docker image vdbench
       script:
       - make vdbench
+    - stage: build docker images
+      name: build docker image fio
+      script:
+      - make fio
+    - stage: build docker images
+      name: build docker image iometer
+      script:
+      - make iometer
+    - stage: build docker images
+      name: build docker image mysql-client
+      script:
+      - make mysql-client
+    - stage: build docker images
+      name: build docker image tpcc-client
+      script:
+      - make tpcc-client
+    - stage: build docker images
+      name: build docker image mongo-client
+      script:
+      - make mongo-client
+    - stage: build docker images
+      name: build docker image postgres-client
+      script:
+      - make postgres-client
+    - stage: build docker images
+      name: build docker image custom-client
+      script:
+      - make custom-client
+    - stage: build docker images
+      name: build docker image jenkins-client
+      script:
+      - make jenkins-client
+    - stage: build docker images
+      name: build docker image libiscsi
+      script:
+      - make libiscsi
+    - stage: build docker images
+      name: build docker image logger
+      script:
+      - make logger
 notifications:
   email:
     recipients:
