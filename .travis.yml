@@ -12,7 +12,7 @@ jobs:
   include:
     - stage: build docker images
       script:
-      - make build
+      - make vdbench
 notifications:
   email:
     recipients:
