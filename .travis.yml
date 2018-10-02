@@ -8,8 +8,11 @@ before_install:
   - sleep 15
   - sudo apt-get install -y
   - sudo apt-get install -y curl
-script:
-  - make build
+jobs:
+  include:
+    - stage: build docker images
+      script:
+      - make build
 notifications:
   email:
     recipients:
