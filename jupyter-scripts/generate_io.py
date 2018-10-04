@@ -64,4 +64,6 @@ def download(url, file_name):
         # write to file
         file.write(response.content)
 
-run()
+
+if __name__ == "__main__":
+    run()
