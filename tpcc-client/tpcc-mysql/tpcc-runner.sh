@@ -30,7 +30,7 @@ fi
 # interval    : ${T_P[6]}
 
 echo -e "\nWaiting for mysql server to start accepting connections.."
-retries=10;wait_retry=30
+retries=30;wait_retry=30
 for i in `seq 1 $retries`; do 
   mysql -h $DB_SERVER_IP -u${T_P[0]} -p${T_P[1]} -e 'status' > /dev/null 2>&1
   rc=$?
