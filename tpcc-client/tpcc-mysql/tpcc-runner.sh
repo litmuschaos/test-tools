@@ -61,6 +61,7 @@ then
   exit 1
 fi
 
+## Updating DB load using https://gist.github.com/sh2/3458844/revisions
 echo -e "\nLoading database.."
 ./tpcc_load -h$DB_SERVER_IP -P3306 -d$DB_NAME -u ${T_P[0]} -p ${T_P[1]} -w ${T_P[2]}
 if [ $? -ne 0 ];
