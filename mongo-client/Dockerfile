@@ -1,8 +1,8 @@
 FROM ubuntu:16.04
 
 RUN apt-get update && apt-get -y --force-yes install --no-install-recommends \
-    python3 \
-    python \                                           \
+    python3 \ 
+    python \
     python-pip \
     make \
     automake \
