@@ -6,6 +6,7 @@ RUN apt-get update && apt-get -y --force-yes install --no-install-recommends \
     python-pip \
     make \
     automake \
+    libmysqlclient-dev \
     libtool \
     libsasl2-dev \
     libssl-dev \
@@ -19,7 +20,7 @@ RUN cp /usr/include/libbson-1.0/* /usr/include/ \
 
 ADD sysbench-mongo/sysbench /sysbench
 WORKDIR /sysbench
-RUN ./autogen.sh && ./configure --without-mysql && make
+RUN ./autogen.sh && ./configure && make
 
 # components for liveness script
   
