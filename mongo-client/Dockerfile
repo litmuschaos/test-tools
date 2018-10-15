@@ -1,7 +1,6 @@
 FROM ubuntu:16.04
 
-RUN apt-get update && apt-get -y --force-yes install --no-install-recommends \
-    python3 \ 
+RUN apt-get update && apt-get -y --force-yes install \
     python \
     python-pip \
     make \
@@ -24,7 +23,6 @@ RUN ./autogen.sh && ./configure && make
 
 # components for liveness script
   
-RUN pip install --upgrade setuptools                                        
 RUN pip install --upgrade pip                                     
 RUN python -m pip install pystrich
 RUN python -m pip install pymongo
