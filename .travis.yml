@@ -56,6 +56,10 @@ jobs:
       name: build docker image logger
       script:
       - make logger
+    - stage: build docker images
+      name: build docker image dd-client
+      script:
+      - make dd-client
 notifications:
   email:
     recipients:
