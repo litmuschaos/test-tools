@@ -9,7 +9,7 @@ i_r_c = os.environ['INIT_RETRY_COUNT']      # Number of retries for DB init chec
 l_p_s = os.environ['LIVENESS_PERIOD_SECONDS'] # Time period (in sec) between liveness checks
 l_t_s = os.environ['LIVENESS_TIMEOUT_SECONDS']  # Time period (in sec) between retries for db_connect failure
 l_r_c = os.environ['LIVENESS_RETRY_COUNT'] # Number of retries after a db_connect failure before declaring liveness fail
-port = os.environ['PORT']
+port = os.environ.get('PORT')
 ns = os.environ['NAMESPACE']
 sv = os.environ['SERVICE']
 
