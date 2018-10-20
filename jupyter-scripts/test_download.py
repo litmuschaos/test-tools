@@ -1,6 +1,8 @@
 import sys
 import os
 import unittest
+import requests
+import generate_io
 
 
 class MockedRequests:
@@ -20,10 +22,8 @@ class TestReader(unittest.TestCase):
     def test_download(self):
         test_url = "someurl"
         test_file = "testdownloadfile"
-        import requests
         sys.modules["requests"] = MockedRequests()
 
-        import generate_io
         generate_io.download(test_url, test_file)
 
         sys.modules["requests"] = requests
