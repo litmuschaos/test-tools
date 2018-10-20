@@ -9,10 +9,11 @@ i_r_c = os.environ['INIT_RETRY_COUNT']      # Number of retries for DB init chec
 l_p_s = os.environ['LIVENESS_PERIOD_SECONDS'] # Time period (in sec) between liveness checks
 l_t_s = os.environ['LIVENESS_TIMEOUT_SECONDS']  # Time period (in sec) between retries for db_connect failure
 l_r_c = os.environ['LIVENESS_RETRY_COUNT'] # Number of retries after a db_connect failure before declaring liveness fail
-port = os.environ['PORT']
+port = os.environ['PORT'] # The port no. being used for connection
 ns = os.environ['NAMESPACE']
-sv = os.environ['SERVICE']
+sv = os.environ['SERVICE'] #The name of the service being used 
 
+#Function to see if the connection socket is Open
 def isOpen(ip,port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
@@ -23,6 +24,7 @@ def isOpen(ip,port):
        return False
 
 
+#Function to check if the specified connection to the database can be made
 def database_check(ip,port):
     for i in range(1,int(i_r_c)):
         x=isOpen(ip,port)
@@ -36,7 +38,7 @@ def database_check(ip,port):
             break
     time.sleep(int(i_w_d))
 
-
+#fFunction to try to reconnect to the database if the initial connecion fails
 def retryConnection(ip,port):
     print("Retrying to establish connection",flush=True)
     for y in range(1,int(l_r_c)):
@@ -47,7 +49,7 @@ def retryConnection(ip,port):
     if z==False:
         return z   
 
-
+#Function being called to check if the socket connection is live 
 def liveness(ip,port):
     while True:    
         res=isOpen(ip,port)
@@ -63,7 +65,7 @@ def liveness(ip,port):
                 break
         time.sleep(int(l_p_s))
 
-  
+#Creating the url based on the service that is assigned initially  
 if __name__ == '__main__':
     url = sv+"."+ns+"."+"svc.cluster.local"
     ip= url
