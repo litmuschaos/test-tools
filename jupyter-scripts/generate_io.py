@@ -9,6 +9,7 @@ import io
 from threading import Thread
 from requests import get
 
+
 class Reader(Thread):
     """
     Reader class
@@ -24,6 +25,7 @@ class Reader(Thread):
                 print("Read " + line)
                 # time.sleep(1)
 
+
 class Writer(Thread):
     """
     Writer class
@@ -38,6 +40,7 @@ class Writer(Thread):
             for i in range(1, 2000000):
                 print("Writing ", i)
                 file.write(str(i))
+
 
 def run():
     """
