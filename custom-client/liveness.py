@@ -24,7 +24,7 @@ def isOpen(ip,port):
        return False
 
 
-#Function to check if the specified connection to the database can be made
+#Function to check if the specified connection to the database can  be made
 def database_check(ip,port):
     for i in range(1,int(i_r_c)):
         x=isOpen(ip,port)
