@@ -50,6 +50,16 @@ _push_tests_fio_image:
 
 fio: deps _build_tests_fio_image _push_tests_fio_image
 
+_build_tests_dd_client:
+	@echo "INFO: Building container image for performing dd client"
+	cd dd-client && docker build -t openebs/tests-dd-client .
+
+_push_tests_dd_client:
+	@echo "INFO: Publish container (openebs/tests-dd-client)"
+	cd dd-client/buildscripts && ./push
+
+dd-client: deps _build_tests_dd_client _push_tests_dd_client
+
 _build_tests_iometer_image:
 	@echo "INFO: Building container image for performing iometer tests"
 	cd iometer && docker build -t openebs/tests-iometer .
