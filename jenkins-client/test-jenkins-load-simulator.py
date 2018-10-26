@@ -10,6 +10,7 @@ os.environ['USER'] = "user"
 os.environ['PASSWORD'] = "password"
 load_simulator = __import__("jenkins-load-simulator")
 
+
 class TestJobSimulator(unittest.TestCase):
     def setUp(self):
         self.server = MagicMock()
@@ -33,5 +34,6 @@ class TestJobSimulator(unittest.TestCase):
         
         self.server.delete_job.has_calls([call("empty"), call("empty_copy")])
         
+
 if __name__ == '__main__':
     unittest.main()
