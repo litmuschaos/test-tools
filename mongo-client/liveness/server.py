@@ -6,11 +6,16 @@ import sys
 
 
 # Assigning the environment variables
-i_w_d = os.environ['INIT_WAIT_DELAY']   # Time period (in sec) b/w retries for DB init check
-i_r_c = os.environ['INIT_RETRY_COUNT']      # No of retries for DB init check
-l_p_s = os.environ['LIVENESS_PERIOD_SECONDS']  # Time period (in sec) b/w liveness checks
-l_t_s = os.environ['LIVENESS_TIMEOUT_SECONDS']  # Time period (in sec) b/w retries for db_connect failure
-l_r_c = os.environ['LIVENESS_RETRY_COUNT']     # No of retries after a db_connect failure before declaring liveness fail
+# Time period (in sec) b/w retries for DB init check
+i_w_d = os.environ['INIT_WAIT_DELAY']
+# No of retries for DB init check
+i_r_c = os.environ['INIT_RETRY_COUNT']
+# Time period (in sec) b/w liveness checks
+l_p_s = os.environ['LIVENESS_PERIOD_SECONDS']
+# Time period (in sec) b/w retries for db_connect failure
+l_t_s = os.environ['LIVENESS_TIMEOUT_SECONDS']
+# No of retries after a db_connect failure before declaring liveness fail
+l_r_c = os.environ['LIVENESS_RETRY_COUNT']
 ns = os.environ["NAMESPACE"]  # Namespace in which mongo is running
 sv = os.environ["SERVICE_NAME"]  # Service name of mongodb
 

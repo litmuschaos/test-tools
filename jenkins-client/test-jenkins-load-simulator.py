@@ -18,7 +18,9 @@ class TestJobSimulator(unittest.TestCase):
     
     def test_load_simulator(self):
         load_simulator.job_simulator(self.server)
-        self.server.create_job.assert_called_with("empty",  jenkins.EMPTY_CONFIG_XML)
+        self.server.create_job.assert_called_with(
+            "empty",  jenkins.EMPTY_CONFIG_XML
+        )
         assert self.server.create_job.call_count == 1
         
         assert self.server.jobs_count.call_count == 2
