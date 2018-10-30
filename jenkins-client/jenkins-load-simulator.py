@@ -3,13 +3,14 @@ import time
 import os
 import sys
 
-minutes=os.environ['MINUTES']
-sv=os.environ['SERVICE']
-ns=os.environ['NAMESPACE']
-user=os.environ['USER']
-password=os.environ['PASSWORD']
+minutes = os.environ['MINUTES']
+sv = os.environ['SERVICE']
+ns = os.environ['NAMESPACE']
+user = os.environ['USER']
+password = os.environ['PASSWORD']
 
 timeout = time.time() + 60*float(minutes)
+
 
 def job_simulator(server):        
     while True:
@@ -22,7 +23,7 @@ def job_simulator(server):
         print(jobs)
         sys.stdout.flush()
         my_job = server.get_job_config('empty')
-        print(my_job) # prints XML configuration
+        print(my_job)  # prints XML configuration
         sys.stdout.flush()
         server.copy_job('empty', 'empty_copy')
         server.enable_job('empty_copy')
@@ -35,8 +36,9 @@ def job_simulator(server):
         server.delete_job('empty')
         server.delete_job('empty_copy')
 
-if __name__== "__main__":
-     # connect to the Jenkins server
+
+if __name__ == "__main__":
+    # connect to the Jenkins server
     try:
         url = "http://"+sv+"."+ns+"."+"svc.cluster.local"
         server = jenkins.Jenkins(url, username=user, password=password)

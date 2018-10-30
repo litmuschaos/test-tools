@@ -10,6 +10,7 @@ os.environ['USER'] = "user"
 os.environ['PASSWORD'] = "password"
 load_simulator = __import__("jenkins-load-simulator")
 
+
 class TestJobSimulator(unittest.TestCase):
     def setUp(self):
         self.server = MagicMock()
@@ -17,7 +18,9 @@ class TestJobSimulator(unittest.TestCase):
     
     def test_load_simulator(self):
         load_simulator.job_simulator(self.server)
-        self.server.create_job.assert_called_with("empty",  jenkins.EMPTY_CONFIG_XML)
+        self.server.create_job.assert_called_with(
+            "empty",  jenkins.EMPTY_CONFIG_XML
+        )
         assert self.server.create_job.call_count == 1
         
         assert self.server.jobs_count.call_count == 2
@@ -33,5 +36,6 @@ class TestJobSimulator(unittest.TestCase):
         
         self.server.delete_job.has_calls([call("empty"), call("empty_copy")])
         
+
 if __name__ == '__main__':
     unittest.main()
