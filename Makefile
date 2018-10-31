@@ -78,7 +78,7 @@ _push_tests_sysbench_client_image:
 	@echo "INFO: Publish container (openebs/sysbench-client)"
 	cd sysbench/buildscripts && ./push
 
-sysbench: deps _build_tests_sysbench_client_image _push_tests_sysbench_client_image
+sysbench-client: deps _build_tests_sysbench_client_image _push_tests_sysbench_client_image
 
 _build_tests_tpcc_client_image:
 	@echo "INFO: Building container image for performing tpcc benchmark tests"
