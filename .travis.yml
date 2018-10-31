@@ -29,6 +29,10 @@ jobs:
       script:
       - make mysql-client
     - stage: build docker images
+      name: build docker image sysbench-client
+      script:
+      - make sysbench-client
+    - stage: build docker images
       name: build docker image tpcc-client
       script:
       - make tpcc-client
