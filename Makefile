@@ -70,6 +70,16 @@ _push_tests_mysql_client_image:
 
 mysql-client: deps _build_tests_mysql_client_image _push_tests_mysql_client_image
 
+_build_tests_sysbench_client_image:
+	@echo "INFO: Building container image for performing sysbench benchmark tests"
+	cd sysbench && docker build -t openebs/sysbench-client .
+
+_push_tests_sysbench_client_image:
+	@echo "INFO: Publish container (openebs/sysbench-client)"
+	cd sysbench/buildscripts && ./push
+
+sysbench: deps _build_tests_sysbench_client_image _push_tests_sysbench_client_image
+
 _build_tests_tpcc_client_image:
 	@echo "INFO: Building container image for performing tpcc benchmark tests"
 	cd tpcc-client && docker build -t openebs/tests-tpcc-client .
@@ -79,16 +89,6 @@ _push_tests_tpcc_client_image:
 	cd tpcc-client/buildscripts && ./push
 
 tpcc-client: deps _build_tests_tpcc_client_image _push_tests_tpcc_client_image
-
-_build_tests_sysbench_client_image:
-  @echo "INFO: Building container image for performing sysbench benchmark tests"
-  cd sysbench && docker build -t openebs/sysbench-client .
-
-_push_tests_sysbench_client_image:
-  @echo "INFO: Publish container (openebs/sysbench-client)"
-  cd sysbench/buildscripts && ./push
-
-sysbench-client: deps _build_tests_sysbench_client_image _push_tests_sysbench_client_image
 
 #_build_tests_custom_percona_image:
 #	@echo "INFO: Building container image for integrating pmm with percona"
