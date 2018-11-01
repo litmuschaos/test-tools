@@ -53,7 +53,7 @@ $(($I_R_C * $I_W_D))s, exiting"
 # Kill the query after 1s if hung/stuck (typically seen w/ disconnects) 
 liveness_check()
 {
- timeout 1 mysql -h $1 -u$2 -p$3 -e 'select 1' > /dev/null 2>&1  
+ timeout -t 5 mysql -h $1 -u$2 -p$3 -e 'select 1' > /dev/null 2>&1
  rc=$?
 }
 
