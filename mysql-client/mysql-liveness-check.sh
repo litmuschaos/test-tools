@@ -4,6 +4,11 @@
 #  VAR DEFINITION   #
 #####################
 
+: << EOF
+The below variables are derived from env, with 
+default values specified where the env are not present
+EOF
+
 # Delay period for MySQL server database init
 I_W_D=${INIT_WAIT_DELAY:-30}
 
@@ -23,6 +28,31 @@ L_R_C=${LIVENESS_RETRY_COUNT:-3}
 #   FUNCTIONS     #
 ###################
 
+# Describe script usage 
+usage()
+{
+ if [[ $1 = "--help" || $1 = "-h" ]]; then
+     echo 
+     echo "Usage: bash $0"
+     echo
+     echo "Set these MANDATORY env before running the script"
+     echo 
+     echo "DB_USER	   	   : MySQL Database User"
+     echo "DB_PASSWORD      	   : MySQL Database Password"
+     echo "DB_SVC	   	   : MySQL service IP/FQDN"
+     echo
+     echo "Set these Optional env before running the script"
+     echo
+     echo "INIT_WAIT_DELAY  	   : Wait period for MySQL server database init (default: 30s)"
+     echo "INIT_RETRY_COUNT 	   : Retry count for MySQL server database init (default: 10)"
+     echo "LIVENESS_PERIOD_SECONDS : Liveness check interval (default: 10s)"
+     echo "LIVENESS_TIMEOUT_SECONDS: Liveness probe failure timeout (default: 10s)"
+     echo "LIVENESS_RETRY_COUNT    : Liveness probe failure retry count (default: 3)"
+     echo 
+     exit  
+ fi  
+}
+
 # Timestamped messages 
 ts_echo()
 {
@@ -35,7 +65,7 @@ mysql_db_init_check()
  ts_echo "Waiting for mysql server to start accepting connections"
 
  for i in `seq 1 $I_R_C`; do
-   mysql -h $1 -u$2 -p$3 -e 'status' > /dev/null 2>&1
+   timeout -t 5 mysql -h $1 -u$2 -p$3 -e 'status' > /dev/null 2>&1
    rc=$?
    [ $rc -eq 0 ] && break
    sleep $I_W_D
@@ -61,28 +91,13 @@ liveness_check()
 #  MAIN   #
 ###########
 
-# Usage
-if [ "$#" -ne 1 ]; then
-    echo 
-    echo "Usage:"
-    echo
-    echo "$0 <db-credentials.conf>"
-    echo
-    echo "<db-credentials.conf> JSON file with db server,user,password"
-    exit 1 
-fi  
-
-# Parse the database credentials JSON file 
-db=($(jq -r .[] $1))
-
-# DB Server Cred Lookup Table
-
-# db_server_ip : ${db[0]} 
-# db_user      : ${db[1]} 
-# db_password  : ${db[2]}
+# Verify availability of DB credentials
+if [[ -z ${DB_SVC} || -z ${DB_USER} || -z ${DB_PASSWORD} ]]; then
+ usage;
+fi
 
 # Perform DB init check
-mysql_db_init_check ${db[0]} ${db[1]} ${db[2]}
+mysql_db_init_check ${DB_SVC} ${DB_USER} ${DB_PASSWORD}
 
 # Begin Liveness check
 ts_echo "MySQL server is ready to accept connections, \
@@ -93,7 +108,7 @@ errc=0
 
 while true
 do 
- liveness_check ${db[0]} ${db[1]} ${db[2]} 
+ liveness_check ${DB_SVC} ${DB_USER} ${DB_PASSWORD} 
  
  if [ $rc -ne 0 ]; then
 
