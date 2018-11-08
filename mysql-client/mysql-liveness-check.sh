@@ -37,14 +37,14 @@ usage()
      echo
      echo "Set these MANDATORY env before running the script"
      echo 
-     echo "DB_USER	   	   : MySQL Database User"
-     echo "DB_PASSWORD      	   : MySQL Database Password"
-     echo "DB_SVC	   	   : MySQL service IP/FQDN"
+     echo "DB_USER                 : MySQL Database User"
+     echo "DB_PASSWORD             : MySQL Database Password"
+     echo "DB_SVC                  : MySQL service IP/FQDN"
      echo
      echo "Set these Optional env before running the script"
      echo
-     echo "INIT_WAIT_DELAY  	   : Wait period for MySQL server database init (default: 30s)"
-     echo "INIT_RETRY_COUNT 	   : Retry count for MySQL server database init (default: 10)"
+     echo "INIT_WAIT_DELAY         : Wait period for MySQL server database init (default: 30s)"
+     echo "INIT_RETRY_COUNT        : Retry count for MySQL server database init (default: 10)"
      echo "LIVENESS_PERIOD_SECONDS : Liveness check interval (default: 10s)"
      echo "LIVENESS_TIMEOUT_SECONDS: Liveness probe failure timeout (default: 10s)"
      echo "LIVENESS_RETRY_COUNT    : Liveness probe failure retry count (default: 3)"
@@ -93,7 +93,7 @@ liveness_check()
 
 # Verify availability of DB credentials
 if [[ -z ${DB_SVC} || -z ${DB_USER} || -z ${DB_PASSWORD} ]]; then
- usage;
+ usage --help;
 fi
 
 # Perform DB init check
