@@ -60,6 +60,15 @@ _push_tests_dd_client:
 
 dd-client: deps _build_tests_dd_client _push_tests_dd_client
 
+_build_tests_memleak:
+	@echo "INFO: Building container image for performing dd client"
+	cd memleak && docker build -t openebs/tests-memleak .
+
+_push_tests_memleak:
+	@echo "INFO: Publish container (openebs/tests-memleak)"
+	cd memleak/buildscripts && ./push
+
+dd-client: deps _build_tests_dd_client _push_tests_dd_client
 _build_tests_iometer_image:
 	@echo "INFO: Building container image for performing iometer tests"
 	cd iometer && docker build -t openebs/tests-iometer .

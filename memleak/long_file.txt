@@ -1,0 +1,12 @@
+Memory Test
+To test what happens when a pod’s memory gets maxed out, we ran a simple python program:
+
+***Max-Out Memory***
+giant_string = ''
+while True:
+    with open('long_file.txt', 'r') as f:
+        for line in f:
+            giant_string+=line
+
+The program reads a very large text file and continuously appends it to a growing string. The outcome we observed was that memory consumption grew until the node transitioned to a “Node Not Ready” state. The offending pod and its neighbor pods on that node were then rescheduled elsewhere.
+
