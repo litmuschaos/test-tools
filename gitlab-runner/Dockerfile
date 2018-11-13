@@ -6,8 +6,8 @@ ENV PATH="${PATH}:/opt/google-cloud-sdk/bin"
 ENV TERM=xterm
 
 ARG ANSIBLE_VERSION=2.6.2~ubuntu16.04.1
-ARG KOPS_VERSION=1.9.0
-ARG KUBECTL_VERSION=1.11.0
+ARG KOPS_VERSION=1.10.0
+ARG KUBECTL_VERSION=1.10.9
 
 # Install generally useful things
 #

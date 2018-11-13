@@ -1,14 +1,14 @@
 #!/bin/bash
 set -e
 
-IMAGEID=$( docker images -q openebs/kops )
+IMAGEID=$( docker images -q openebs/infra )
 
 if [ ! -z "${DNAME}" ] && [ ! -z "${DPASS}" ]; 
 then 
   docker login -u "${DNAME}" -p "${DPASS}"; 
   #Push to docker hub repository with latest tag
-  docker tag ${IMAGEID} openebs/kops:latest
-  docker push openebs/kops:latest; 
+  docker tag ${IMAGEID} openebs/infra:latest
+  docker push openebs/infra:latest; 
 else
   echo "No docker credentials provided. Skip uploading openebs/kops:latest to docker hub"; 
 fi;

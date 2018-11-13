@@ -19,5 +19,5 @@ if [[ $INFRA == True ]]; then
 else
   echo "building Gitlab-runner infra image."
   cd ..
-  docker build -t atulabhi/kops:v22 .
+  docker build -t openebs/infra:latest .
 fi
