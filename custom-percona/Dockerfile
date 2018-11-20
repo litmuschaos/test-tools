@@ -122,7 +122,7 @@ RUN wget https://repo.percona.com/apt/percona-release_0.1-6.$(lsb_release -sc)_a
     && dkpg -i percona-release_0.1-6.$(lsb_release -sc)_all.deb || true \
     && apt-get install -y -f
 
-RUN apt-get update && apt-get install pmm-client
+RUN apt-get update && apt-get install -y pmm-client procps
 # End of changes to include pmm-client
 
 VOLUME ["/var/lib/mysql", "/var/log/mysql"]
