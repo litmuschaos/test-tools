@@ -68,6 +68,10 @@ jobs:
       name: build docker image gitlab-runner
       script:
       - make gitlab-runner
+    - stage: build docker images
+      name: build docker image memleak
+      script:
+      - make memleak    
 notifications:
   email:
     recipients:
