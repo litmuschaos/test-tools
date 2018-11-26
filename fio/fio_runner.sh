@@ -8,6 +8,8 @@
 # Script Author : Karthik											      
 #######################################################################################################################
 
+set -x
+
 TEST_TEMPLATE="file/basic-rw"
 TEST_DIR="datadir"
 TEST_SIZE="256m"
@@ -98,6 +100,11 @@ for i in `ls templates/${TEST_TEMPLATE}`
 do
    profile=$(basename $i)
    echo -e "\nRunning $profile test with size=$TEST_SIZE, runtime=$TEST_DURATION... Wait for results !!\n"
-   fio $i --size=$TEST_SIZE --runtime=$TEST_DURATION --output-format=json
+   if [ $TEST_DURATION = 0 ]
+   then
+        fio $i --size=$TEST_SIZE --output-format=json
+   else
+        fio $i --size=$TEST_SIZE --runtime=$TEST_DURATION --output-format=json
+   fi 
 done  
 
