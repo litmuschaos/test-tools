@@ -6,6 +6,6 @@ RUN apt-get update \
     && apt-get clean
 
 
-COPY memleak.py /
+COPY [ "memleak.py","long_file.txt","/"]
 
 CMD ["python memleak.py"]
