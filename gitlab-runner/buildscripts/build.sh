@@ -20,6 +20,9 @@ else
   echo "building Gitlab-runner infra image."
   cd ..
   docker build -t openebs/infra:latest .
-  docker login -u "${DNAME}" -p "${DPASS}";
-  docker push openebs/infra:latest;
+  if [ ! -z "${DNAME}" ] && [ ! -z "${DPASS}" ];
+  then
+    docker login -u "${DNAME}" -p "${DPASS}";
+    docker push openebs/infra:latest;
+  fi;
 fi
