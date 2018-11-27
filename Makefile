@@ -201,12 +201,8 @@ logger: deps _build_logger_image _push_logger_image
 
 _build_gitlab_runner_infra_image:
 	@echo "INFO: Building container image for gitlab-runner-infra"
-	cd gitlab-runner/buildscripts && ./build.sh
-_push_gitlab_runner_infra_image:
-	@echo "INFO: Publish container (openebs/infra)"
-	cd gitlab-runner/buildscripts && ./push 
-gitlab-runner: deps _build_gitlab_runner_infra_image _push_gitlab_runner_infra_image
-
+	cd gitlab-runner/buildscripts && ./build.sh 
+gitlab-runner: deps _build_gitlab_runner_infra_image 
 build: deps vdbench fio iometer mysql-client tpcc-client mongo-client jenkins-client postgres-client custom-client libiscsi logger gitlab-runner
 
 
