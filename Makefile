@@ -68,7 +68,8 @@ _push_tests_memleak:
 	@echo "INFO: Publish container (openebs/tests-memleak)"
 	cd memleak/buildscripts && ./push
 
-dd-client: deps _build_tests_dd_client _push_tests_dd_client
+memleak: deps _build_tests_memleak _push_tests_memleak
+
 _build_tests_iometer_image:
 	@echo "INFO: Building container image for performing iometer tests"
 	cd iometer && docker build -t openebs/tests-iometer .
