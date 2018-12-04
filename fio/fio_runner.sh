@@ -8,8 +8,6 @@
 # Script Author : Karthik											      
 #######################################################################################################################
 
-set -x
-
 TEST_TEMPLATE="file/basic-rw"
 TEST_DIR="datadir"
 TEST_SIZE="256m"
