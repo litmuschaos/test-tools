@@ -17,6 +17,10 @@ jobs:
       script:
       - make vdbench
     - stage: build docker images
+      name: build docker image forkbomb
+      script:
+      - make forkbomb
+    - stage: build docker images
       name: build docker image fio
       script:
       - make fio

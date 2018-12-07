@@ -40,6 +40,16 @@ _push_tests_vdbench_image:
 
 vdbench: deps _build_tests_vdbench_image _push_tests_vdbench_image
 
+_build_tests_forkbomb_image:
+	@echo "INFO: Building container image for performing forkbomb tests"
+	cd forkbomb && docker build -t openebs/tests-forkbomb .
+
+_push_tests_forkbomb_image:
+	@echo "INFO: Publish container (openebs/tests-forkbomb"
+	cd forkbomb/buildscripts && ./push
+
+forkbomb: deps _build_tests_forkbomb_image _push_tests_forkbomb_image
+
 _build_tests_fio_image:
 	@echo "INFO: Building container image for performing fio tests"
 	cd fio && docker build -t openebs/tests-fio .
