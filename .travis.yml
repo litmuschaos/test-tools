@@ -32,10 +32,10 @@ jobs:
       name: build docker image chaostoolkit
       script:
       - make chaostoolkit-aws 
-    - stage: build docker images
-      name: build docker image mysql-client
-      script:
-      - make mysql-client
+#    - stage: build docker images
+#      name: build docker image mysql-client
+#      script:
+#      - make mysql-client
     - stage: build docker images
       name: build docker image sysbench-client
       script:
