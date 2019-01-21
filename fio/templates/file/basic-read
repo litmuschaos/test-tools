@@ -1,0 +1,8 @@
+[global]
+directory=/datadir
+filename=basic.test.file
+
+[basic-read]
+rw=read
+bs=4k
+time_based=1

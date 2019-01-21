@@ -1,0 +1,12 @@
+[global]
+directory=/datadir
+filename=basic.test.file
+
+[basic-randwrite]
+rw=randwrite
+bs=4k
+runtime=60
+time_based=1
+verify=crc32c
+verify=pattern
+verify_pattern=%o
