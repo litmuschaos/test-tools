@@ -221,6 +221,17 @@ _push_logger_image:
 
 logger: deps _build_logger_image _push_logger_image
 
+
+_build_tests_elasticsearch_stress_image:
+	@echo "INFO: Building container image for performing elasticsearch-stress tests"
+	cd elasticsearch-stress && docker build -t openebs/tests-elasticsearch-stress .
+
+_push_tests_elasticsearch_stress_image:
+	@echo "INFO: Publish container (openebs/tests-elasticsearch-stress)"
+	cd elasticsearch-stress/buildscripts && ./push
+
+elasticsearch-stress: deps _build_tests_elasticsearch_stress_image _push_tests_elasticsearch_stress_image
+
 _build_gitlab_runner_infra_image:
 	@echo "INFO: Building container image for gitlab-runner-infra"
 	cd gitlab-runner/buildscripts && ./build.sh 
