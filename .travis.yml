@@ -79,7 +79,11 @@ jobs:
     - stage: build docker images
       name: build docker image memleak
       script:
-      - make memleak    
+      - make memleak   
+    - stage: build docker images    
+      name: build docker image elasticsearch-stress
+      script:
+      - make elasticsearch-stress
 notifications:
   email:
     recipients:
