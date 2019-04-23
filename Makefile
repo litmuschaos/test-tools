@@ -139,7 +139,7 @@ _push_tests_busybox_client_image:
     @echo "INFO: Publish container (openebs/busybox-liveness)"
 	cd busybox/buildscripts && ./push
 
-busybox-client: deps _build_tests_busybox_client_image _push_tests_busybox_client_image
+busybox: deps _build_tests_busybox_client_image _push_tests_busybox_client_image
 
 #_build_tests_custom_percona_image:
 #	@echo "INFO: Building container image for integrating pmm with percona"
