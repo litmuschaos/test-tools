@@ -84,6 +84,10 @@ jobs:
       name: build docker image elasticsearch-stress
       script:
       - make elasticsearch-stress
+    - stage: build docker images
+      name: build docker image busybox-client
+      script:
+      - make busybox  
 notifications:
   email:
     recipients:
