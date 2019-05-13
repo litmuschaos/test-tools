@@ -10,7 +10,7 @@ if [ "$retry" == "$LIVENESS_RETRY_COUNT" ]; then
   break;
 fi
 
-eval $liveness_cmd >/dev/null # '>/dev/null will supress the output of the commnad
+eval $liveness_cmd >/dev/null # '>/dev/null will supress  the output of the commnad
 
 if [ "$?" == 0 ]; then
   echo "liveness-running"
