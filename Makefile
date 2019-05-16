@@ -132,14 +132,16 @@ _push_tests_tpcc_client_image:
 tpcc-client: deps _build_tests_tpcc_client_image _push_tests_tpcc_client_image
 
 _build_tests_busybox_client_image:
-    @echo "INFO": Building container image for performing busybox liveness"
-	cd busybox && docker build -t openebs/busybox-liveness .
+	@echo "INFO: Building container image for performing busybox-liveness"
+	cd busybox && docker build -t openebs/busybox-client .
 
 _push_tests_busybox_client_image:
-    @echo "INFO: Publish container (openebs/busybox-liveness)"
+	@echo "INFO: Publish container (openebs/busybox-client)"
 	cd busybox/buildscripts && ./push
 
 busybox: deps _build_tests_busybox_client_image _push_tests_busybox_client_image
+
+# busybox: deps _build_tests_busybox_client_image _push_tests_busybox_client_image
 
 #_build_tests_custom_percona_image:
 #	@echo "INFO: Building container image for integrating pmm with percona"
