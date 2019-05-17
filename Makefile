@@ -213,6 +213,16 @@ _push_tests_jenkins_client_image:
 
 jenkins-client: deps _build_tests_jenkins_client_image _push_tests_jenkins_client_image
 
+_build_tests_elasticsearch_liveness_image:
+	@echo "INFO: Building container image for elasticsearch-liveness"
+	cd elasticsearch-liveness && docker build -t openebs/elasticsearch-liveness .
+
+ _push_tests_elasticsearch_liveness_image:
+	@echo "INFO: Publish container (openebs/elasticsearch-liveness)"
+	cd elasticsearch-liveness/buildscripts && ./push
+
+ elasticsearch-liveness: deps _build_tests_elasticsearch_liveness_image _push_tests_elasticsearch_liveness_image
+
 _build_tests_libiscsi_image:
 	@echo "INFO: Building container image for libiscsi"
 	cd libiscsi && docker build -t openebs/tests-libiscsi .

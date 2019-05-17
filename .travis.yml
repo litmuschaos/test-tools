@@ -21,6 +21,10 @@ jobs:
       script:
       - make forkbomb
     - stage: build docker images
+      name: build docker image elasticsearch-liveness
+      script:
+      - make elasticsearch-liveness
+    - stage: build docker images
       name: build docker image fio
       script:
       - make fio
