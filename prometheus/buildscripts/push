@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+IMAGEID=$( docker images -q openebs/prometheus-liveness )
+
+if [ ! -z "${DNAME}" ] && [ ! -z "${DPASS}" ]; 
+then 
+  docker login -u "${DNAME}" -p "${DPASS}"; 
+  #Push to docker hub repository with latest tag
+  docker tag ${IMAGEID} openebs/prometheus-liveness:latest
+  docker push openebs/prometheus-liveness:latest; 
+else
+  echo "No docker credentials provided. Skip uploading openebs/prometheus-liveness:latest to docker hub"; 
+fi;
