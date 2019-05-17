@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-IMAGEID=$( docker images -q openebs/busybox-liveness )
+IMAGEID=$( docker images -q openebs/busybox-client )
 
 if [ ! -z "${DNAME}" ] && [ ! -z "${DPASS}" ]; 
 then 
