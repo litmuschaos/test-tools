@@ -7,8 +7,8 @@ if [ ! -z "${DNAME}" ] && [ ! -z "${DPASS}" ];
 then 
   docker login -u "${DNAME}" -p "${DPASS}"; 
   #Push to docker hub repository with latest tag
-  docker tag ${IMAGEID} openebs/busybox-liveness:latest
-  docker push openebs/busybox-liveness:latest; 
+  docker tag ${IMAGEID} openebs/busybox-client:latest
+  docker push openebs/busybox-client:latest; 
 else
-  echo "No docker credentials provided. Skip uploading openebs/sysbench-client:latest to docker hub"; 
+  echo "No docker credentials provided. Skip uploading openebs/busybox-client:latest to docker hub"; 
 fi;
