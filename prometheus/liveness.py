@@ -5,6 +5,8 @@ import sys
 import time
 import subprocess
 
+''' Fetching below environment variables from litmus job  '''
+
 # Number of retries to check liveness
 LIVENESS_RETRY = os.environ['LIVENESS_RETRY_COUNT']
 
@@ -16,6 +18,12 @@ LIVENESS_PERIOD = os.environ['LIVENESS_PERIOD_SECONDS']
 
 # Namespace where app is running
 NAMESPACE = os.environ['APP_NAMESPACE']
+
+# Service endpoint 
+SERVICE_ENDPOINT = os.environ['SERVICE_ENDPOINT']
+
+# Service port 
+PORT = os.environ['PORT']
 
 def is_open(ip, port):
     """Socket connection to url:port"""
@@ -51,20 +59,14 @@ def liveness(ip, port):
             sys.stdout.flush()
             result = retry_connection(ip, port)
             if result is False:
-                print("Liveness finally failed:", flush=True)
+                print("Liveness finally failed", flush=True)
                 break
         time.sleep(int(LIVENESS_PERIOD))
 
 def main():
-    """fetching service ip, port and pass it to liveness()"""
-    # fetching service name
-    svc_name = "kubectl get svc -n {} -o custom-columns=:.metadata.name --no-headers".format(NAMESPACE)
-    svc_name = ((subprocess.check_output(svc_name, shell=True)).decode('UTF-8')).strip()
-    # fetching service endpoints 
-    svc_endpoint = "kubectl get endpoints {0} -n {1}  -o custom-columns=IP:subsets[*].addresses[*].ip --no-headers".format(svc_name,NAMESPACE)
-    svc_ip = ((subprocess.check_output(svc_endpoint, shell=True)).decode('UTF-8')).strip()
-    # service port
-    port = 9090
-    liveness(svc_ip, port)
+    ''' Checking app liveness by trying to establish socket connection to service endpoint '''
+    print("Service Endpoint: {}".format(SERVICE_ENDPOINT))
+    print("Port: {}".format(PORT))
+    liveness(SERVICE_ENDPOINT, PORT)
 
 main()
