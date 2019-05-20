@@ -21,9 +21,9 @@ jobs:
       script:
       - make forkbomb
     - stage: build docker images
-      name: build docker image prometheus
+      name: build docker image liveness
       script:
-      - make prometheus
+      - make liveness
     - stage: build docker images
       name: build docker image fio
       script:

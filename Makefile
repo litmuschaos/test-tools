@@ -213,15 +213,15 @@ _push_tests_jenkins_client_image:
 
 jenkins-client: deps _build_tests_jenkins_client_image _push_tests_jenkins_client_image
 
-_build_tests_prometheus_liveness_image:
-	@echo "INFO: Building container image for prometheus-liveness"
-	cd prometheus && docker build -t openebs/prometheus-liveness .
+_build_tests_service_liveness_image:
+	@echo "INFO: Building container image for service-liveness"
+	cd prometheus && docker build -t openebs/service-liveness .
 
-_push_tests_prometheus_liveness_image:
-	@echo "INFO: Publish container (openebs/prometheus-liveness)"
+_push_tests_service_liveness_image:
+	@echo "INFO: Publish container (openebs/service-liveness)"
 	cd prometheus/buildscripts && ./push
 
-prometheus: deps _build_tests_prometheus_liveness_image _push_tests_prometheus_liveness_image
+liveness: deps _build_tests_service_liveness_image _push_tests_service_liveness_image
 
 _build_tests_libiscsi_image:
 	@echo "INFO: Building container image for libiscsi"
