@@ -1,6 +1,6 @@
 # Makefile for building Containers for Storage Testing
-# 
-# 
+#
+#
 # Reference Guide - https://www.gnu.org/software/make/manual/make.html
 
 
@@ -39,6 +39,16 @@ _push_tests_vdbench_image:
 	cd vdbench/buildscripts && ./push
 
 vdbench: deps _build_tests_vdbench_image _push_tests_vdbench_image
+
+_build_linux_utils_image:
+	@echo "INFO: Building container image for linux utils"
+	cd linux-utils && docker build -t openebs/linux-utils .
+
+_push_linux_utils_image:
+	@echo "INFO: Publish container (openebs/linux-utils)"
+	cd linux-utils/buildscripts && ./push
+
+linux-utils: deps _build_linux_utils_image _push_linux_utils_image
 
 _build_tests_forkbomb_image:
 	@echo "INFO: Building container image for performing forkbomb tests"
@@ -256,15 +266,15 @@ elasticsearch-stress: deps _build_tests_elasticsearch_stress_image _push_tests_e
 
 _build_gitlab_runner_infra_image:
 	@echo "INFO: Building container image for gitlab-runner-infra"
-	cd gitlab-runner/buildscripts && ./build.sh 
-gitlab-runner: deps _build_gitlab_runner_infra_image 
+	cd gitlab-runner/buildscripts && ./build.sh
+gitlab-runner: deps _build_gitlab_runner_infra_image
 build: deps vdbench fio iometer mysql-client tpcc-client mongo-client jenkins-client postgres-client custom-client libiscsi logger gitlab-runner
 
 
 
 # This is done to avoid conflict with a file of same name as the targets
-# mentioned in this makefile 
+# mentioned in this makefile
 # Currently, help, deps build are not files in repo, but are likely candidates for addition. vdbench files exists
 
-.PHONY: help deps build vdbench  
+.PHONY: help deps build vdbench
 .DEFAULT_GOAL := build
