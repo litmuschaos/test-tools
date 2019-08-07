@@ -1,0 +1,5 @@
+FROM alpine:latest
+RUN apk add nmap-ncat fio
+COPY docker-entrypoint.sh /
+
+CMD ["/docker-entrypoint.sh"]
