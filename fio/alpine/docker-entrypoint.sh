@@ -2,72 +2,69 @@
 set -e
 
 if [ -z $DBENCH_MOUNTPOINT ]; then
-    DBENCH_MOUNTPOINT=/tmp
+    DBENCH_MOUNTPOINT=/data
 fi
 
-if [ -z $FIO_SIZE ]; then
-    FIO_SIZE=2G
-fi
+if [ -z $DBENCH_TYPE ] || [ "$DBENCH_TYPE" == "quick" ] || [ "$DBENCH_TYPE" == "detailed" ]; then
 
-if [ -z $FIO_OFFSET_INCREMENT ]; then
-    FIO_OFFSET_INCREMENT=500M
-fi
+    if [ -z $FIO_SIZE ]; then
+        FIO_SIZE=2G
+    fi
 
-if [ -z $FIO_DIRECT ]; then
-    FIO_DIRECT=1
-fi
+    if [ -z $FIO_OFFSET_INCREMENT ]; then
+        FIO_OFFSET_INCREMENT=500M
+    fi
 
-if [ -z $FIO_NUMJOBS ]; then
-    FIO_NUMJOBS=1
-fi
+    if [ -z $FIO_DIRECT ]; then
+        FIO_DIRECT=1
+    fi
 
-if [ -z $FIO_IODEPTH ]; then 
-    FIO_IODEPTH=64
-fi
+    if [ -z $FIO_NUMJOBS ]; then
+        FIO_NUMJOBS=1
+    fi
 
-if [ -z $FIO_IOENGINE ]; then 
-    FIO_IOENGINE=libaio
-fi
+    if [ -z $FIO_IOENGINE ]; then 
+        FIO_IOENGINE=libaio
+    fi
 
-if [ -z $OPTIONS ]; then 
-    OPTIONS=''
-fi
+    if [ -z $OPTIONS ]; then 
+        OPTIONS=''
+    fi
 
 
-echo Working dir: $DBENCH_MOUNTPOINT
-echo
+    echo Working dir: $DBENCH_MOUNTPOINT
+    echo
 
-if [ "$1" = 'fio' ]; then
 
     echo Testing Read IOPS...
-    READ_IOPS=$(fio --numjobs=$FIO_NUMJOBS --randrepeat=0 --verify=0 --ioengine=$FIO_IOENGINE --direct=$FIO_DIRECT --gtod_reduce=1 --name=read_iops --filename=$DBENCH_MOUNTPOINT/fiotest --bs=4K --iodepth=$FIO_IODEPTH --size=$FIO_SIZE --readwrite=randread --time_based --ramp_time=2s --runtime=15s $OPTIONS)
+    READ_IOPS=$(fio --numjobs=$FIO_NUMJOBS --randrepeat=0 --verify=0 --ioengine=$FIO_IOENGINE --direct=$FIO_DIRECT --gtod_reduce=1 --name=read_iops --filename=$DBENCH_MOUNTPOINT/fiotest --bs=4K --iodepth=64 --size=$FIO_SIZE --readwrite=randread --time_based --ramp_time=2s --runtime=15s $OPTIONS)
     echo "$READ_IOPS"
     READ_IOPS_VAL=$(echo "$READ_IOPS"|grep -E 'read ?:'|grep -Eoi 'IOPS=[0-9k.]+'|cut -d'=' -f2)
     echo
     echo
 
     echo Testing Write IOPS...
-    WRITE_IOPS=$(fio --numjobs=$FIO_NUMJOBS --randrepeat=0 --verify=0 --ioengine=$FIO_IOENGINE --direct=$FIO_DIRECT --gtod_reduce=1 --name=write_iops --filename=$DBENCH_MOUNTPOINT/fiotest --bs=4K --iodepth=$FIO_IODEPTH --size=$FIO_SIZE --readwrite=randwrite --time_based --ramp_time=2s --runtime=15s $OPTIONS)
+    WRITE_IOPS=$(fio --numjobs=$FIO_NUMJOBS --randrepeat=0 --verify=0 --ioengine=$FIO_IOENGINE --direct=$FIO_DIRECT --gtod_reduce=1 --name=write_iops --filename=$DBENCH_MOUNTPOINT/fiotest --bs=4K --iodepth=64 --size=$FIO_SIZE --readwrite=randwrite --time_based --ramp_time=2s --runtime=15s $OPTIONS)
     echo "$WRITE_IOPS"
     WRITE_IOPS_VAL=$(echo "$WRITE_IOPS"|grep -E 'write:'|grep -Eoi 'IOPS=[0-9k.]+'|cut -d'=' -f2)
     echo
     echo
 
     echo Testing Read Bandwidth...
-    READ_BW=$(fio --numjobs=$FIO_NUMJOBS --randrepeat=0 --verify=0 --ioengine=$FIO_IOENGINE --direct=$FIO_DIRECT --gtod_reduce=1 --name=read_bw --filename=$DBENCH_MOUNTPOINT/fiotest --bs=128K --iodepth=$FIO_IODEPTH --size=$FIO_SIZE --readwrite=randread --time_based --ramp_time=2s --runtime=15s $OPTIONS)
+    READ_BW=$(fio --numjobs=$FIO_NUMJOBS --randrepeat=0 --verify=0 --ioengine=$FIO_IOENGINE --direct=$FIO_DIRECT --gtod_reduce=1 --name=read_bw --filename=$DBENCH_MOUNTPOINT/fiotest --bs=128K --iodepth=64 --size=$FIO_SIZE --readwrite=randread --time_based --ramp_time=2s --runtime=15s $OPTIONS)
     echo "$READ_BW"
     READ_BW_VAL=$(echo "$READ_BW"|grep -E 'read ?:'|grep -Eoi 'BW=[0-9GMKiBs/.]+'|cut -d'=' -f2)
     echo
     echo
 
     echo Testing Write Bandwidth...
-    WRITE_BW=$(fio --numjobs=$FIO_NUMJOBS --randrepeat=0 --verify=0 --ioengine=$FIO_IOENGINE --direct=$FIO_DIRECT --gtod_reduce=1 --name=write_bw --filename=$DBENCH_MOUNTPOINT/fiotest --bs=128K --iodepth=$FIO_IODEPTH --size=$FIO_SIZE --readwrite=randwrite --time_based --ramp_time=2s --runtime=15s $OPTIONS)
+    WRITE_BW=$(fio --numjobs=$FIO_NUMJOBS --randrepeat=0 --verify=0 --ioengine=$FIO_IOENGINE --direct=$FIO_DIRECT --gtod_reduce=1 --name=write_bw --filename=$DBENCH_MOUNTPOINT/fiotest --bs=128K --iodepth=64 --size=$FIO_SIZE --readwrite=randwrite --time_based --ramp_time=2s --runtime=15s $OPTIONS)
     echo "$WRITE_BW"
     WRITE_BW_VAL=$(echo "$WRITE_BW"|grep -E 'write:'|grep -Eoi 'BW=[0-9GMKiBs/.]+'|cut -d'=' -f2)
     echo
     echo
 
-    if [ "$DBENCH_QUICK" == "" ] || [ "$DBENCH_QUICK" == "no" ]; then
+    if [ "$DBENCH_TYPE" == "" ] || [ "$DBENCH_TYPE" == "detailed" ]; then
         echo Testing Read Latency...
         READ_LATENCY=$(fio --numjobs=$FIO_NUMJOBS --randrepeat=0 --verify=0 --ioengine=$FIO_IOENGINE --direct=$FIO_DIRECT --name=read_latency --filename=$DBENCH_MOUNTPOINT/fiotest --bs=4K --iodepth=4 --size=$FIO_SIZE --readwrite=randread --time_based --ramp_time=2s --runtime=15s $OPTIONS)
         echo "$READ_LATENCY"
@@ -97,7 +94,7 @@ if [ "$1" = 'fio' ]; then
         echo
 
         echo Testing Read/Write Mixed...
-        RW_MIX=$(fio --numjobs=$FIO_NUMJOBS --randrepeat=0 --verify=0 --ioengine=$FIO_IOENGINE --direct=$FIO_DIRECT --gtod_reduce=1 --name=rw_mix --filename=$DBENCH_MOUNTPOINT/fiotest --bs=4k --iodepth=$FIO_IODEPTH --size=$FIO_SIZE --readwrite=randrw --rwmixread=75 --time_based --ramp_time=2s --runtime=15s $OPTIONS)
+        RW_MIX=$(fio --numjobs=$FIO_NUMJOBS --randrepeat=0 --verify=0 --ioengine=$FIO_IOENGINE --direct=$FIO_DIRECT --gtod_reduce=1 --name=rw_mix --filename=$DBENCH_MOUNTPOINT/fiotest --bs=4k --iodepth=64 --size=$FIO_SIZE --readwrite=randrw --rwmixread=75 --time_based --ramp_time=2s --runtime=15s $OPTIONS)
         echo "$RW_MIX"
         RW_MIX_R_IOPS=$(echo "$RW_MIX"|grep -E 'read ?:'|grep -Eoi 'IOPS=[0-9k.]+'|cut -d'=' -f2)
         RW_MIX_W_IOPS=$(echo "$RW_MIX"|grep -E 'write:'|grep -Eoi 'IOPS=[0-9k.]+'|cut -d'=' -f2)
@@ -111,7 +108,7 @@ if [ "$1" = 'fio' ]; then
     echo = Dbench Summary =
     echo ==================
     echo "Random Read/Write IOPS: $READ_IOPS_VAL/$WRITE_IOPS_VAL. BW: $READ_BW_VAL / $WRITE_BW_VAL"
-    if [ -z $DBENCH_QUICK ] || [ "$DBENCH_QUICK" == "no" ]; then
+    if [ -z $DBENCH_TYPE ] || [ "$DBENCH_TYPE" == "detailed" ]; then
         echo "Average Latency (usec) Read/Write: $READ_LATENCY_VAL/$WRITE_LATENCY_VAL"
         echo "Sequential Read/Write: $READ_SEQ_VAL / $WRITE_SEQ_VAL"
         echo "Mixed Random Read/Write IOPS: $RW_MIX_R_IOPS/$RW_MIX_W_IOPS"
@@ -119,6 +116,15 @@ if [ "$1" = 'fio' ]; then
 
     rm $DBENCH_MOUNTPOINT/fiotest
     exit 0
-fi
+
+else 
+    
+    echo Testing Custom I/O Profile..
+
+    ## In custom jobs, parsing the simple o/p as with above runs may not be effective as the o/p keys change based on params.
+    ## Unmodified Json output will be provided for user consumption 
+    fio --filename=$DBENCH_MOUNTPOINT/fiotest --output-format=json $CUSTOM 
+    rm -f $DBENCH_MOUNTPOINT/*
+fi    
 
 exec "$@"
