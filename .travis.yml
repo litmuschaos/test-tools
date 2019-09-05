@@ -12,10 +12,10 @@ before_install:
   - sudo apt-get install -y curl
 jobs:
   include:
-    - stage: build docker images
-      name: build docker image vdbench
-      script:
-      - make vdbench
+    #- stage: build docker images
+    #  name: build docker image vdbench
+    #  script:
+    #  - make vdbench
     - stage: build docker images
       name: build docker image forkbomb
       script:
