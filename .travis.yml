@@ -96,6 +96,10 @@ jobs:
       name: build docker image linux-utils
       script:
       - make linux-utils
+    - stage: build docker images
+      name: build docker image pv-monitor
+      script:
+      - make pv-monitor
 notifications:
   email:
     recipients:

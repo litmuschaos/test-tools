@@ -264,11 +264,21 @@ _push_tests_elasticsearch_stress_image:
 
 elasticsearch-stress: deps _build_tests_elasticsearch_stress_image _push_tests_elasticsearch_stress_image
 
+_build_pv_monitor_image:
+	@echo "INFO: Building container image for pv-metrics-monitor"
+	cd pv-monitor && docker build -t openebs/pv-monitor .
+
+_push_pv_monitor_image:
+	@echo "INFO: Publish container (openebs/pv-metrics-monitor)"
+	cd pv-monitor/buildscripts && ./push
+
+pv-monitor: deps _build_pv_monitor_image _push_pv_monitor_image
+
 _build_gitlab_runner_infra_image:
 	@echo "INFO: Building container image for gitlab-runner-infra"
 	cd gitlab-runner/buildscripts && ./build.sh
 gitlab-runner: deps _build_gitlab_runner_infra_image
-build: deps vdbench fio iometer mysql-client tpcc-client mongo-client jenkins-client postgres-client custom-client libiscsi logger gitlab-runner
+build: deps vdbench fio iometer mysql-client tpcc-client mongo-client jenkins-client postgres-client custom-client libiscsi logger gitlab-runner pv-monitor
 
 
 

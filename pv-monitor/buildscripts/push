@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+IMAGEID=$( docker images -q openebs/pv-monitor )
+
+if [ ! -z "${DNAME}" ] && [ ! -z "${DPASS}" ]; 
+then 
+  docker login -u "${DNAME}" -p "${DPASS}"; 
+  #Push to docker hub repository with latest tag
+  docker tag ${IMAGEID} openebs/pv-monitor:latest
+  docker push openebs/pv-monitor:latest; 
+else
+  echo "No docker credentials provided. Skip uploading openebs/pv-monitor:latest to docker hub"; 
+fi;
