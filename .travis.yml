@@ -6,6 +6,9 @@ stages:
 env:
   global:
     - GOARCH=amd64
+language: shell
+script:
+  - bash -c 'shopt -s globstar nullglob; shellcheck **/*.{sh,ksh,bash}'
 before_install:
   - sleep 15
   - sudo apt-get install -y
@@ -21,7 +24,7 @@ jobs:
     - stage: build docker images
       name: build docker image forkbomb
       script:
-      - shellcheck $(find ./forkbomb -type f ! -name 'push' | grep .sh)
+      # - shellcheck $(find ./forkbomb -type f ! -name 'push' | grep .sh)
       - make forkbomb
     - stage: build docker images
       name: build docker image liveness
@@ -41,7 +44,7 @@ jobs:
     - stage: build docker images
       name: build docker image chaostoolkit
       script:
-      - shellcheck $(find ./chaostoolkit-aws -type f ! -name 'push' | grep .sh)
+      # - shellcheck $(find ./chaostoolkit-aws -type f ! -name 'push' | grep .sh)
       - make chaostoolkit-aws
 #    - stage: build docker images
 #      name: build docker image mysql-client
@@ -70,12 +73,12 @@ jobs:
     - stage: build docker images
       name: build docker image custom-client
       script:
-      - shellcheck $(find ./custom-client -type f ! -name 'push' | grep .sh)
+      # - shellcheck $(find ./custom-client -type f ! -name 'push' | grep .sh)
       - make custom-client
     - stage: build docker images
       name: build docker image jenkins-client
       script:
-      - shellcheck $(find ./jenkins-client -type f ! -name 'push' | grep .sh)
+      # - shellcheck $(find ./jenkins-client -type f ! -name 'push' | grep .sh)
       - make jenkins-client
     - stage: build docker images
       name: build docker image libiscsi
@@ -100,7 +103,7 @@ jobs:
     - stage: build docker images
       name: build docker image memleak
       script:
-      - shellcheck $(find ./memleak -type f ! -name 'push' | grep .sh)
+      # - shellcheck $(find ./memleak -type f ! -name 'push' | grep .sh)
       - make memleak
     - stage: build docker images
       name: build docker image elasticsearch-stress
@@ -115,7 +118,7 @@ jobs:
     - stage: build docker images
       name: build docker image linux-utils
       script:
-      - shellcheck $(find ./linux-utils -type f ! -name 'push' | grep .sh)
+      # - shellcheck $(find ./linux-utils -type f ! -name 'push' | grep .sh)
       - make linux-utils
 notifications:
   email:
