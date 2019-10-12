@@ -6,14 +6,16 @@ stages:
 env:
   global:
     - GOARCH=amd64
-language: shell
-script:
-  - bash -c 'shopt -s globstar nullglob; shellcheck **/*.{sh,ksh,bash}'
 before_install:
   - sleep 15
   - sudo apt-get install -y
   - sudo apt-get install -y curl
   - sudo apt-get install -y shellcheck
+
+language: shell
+script:
+  - bash -c 'shopt -s globstar nullglob; shellcheck **/*.{sh,ksh,bash}'
+
 jobs:
   include:
     - stage: build docker images
