@@ -1,5 +1,4 @@
 dist: trusty
-sudo: required
 install: true
 stages:
   - build docker images
