@@ -66,7 +66,7 @@ _build_tests_stress_image:
 
 _push_tests_forkbomb_image:
 	@echo "INFO: Publish container (litmuschaos/cpu"
-	cd forkbomb/buildscripts && ./push
+	cd stress/buildscripts && ./push
 
 stress: deps _build_tests_stress_image _push_tests_stress_image
 
