@@ -60,7 +60,6 @@ _push_tests_forkbomb_image:
 
 forkbomb: deps _build_tests_forkbomb_image _push_tests_forkbomb_image
 
-
 _build_tests_fio_image:
 	@echo "INFO: Building container image for performing fio tests"
 	cd fio && docker build -t openebs/tests-fio .
