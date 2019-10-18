@@ -13,8 +13,8 @@ before_install:
   - sudo apt-get install -y shellcheck
 
 language: shell
-  script:
-    - bash -c 'shopt -s globstar nullglob; shellcheck **/*.{sh,ksh,bash}'
+script:
+  - bash -c 'shopt -s globstar nullglob; shellcheck **/*.{sh,ksh,bash}'
 
 
 jobs:
