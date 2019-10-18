@@ -15,7 +15,6 @@ before_install:
 language: shell
   script:
     - bash -c 'shopt -s globstar nullglob; shellcheck **/*.{sh,ksh,bash}'
-    - shellcheck busybox/liveness.sh custom-percona/docker-entrypoint.sh custom-percona/sql-test.sh dd-client/io_runner.sh debug-scripts/openebs/get_all_logs.sh elasticsearch-stress/elasticsearch-stress-test/run.sh fio/fio_runner.sh gitlab-runner/buildscripts/build.sh libiscsi/testiscsi.sh logger/logger.sh mongo-client/sysbench-mongo/sysbench/autogen.sh mongo-client/sysbench-mongo/sysbench/install-sh mysql-client/mysql-liveness-check.sh mysql-client/MySQLLoadGenerate.sh mysql-master/docker-entrypoint.sh mysql-slave/docker-entrypoint.sh postgres-client/workloads/test.sh sysbench/src/sysbench-runner.sh tpcc-client/tpcc-mysql/tpcc-runner.sh tpcc-client/tpcc-mysql/load.sh tpcc-client/tpcc-mysql/load_multi_schema.sh tpcc-client/tpcc-mysql/scripts/analyzeR.sh tpcc-client/tpcc-mysql/scripts/runX.sh tpcc-client/tpcc-mysql/scripts/2instances/run.sh tpcc-client/tpcc-mysql/scripts/innodb_stat.sh tpcc-client/tpcc-mysql/scripts/analyze_flushed.sh tpcc-client/tpcc-mysql/scripts/run.sh tpcc-client/tpcc-mysql/scripts/analyze_evicted.sh tpcc-client/tpcc-mysql/scripts/remote/runX.sh tpcc-client/tpcc-mysql/scripts/run_no_backup.sh tpcc-client/tpcc-mysql/scripts/analyze_checkpoint_xtradb.sh tpcc-client/tpcc-mysql/scripts/analyze_min.sh tpcc-client/tpcc-mysql/scripts/analyze_dirty.sh tpcc-client/tpcc-mysql/scripts/virident_stat.sh tpcc-client/tpcc-mysql/scripts/analyze_checkpoint.sh tpcc-client/tpcc-mysql/scripts/multi-instances/runX.sh tpcc-client/tpcc-mysql/scripts/analyze_checkpoint_xtradb1.sh tpcc-client/tpcc-mysql/scripts/analyze_modified.sh tpcc-client/tpcc-mysql/scripts/analyze_flushed_innodb.sh tpcc-client/tpcc-mysql/scripts/flashcache_stat.sh tpcc-client/tpcc-mysql/scripts/analyze.full.sh tpcc-client/tpcc-mysql/scripts/analyze.sh vdbench/vdbench.bash vdbench/bench_runner.sh
 
 
 jobs:
@@ -23,106 +22,90 @@ jobs:
     - stage: build docker images
       name: build docker image vdbench
       script:
-      # - shellcheck $(find ./vdbench -type f ! -name 'push' | grep .sh)
       - make vdbench
     - stage: build docker images
       name: build docker image forkbomb
       script:
-      ## - shellcheck $(find ./forkbomb -type f ! -name 'push' | grep .sh)
       - make forkbomb
     - stage: build docker images
       name: build docker image liveness
       script:
-      # - shellcheck $(find ./busybox -type f ! -name 'push' | grep .sh)
       - make liveness
     - stage: build docker images
       name: build docker image fio
       script:
-      # - shellcheck $(find ./fio -type f ! -name 'push' | grep .sh)
       - make fio
     - stage: build docker images
       name: build docker image iometer
       script:
-      # - shellcheck $(find ./iometer -type f ! -name 'push' | grep .sh)
       - make iometer
     - stage: build docker images
       name: build docker image chaostoolkit
       script:
-      ## - shellcheck $(find ./chaostoolkit-aws -type f ! -name 'push' | grep .sh)
       - make chaostoolkit-aws
-##    - stage: build docker images
-##      name: build docker image mysql-client
-##      script:
-##      - make mysql-client
+#    - stage: build docker images
+#      name: build docker image mysql-client
+#      script:
+#      - make mysql-client
     - stage: build docker images
       name: build docker image sysbench-client
       script:
-      # - shellcheck $(find ./sysbench -type f ! -name 'push' | grep .sh)
       - make sysbench-client
     - stage: build docker images
       name: build docker image tpcc-client
       script:
-      # - shellcheck $(find ./tpcc-client -type f ! -name 'push' | grep .sh)
       - make tpcc-client
+    - stage: build docker images
+      name: build docker image stress
+      script:
+      - make stress
     - stage: build docker images
       name: build docker image mongo-client
       script:
-      # - shellcheck $(find ./mongo-client -type f ! -name 'push' | grep .sh)
       - make mongo-client
     - stage: build docker images
       name: build docker image postgres-client
       script:
-      # - shellcheck $(find ./postgres-client -type f ! -name 'push' | grep .sh)
       - make postgres-client
     - stage: build docker images
       name: build docker image custom-client
       script:
-      ## - shellcheck $(find ./custom-client -type f ! -name 'push' | grep .sh)
       - make custom-client
     - stage: build docker images
       name: build docker image jenkins-client
       script:
-      ## - shellcheck $(find ./jenkins-client -type f ! -name 'push' | grep .sh)
       - make jenkins-client
     - stage: build docker images
       name: build docker image libiscsi
       script:
-      # - shellcheck $(find ./libiscsi -type f ! -name 'push' | grep .sh)
       - make libiscsi
     - stage: build docker images
       name: build docker image logger
       script:
-      # - shellcheck $(find ./logger -type f ! -name 'push' | grep .sh)
       - make logger
     - stage: build docker images
       name: build docker image dd-client
       script:
-      # - shellcheck $(find ./dd-client -type f ! -name 'push' | grep .sh)
       - make dd-client
-    - stage: build docker images
-      name: build docker image gitlab-runner
-      script:
-      # - shellcheck $(find ./gitlab-runner -type f ! -name 'push' | grep .sh)
-      - make gitlab-runner
+        #    - stage: build docker images
+        #      name: build docker image gitlab-runner
+        #      script:
+        #      - make gitlab-runner
     - stage: build docker images
       name: build docker image memleak
       script:
-      ## - shellcheck $(find ./memleak -type f ! -name 'push' | grep .sh)
       - make memleak
     - stage: build docker images
       name: build docker image elasticsearch-stress
       script:
-      # - shellcheck $(find ./elasticsearch-stress -type f ! -name 'push' | grep .sh)
       - make elasticsearch-stress
     - stage: build docker images
       name: build docker image busybox-client
       script:
-      # - shellcheck $(find ./busybox -type f ! -name 'push' | grep .sh)
       - make busybox
     - stage: build docker images
       name: build docker image linux-utils
       script:
-      ## - shellcheck $(find ./linux-utils -type f ! -name 'push' | grep .sh)
       - make linux-utils
 notifications:
   email:
