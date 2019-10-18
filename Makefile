@@ -60,6 +60,16 @@ _push_tests_forkbomb_image:
 
 forkbomb: deps _build_tests_forkbomb_image _push_tests_forkbomb_image
 
+_build_tests_stress_image:
+	@echo "INFO: Building container image for performing stress tests"
+	cd stress && docker build -t litmuschaos/cpu .
+
+_push_tests_stress_image:
+	@echo "INFO: Publish container (litmuschaos/cpu"
+	cd stress/buildscripts && ./push
+
+stress: deps _build_tests_stress_image _push_tests_stress_image
+
 _build_tests_fio_image:
 	@echo "INFO: Building container image for performing fio tests"
 	cd fio && docker build -t openebs/tests-fio .

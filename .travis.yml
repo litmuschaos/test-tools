@@ -49,6 +49,10 @@ jobs:
       script:
       - make tpcc-client
     - stage: build docker images
+      name: build docker image stress
+      script:
+      - make stress
+    - stage: build docker images
       name: build docker image mongo-client
       script:
       - make mongo-client
@@ -76,10 +80,10 @@ jobs:
       name: build docker image dd-client
       script:
       - make dd-client
-    - stage: build docker images
-      name: build docker image gitlab-runner
-      script:
-      - make gitlab-runner
+        #    - stage: build docker images
+        #      name: build docker image gitlab-runner
+        #      script:
+        #      - make gitlab-runner
     - stage: build docker images
       name: build docker image memleak
       script:
