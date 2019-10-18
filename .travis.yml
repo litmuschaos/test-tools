@@ -56,10 +56,6 @@ jobs:
       script:
       - make tpcc-client
     - stage: build docker images
-      name: build docker image stress
-      script:
-      - make stress
-    - stage: build docker images
       name: build docker image mongo-client
       script:
       - make mongo-client
