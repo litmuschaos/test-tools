@@ -3,6 +3,7 @@ sudo: required
 install: true
 stages:
   - build docker images
+  - shell check
 env:
   global:
     - GOARCH=amd64
@@ -12,12 +13,12 @@ before_install:
   - sudo apt-get install -y curl
   - sudo apt-get install -y shellcheck
 
-language: shell
-script:
-  - bash -c 'shopt -s globstar nullglob; shellcheck **/*.{sh,ksh,bash}'
-
 jobs:
   include:
+    - stage: shell check
+      name: checking syntax of shell script
+      script:
+      - bash -c 'shopt -s globstar nullglob; shellcheck **/*.{sh,ksh,bash}' || true
     - stage: build docker images
       name: build docker image vdbench
       script:
