@@ -16,7 +16,7 @@ if [ "$?" == 0 ]; then
   echo "liveness-running"
   sleep $LIVENESS_TIMEOUT_SECONDS
 else
-  echo "livenes-failed"
+  echo "liveness-failed"
   sleep $LIVENESS_TIMEOUT_SECONDS
   retry=$((retry+1))  
 fi

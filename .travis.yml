@@ -2,6 +2,7 @@ dist: trusty
 sudo: required
 install: true
 stages:
+  - shell check
   - build docker images
 env:
   global:
@@ -10,8 +11,14 @@ before_install:
   - sleep 15
   - sudo apt-get install -y
   - sudo apt-get install -y curl
+  - sudo apt-get install -y shellcheck
+
 jobs:
   include:
+    - stage: shell check
+      name: checking syntax of shell script
+      script:
+      - bash -c 'shopt -s globstar nullglob; shellcheck **/*.{sh,ksh,bash}' || true
     - stage: build docker images
       name: build docker image vdbench
       script:
