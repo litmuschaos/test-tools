@@ -38,7 +38,7 @@ def is_open(ip, port):
 def retry_connection(ip, port):
     """Retries int(LIVENESS_RETRY) times with int(LIVENESS_TIMEOUT) secs wait between each retry"""
     print("Retrying to establish connection", flush=True)
-    for itr in range(1, int(LIVENESS_RETRY)):
+    for _ in range(1, int(LIVENESS_RETRY)):
         result = is_open(ip, port)
         if result is True:
             return result
