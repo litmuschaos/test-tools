@@ -274,12 +274,21 @@ _push_tests_elasticsearch_stress_image:
 
 elasticsearch-stress: deps _build_tests_elasticsearch_stress_image _push_tests_elasticsearch_stress_image
 
-_build_gitlab_runner_infra_image:
-	@echo "INFO: Building container image for gitlab-runner-infra"
-	cd gitlab-runner/buildscripts && ./build.sh
-gitlab-runner: deps _build_gitlab_runner_infra_image
-build: deps vdbench fio iometer mysql-client tpcc-client mongo-client jenkins-client postgres-client custom-client libiscsi logger gitlab-runner
+#_build_gitlab_runner_infra_image:
+#	@echo "INFO: Building container image for gitlab-runner-infra"
+#	cd gitlab-runner/buildscripts && ./build.sh
+#gitlab-runner: deps _build_gitlab_runner_infra_image
+#build: deps vdbench fio iometer mysql-client tpcc-client mongo-client jenkins-client postgres-client custom-client libiscsi logger gitlab-runner
 
+_build_tests_kafka_client_image:
+	@echo "INFO: Building container image for kafka-liveness"
+	cd kafka-client && docker build -t litmuschaos/kafka-client .
+
+_push_tests_kafka_client_image:
+	@echo "INFO: Publish container (litmuschaos/kafka-client)"
+	cd kafka-client/buildscripts && ./push
+
+kafka-client: deps _build_tests_kafka_client_image _push_tests_kafka_client_image
 
 
 # This is done to avoid conflict with a file of same name as the targets
