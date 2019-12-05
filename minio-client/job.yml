@@ -1,0 +1,56 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: minio-client
+  namespace: litmus
+spec:
+  template:
+    metadata:
+      name: minio
+      labels:
+        app: minio-client
+
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: minio-client
+        image: mayadataio/minio-client:latest 
+        imagePullPolicy: Always
+
+        env:
+        
+          - name: ACCESS_KEY
+            value: minio
+
+            # Application pvc
+          - name: SECRET_KEY
+            value: minio123
+
+            # Application namespace
+          - name: NAMESPACE
+            value: minio
+
+          - name: SERVICE_NAME
+            value: minio-service3
+
+          - name: PORT
+            value: "9000"
+
+          - name: LIVENESS_CHECK_INTERVAL
+            value: "5"
+
+          - name: LIVENESS_RETRY_COUNT
+            value: "5"
+          # Unit of Capacity here is in GB   
+          # Unit of Allowed values are: {1,1.5,2,2.5}
+          - name: CAPACITY
+            value: "1"
+        
+          - name: MODE
+            value: liveness
+
+        command: ["/bin/sh"]
+        args: ["-c", "/usr/local/bin/main"; exit 0"]
+
+
