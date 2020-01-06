@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+IMAGEID=$( docker images -q litmuschaos/app-cpu-stress:latest)
+
+if [ ! -z "${DNAME}" ] && [ ! -z "${DPASS}" ]; 
+then 
+  docker login -u "${DNAME}" -p "${DPASS}"; 
+  #Push to docker hub repository with latest tag
+  docker push litmuschaos/app-cpu-stress; 
+else
+  echo "No docker credentials provided. Skip uploading litmuschaos/app-cpu-stress:latest to docker hub"; 
+fi;
+

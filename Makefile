@@ -290,6 +290,17 @@ _push_tests_kafka_client_image:
 
 kafka-client: deps _build_tests_kafka_client_image _push_tests_kafka_client_image
 
+_build_tests_app_cpu_stress_image:
+	@echo "INFO: Building container image for performing app-cpu-stress"
+	cd app-cpu-stress && docker build -t litmuschaos/app-cpu-stress .
+
+_push_tests_app_cpu_stress_image:
+	@echo "INFO: Publish container (litmuschaos/app-cpu-stress)"
+	cd app-cpu-stress/buildscripts && ./push
+
+app-cpu-stress: deps _build_tests_app_cpu_stress_image _push_tests_app_cpu_stress_image 
+
+# busybox: deps _build_tests_busybox_client_image _push_tests_busybox_client_image
 
 # This is done to avoid conflict with a file of same name as the targets
 # mentioned in this makefile
