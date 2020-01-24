@@ -111,6 +111,10 @@ jobs:
       name: build docker image kafka-client
       script:
       - make kafka-client
+    - stage: build docker images
+      name: build docker image app-cpu-stress
+      script:
+      - make app-cpu-stress
 notifications:
   email:
     recipients:
