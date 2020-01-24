@@ -6,11 +6,15 @@ container_id=${CONTAINER_ID}
 ## optional args
 core_count=${CORES:=1}
 duration=${DURATION:=60}
+ramp_time=${RAMP_TIME:=5}
 
 ## initialize chaos command
 chaos_cmd="md5sum /dev/zero"
 
 if [ ! -z "${CONTAINER_ID}" ]; then 
+
+	echo "wait for the specified ramp time before injecting chaos"
+	sleep ${ramp_time}
 
         echo "starting cpu consumption for ${core_count} cores"
         i=0
