@@ -5,11 +5,10 @@ LABEL name=chaostoolkit
 
 
 ### upgrade and setup python
-RUN apt-get update && \
-    apt-get -y install gcc python3-pip python-dev && \
-    curl \
-    pip3 install --upgrade pip
-### upgrade and setup python
+RUN apt-get update \
+    && apt-get -y install gcc python-pip python3-pip python-dev curl \
+    && pip3 install --upgrade pip \
+    && pip2 install jinja2 pyYaml
 
 ### Setup kops
 WORKDIR /app
@@ -28,25 +27,22 @@ RUN mv ./kubectl /usr/local/bin/kubectl
 ### Setup kubectl
 
 ### Other Packages 
-RUN export DEBIAN_FRONTEND=noninteractive && \
-    apt-get install -y texlive-latex-base \
-      texlive-fonts-recommended \
-      texlive-latex-extra \
-      vim \
-      net-tools && \
-    curl -Lvf -o pandoc.deb https://github.com/jgm/pandoc/releases/download/2.2.1/pandoc-2.2.1-1-amd64.deb && \
-    dpkg -i pandoc.deb && \
-    apt-get remove -y curl \
-      texlive-latex-extra-doc \
-      texlive-latex-recommended-doc \
-      texlive-latex-base-doc \
-      texlive-fonts-recommended-doc \
-      texlive-pstricks-doc \
-      texlive-pictures-doc && \
-    apt-get autoremove && \
-    apt-get autoclean
-### Other Packages
-
+RUN export DEBIAN_FRONTEND=noninteractive \
+    && apt-get install -y texlive-latex-base texlive-fonts-recommended texlive-latex-extra \
+    vim \
+    net-tools \
+    libcairo2-dev \ 
+    && curl -Lvf -o pandoc.deb https://github.com/jgm/pandoc/releases/download/2.2.1/pandoc-2.2.1-1-amd64.deb \
+    && dpkg -i pandoc.deb \
+    && apt-get remove -y curl \
+    texlive-latex-extra-doc \
+    texlive-latex-recommended-doc \
+    texlive-latex-base-doc \
+    texlive-fonts-recommended-doc \
+    texlive-pstricks-doc \
+    texlive-pictures-doc \
+    && apt-get autoremove || true \
+    && apt-get autoclean || true
 
 ### Copy Data 
 WORKDIR /app/data
