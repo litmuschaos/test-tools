@@ -80,17 +80,6 @@ _push_tests_fio_image:
 
 fio: deps _build_tests_fio_image _push_tests_fio_image
 
-
-_build_tests_chaostoolkit_image:
-	@echo "INFO: Building container image for performing chaostoolkit"
-	cd chaostoolkit-aws && docker build -t openebs/tests-chaostoolkit .
-
-_push_tests_chaostoolkit_image:
-	@echo "INFO: Publish container (openebs/tests-chaostoolkit)"
-	cd chaostoolkit-aws/buildscripts && ./push
-
-chaostoolkit: deps _build_tests_chaostoolkit_image _push_tests_chaostoolkit_image
-
 _build_tests_dd_client:
 	@echo "INFO: Building container image for performing dd client"
 	cd dd-client && docker build -t openebs/tests-dd-client .
@@ -299,6 +288,16 @@ _push_tests_app_cpu_stress_image:
 	cd app-cpu-stress/buildscripts && ./push
 
 app-cpu-stress: deps _build_tests_app_cpu_stress_image _push_tests_app_cpu_stress_image 
+
+_build_tests_chaostoolkit_image:
+	@echo "INFO: Building container image for performing chaostoolkit tests"
+	cd chaostoolkit && docker build -t litmuschaos/chaostoolkit .
+
+_push_tests_chaostoolkit_image:
+	@echo "INFO: Publish container (litmuschaos/chaostoolkit)"
+	cd chaostoolkit/buildscripts && ./push
+
+chaostoolkit: deps _build_tests_chaostoolkit_image _push_tests_chaostoolkit_image 
 
 # busybox: deps _build_tests_busybox_client_image _push_tests_busybox_client_image
 

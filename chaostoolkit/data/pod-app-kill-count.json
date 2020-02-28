@@ -14,7 +14,7 @@
     },
     "name_space": {
       "type": "env",
-      "key": "NAMESPACE"
+      "key": "NAME_SPACE"
     }
   },
   "steady-state-hypothesis": {
@@ -22,8 +22,8 @@
     "probes": [
       {
         "type": "probe",
-        "name": "there-should-be-fixed-running-instance-5-node-3-master",
-        "tolerance": 3,
+        "name": "there-should-be-at-least-2-running-app-replicas",
+        "tolerance": 2,
         "provider": {
           "type": "python",
           "module": "chaosk8s.pod.probes",

@@ -1,0 +1,159 @@
+{
+  "chaoslib-version": "1.8.1",
+  "run": [
+    {
+      "start": "2020-02-27T18:31:46.266408",
+      "status": "succeeded",
+      "duration": 0.030253,
+      "output": null,
+      "activity": {
+        "type": "action",
+        "name": "Terminate_pod",
+        "pauses": {
+          "after": 20
+        },
+        "provider": {
+          "type": "python",
+          "arguments": {
+            "name_pattern": "${app_name}",
+            "qty": 1,
+            "rand": true,
+            "ns": "${name_space}",
+            "label_selector": "app=${app_name}",
+            "mode": "fixed"
+          },
+          "func": "terminate_pods",
+          "module": "chaosk8s.pod.actions"
+        }
+      },
+      "end": "2020-02-27T18:31:46.296661"
+    }
+  ],
+  "platform": "Linux-4.15.0-1044-gke-x86_64-with-Ubuntu-16.04-xenial",
+  "steady_states": {
+    "after": {
+      "probes": [
+        {
+          "start": "2020-02-27T18:32:06.318533",
+          "tolerance_met": true,
+          "status": "succeeded",
+          "duration": 0.022319,
+          "output": 2,
+          "activity": {
+            "type": "probe",
+            "name": "there-should-be-at-least-2-running-app-replicas",
+            "tolerance": 2,
+            "provider": {
+              "type": "python",
+              "arguments": {
+                "ns": "${name_space}",
+                "label_selector": "app=${app_name}"
+              },
+              "func": "count_pods",
+              "module": "chaosk8s.pod.probes"
+            }
+          },
+          "end": "2020-02-27T18:32:06.340852"
+        }
+      ],
+      "steady_state_met": true
+    },
+    "before": {
+      "probes": [
+        {
+          "start": "2020-02-27T18:31:46.246647",
+          "tolerance_met": true,
+          "status": "succeeded",
+          "duration": 0.018435,
+          "output": 2,
+          "activity": {
+            "type": "probe",
+            "name": "there-should-be-at-least-2-running-app-replicas",
+            "tolerance": 2,
+            "provider": {
+              "type": "python",
+              "arguments": {
+                "ns": "${name_space}",
+                "label_selector": "app=${app_name}"
+              },
+              "func": "count_pods",
+              "module": "chaosk8s.pod.probes"
+            }
+          },
+          "end": "2020-02-27T18:31:46.265082"
+        }
+      ],
+      "steady_state_met": true
+    }
+  },
+  "end": "2020-02-27T18:32:06.342829",
+  "node": "k8-pod-delete-v95zf-rsbvj",
+  "rollbacks": [],
+  "start": "2020-02-27T18:31:46.245706",
+  "deviated": false,
+  "status": "completed",
+  "duration": 20.09839367866516,
+  "experiment": {
+    "steady-state-hypothesis": {
+      "probes": [
+        {
+          "type": "probe",
+          "name": "there-should-be-at-least-2-running-app-replicas",
+          "tolerance": 2,
+          "provider": {
+            "type": "python",
+            "arguments": {
+              "ns": "${name_space}",
+              "label_selector": "app=${app_name}"
+            },
+            "func": "count_pods",
+            "module": "chaosk8s.pod.probes"
+          }
+        }
+      ],
+      "title": "Killing the pod where application is running"
+    },
+    "dry": false,
+    "tags": [
+      "service",
+      "kubernetes",
+      "spring"
+    ],
+    "version": "1.0.0",
+    "rollbacks": [],
+    "method": [
+      {
+        "type": "action",
+        "name": "Terminate_pod",
+        "pauses": {
+          "after": 20
+        },
+        "provider": {
+          "type": "python",
+          "arguments": {
+            "name_pattern": "${app_name}",
+            "qty": 1,
+            "rand": true,
+            "ns": "${name_space}",
+            "label_selector": "app=${app_name}",
+            "mode": "fixed"
+          },
+          "func": "terminate_pods",
+          "module": "chaosk8s.pod.actions"
+        }
+      }
+    ],
+    "description": "Can our consumer survive gracefully a provider's failure?",
+    "configuration": {
+      "app_name": {
+        "type": "env",
+        "key": "LABEL_NAME"
+      },
+      "name_space": {
+        "type": "env",
+        "key": "NAME_SPACE"
+      }
+    },
+    "title": "System is resilient to provider's failures"
+  }
+}

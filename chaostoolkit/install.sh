@@ -12,6 +12,6 @@ do
 done
 rm -rf /tmp/* /root/.cache
 
-nohup kubectl proxy --port=8080 &>/dev/null &
-wait
+#nohup kubectl proxy --port=8080 &>/dev/null &
+#wait
 
