@@ -46,6 +46,11 @@ parser.add_argument("-file", action='store',
                     dest = "file",
                     help="Chaos file to chose for execution"
                     )
+parser.add_argument("-exp", action='store',
+                    default="k8-pod-delete",
+                    dest = "exp",
+                    help="Chaos experiment to chose for execution"
+                    )                    
 parser.add_argument('-label', action='store',
                     dest='label',
                     default="app",
@@ -78,7 +83,8 @@ env_params = dict(
         NAME_SPACE=results.namespace,
         APP_ENDPOINT=results.app,
         PERCENTAGE=results.percentage,
-        FILE=results.file
+        FILE=results.file,
+        EXP=result.exp
     )
 
 # check (&set) env based on input and/or default values
@@ -90,12 +96,13 @@ for key in env_params:
 
 filename = os.environ['FILE']
 namespace = os.environ['NAME_SPACE']
+experiment = os.environ['EXP']
 
 # if the env CHAOSENGINE is defined, suffix it standard experiment name 
 # to generate the fully-qualified chaos experiment/chaosresult name 
-experiment_name = 'k8-pod-delete'
+
 if 'CHAOSENGINE' in os.environ.keys():
-    experiment_name = os.environ['CHAOSENGINE'] + '-' + experiment_name 
+    experiment_name = os.environ['CHAOSENGINE'] + '-' + experiment
 
 # create chaosresult custom resource with phase=Running, verdict=Awaited
 chaos_result_tracker(experiment_name, 'Running', 'Awaited', namespace)
