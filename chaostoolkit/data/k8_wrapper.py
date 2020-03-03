@@ -82,9 +82,9 @@ env_params = dict(
         LABEL_NAME=results.label,
         NAME_SPACE=results.namespace,
         APP_ENDPOINT=results.app,
-        PERCENTAGE=results.percentage,
+        PERCENTAGE=int(results.percentage),
         FILE=results.file,
-        EXP=result.exp
+        EXP=results.exp
     )
 
 # check (&set) env based on input and/or default values
@@ -103,6 +103,8 @@ experiment = os.environ['EXP']
 
 if 'CHAOSENGINE' in os.environ.keys():
     experiment_name = os.environ['CHAOSENGINE'] + '-' + experiment
+else:
+    experiment_name = experiment
 
 # create chaosresult custom resource with phase=Running, verdict=Awaited
 chaos_result_tracker(experiment_name, 'Running', 'Awaited', namespace)
