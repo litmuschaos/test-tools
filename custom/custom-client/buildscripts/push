@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+IMAGEID=$( docker images -q litmuschaos/custom-client )
+
+if [ ! -z "${DNAME}" ] && [ ! -z "${DPASS}" ]; 
+then 
+  docker login -u "${DNAME}" -p "${DPASS}"; 
+  #Push to docker hub repository with latest tag
+  docker tag ${IMAGEID} litmuschaos/custom-client:latest
+  docker push litmuschaos/custom-client:latest; 
+else
+  echo "No docker credentials provided. Skip uploading litmuschaos/custom-client:latest to docker hub"; 
+fi;
