@@ -52,7 +52,7 @@ spec:
       serviceAccountName: debugjob 
       containers:
       - name: debugjob
-        image: openebs/logger 
+        image: litmuschaos/logger 
         imagePullPolicy: IfNotPresent
         command: ["/bin/bash"]
         ## Specify duration in minutes

@@ -13,7 +13,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: custom-liveness
-        image: openebs/custom-liveness
+        image: litmuschaos/custom-liveness
         imagePullPolicy: Always
 
         env: 

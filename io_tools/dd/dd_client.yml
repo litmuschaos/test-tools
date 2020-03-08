@@ -17,7 +17,7 @@ spec:
  
       containers:
       - name: dd-client 
-        image: openebs/tests-dd-client
+        image: litmuschaos/dd-client
         imagePullPolicy: Always
         tty: true
 
