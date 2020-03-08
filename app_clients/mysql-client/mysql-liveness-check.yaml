@@ -22,7 +22,7 @@ spec:
 
   containers:
   - name: mysql-liveness-check
-    image: openebs/tests-mysql-client
+    image: litmuschaos/mysql-client
     env:
       # Time period (in sec) b/w retries for DB init check
       - name: INIT_WAIT_DELAY

@@ -1,4 +1,4 @@
-## openebs/tests-mysql-client
+## litmuschaos/mysql-client
 
 This image provides a couple of simple bash scripts that can be used alongside percona/mysql deployments to test their health & functionality
 

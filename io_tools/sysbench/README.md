@@ -16,10 +16,10 @@ As an OLTP system benchmark, TPC-C (Transaction Performance Council - C) simulat
 
 - Note the db_user name and password for the mysql to perform the remote login
 
-- Pull the openebs/sysbench docker image on the test host/kubernetes minion
+- Pull the litmuschaos/sysbench docker image on the test host/kubernetes minion
 
   ```bash
-  docker pull openebs/sysbench
+  docker pull litmuschaos/sysbench
   ```
 
 - Edit the sysbench.conf file to set the right values for the benchmark attributes
@@ -44,8 +44,3 @@ As an OLTP system benchmark, TPC-C (Transaction Performance Council - C) simulat
   ```bash
   docker run -it --link some-mysql:mysql -v $PWD:/tmp --rm sysbench mysql /tmp/sysbench.conf
   ```
-
-## License
-
-openebs/test-storage is developed under Apache 2.0 License. Some components of the project are derived from other opensource projects
-like [axboe/fio](https://github.com/axboe/fio), [percona-Lab/tpcc-mysql](https://github.com/Percona-Lab/tpcc-mysql) and are distributed under their respective licenses.

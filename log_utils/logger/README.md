@@ -1,11 +1,11 @@
-## OpenEBS Logger FAQ
+## Logger FAQ
 
-### What is OpenEBS Logger   
+### What is Logger   
 
 - The logger is an Kubernetes job which can be run on the cluster to extract pod logs and 
   cluster info. It has been created to aid troubleshoot/debugging activities.
 
-- It runs the logger container *openebs/logger*
+- It runs the logger container *litmuschaos/logger*
 
 - Recommended to run for a specifc duration to capture logs on issue reproduction attempts 
 
@@ -51,6 +51,6 @@
 - The node in which the debug pod/logger is scheduled & logs are available can be obtained by 
   performing a `kubectl get pod -o wide` command. 
 
-- Attach this log support bundle while raising issues on the OpenEBS repository
+- Attach this log support bundle while raising issues on the litmuschaos/test-tools repository
 
 

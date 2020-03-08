@@ -1,5 +1,5 @@
 FROM ubuntu:16.04 
-LABEL maintainer="OpenEBS"
+LABEL maintainer="LitmusChaos"
 RUN apt-get update || true \
     && apt-get install -y curl libgetopt++-dev 
 ENV KUBE_LATEST_VERSION="v1.8.2"
