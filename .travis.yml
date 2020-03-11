@@ -89,7 +89,7 @@ jobs:
     - stage: build elasticsearch-stress image
       name: build docker image elasticsearch-stress
       script:
-      - make elasticsearch-stressitmus
+      - make elasticsearch-stress
 
     - stage: build kafka-client image
       name: build docker image kafka-client
