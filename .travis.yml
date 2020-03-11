@@ -15,107 +15,93 @@ before_install:
 
 jobs:
   include:
+
     - stage: shell check
       name: checking syntax of shell script
       script:
       - bash -c 'shopt -s globstar nullglob; shellcheck **/*.{sh,ksh,bash}' || true
-    - stage: build docker images
-      name: build docker image vdbench
-      script:
-      - make vdbench
-    - stage: build docker images
+
+    - stage: build forkbomb image
       name: build docker image forkbomb
       script:
       - make forkbomb
-    - stage: build docker images
-      name: build docker image liveness
-      script:
-      - make liveness
-    - stage: build docker images
+
+    - stage: build fio image
       name: build docker image fio
       script:
       - make fio
-    - stage: build docker images
-      name: build docker image iometer
-      script:
-      - make iometer
-    - stage: build docker images
+      
+    - stage: build chaostoolkit images
       name: build docker image chaostoolkit
       script:
       - make chaostoolkit
-#    - stage: build docker images
-#      name: build docker image mysql-client
-#      script:
-#      - make mysql-client
-    - stage: build docker images
+
+    - stage: build mysql-client image
+      name: build docker image mysql-client
+      script:
+      - make mysql-client
+
+    - stage: build sysbench-client image
       name: build docker image sysbench-client
       script:
-      - make sysbench-client
-    - stage: build docker images
+      - make sysbench
+
+    - stage: build tpcc-client image
       name: build docker image tpcc-client
       script:
-      - make tpcc-client
-    - stage: build docker images
+      - make tpcc
+
+    - stage: build stress image
       name: build docker image stress
       script:
       - make stress
-    - stage: build docker images
+
+    - stage: build mongo-client image
       name: build docker image mongo-client
       script:
       - make mongo-client
-    - stage: build docker images
+
+    - stage: build postgres-client image
       name: build docker image postgres-client
       script:
       - make postgres-client
-    - stage: build docker images
+
+    - stage: build custom-client image
       name: build docker image custom-client
       script:
       - make custom-client
-    - stage: build docker images
-      name: build docker image jenkins-client
-      script:
-      - make jenkins-client
-    - stage: build docker images
-      name: build docker image libiscsi
-      script:
-      - make libiscsi
-    - stage: build docker images
+
+    - stage: build logger image
       name: build docker image logger
       script:
       - make logger
-    - stage: build docker images
+
+    - stage: build dd-client image
       name: build docker image dd-client
       script:
-      - make dd-client
-        #    - stage: build docker images
-        #      name: build docker image gitlab-runner
-        #      script:
-        #      - make gitlab-runner
-    - stage: build docker images
+      - make dd
+
+    - stage: build memleak image
       name: build docker image memleak
       script:
       - make memleak
-    - stage: build docker images
+
+    - stage: build elasticsearch-stress image
       name: build docker image elasticsearch-stress
       script:
-      - make elasticsearch-stress
-    - stage: build docker images
-      name: build docker image busybox-client
-      script:
-      - make busybox
-    - stage: build docker images
-      name: build docker image linux-utils
-      script:
-      - make linux-utils
-    - stage: build docker images
+      - make elasticsearch-stressitmus
+
+    - stage: build kafka-client image
       name: build docker image kafka-client
       script:
       - make kafka-client
-    - stage: build docker images
+
+    - stage: build app-cpu-stress image
       name: build docker image app-cpu-stress
       script:
       - make app-cpu-stress
+
 notifications:
   email:
     recipients:
-      - karthik.s@openebs.io
+      - karthik.s@mayadata.io
