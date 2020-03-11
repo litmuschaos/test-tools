@@ -144,7 +144,6 @@ _push_logger_image:
 
 logger: deps _build_logger_image _push_logger_image
 
-
 _build_tests_elasticsearch_stress_image:
 	@echo "INFO: Building container image for performing elasticsearch-stress tests"
 	cd app_clients/elasticsearch-stress && docker build -t litmuschaos/elasticsearch-stress .
@@ -175,5 +174,12 @@ _push_tests_app_cpu_stress_image:
 
 app-cpu-stress: deps _build_tests_app_cpu_stress_image _push_tests_app_cpu_stress_image 
 
-PHONY: help deps 
-.DEFAULT_GOAL := deps
+_build_tests_chaostoolkit_image:
+	@echo "INFO: Building container image for performing chaostoolkit tests"
+	cd chaostoolkit && docker build -t litmuschaos/chaostoolkit .
+
+_push_tests_chaostoolkit_image:
+	@echo "INFO: Publish container litmuschaos/chaostoolkit"
+	cd chaostoolkit/buildscripts && ./push
+
+chaostoolkit: deps _build_tests_chaostoolkit_image _push_tests_chaostoolkit_image 
