@@ -183,3 +183,13 @@ _push_tests_chaostoolkit_image:
 	cd chaostoolkit/buildscripts && ./push
 
 chaostoolkit: deps _build_tests_chaostoolkit_image _push_tests_chaostoolkit_image 
+
+_build_tests_nfs_client_image:
+	@echo "INFO: Building container image for performing nfs mount liveness check"
+	cd app_clients/nfs-client && docker build -t litmuschaos/nfs-client .
+
+_push_tests_nfs_client_image:
+	@echo "INFO: Publish container litmuschaos/nfs-client"
+	cd app_clients/nfs-client/buildscripts && ./push
+
+nfs-client: deps _build_tests_nfs_client_image _push_tests_nfs_client_image 
