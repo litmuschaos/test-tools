@@ -1,0 +1,61 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mysql-liveness-check
+  labels:
+    name: mysql-liveness-check
+spec:
+
+  restartPolicy: Never
+
+  #affinity:
+  #  podAffinity: # (/podAntiAffinity)
+  #    requiredDuringSchedulingIgnoredDuringExecution:
+  #    - labelSelector:
+  #        matchExpressions:
+  #        - key: name
+  #          operator: In
+  #          values: 
+  #          - litmus # (/percona) 
+  #      topologyKey: kubernetes.io/hostname
+
+  containers:
+  - name: mysql-liveness-check
+    image: litmuschaos/mysql-client
+    env:
+      # Time period (in sec) b/w retries for DB init check
+      - name: INIT_WAIT_DELAY
+        value: "30"
+
+      # No of retries for DB init check 
+      - name: INIT_RETRY_COUNT
+        value: "10"
+
+      # Time period (in sec) b/w liveness checks
+      - name: LIVENESS_PERIOD_SECONDS
+        value: "10"
+
+      # Time period (in sec) b/w retries for db_connect failure
+      - name: LIVENESS_TIMEOUT_SECONDS
+        value: "10"
+
+      # No of retries after a db_connect failure before declaring liveness fail
+      - name: LIVENESS_RETRY_COUNT
+        value: "6"
+
+      # Application service name
+      - name: DB_SVC 
+        value: percona-mysql.default.svc.cluster.local
+         
+      # Database username
+      - name: DB_USER
+        value: root
+
+      # Database password
+      - name: DB_PASSWORD
+        value: k8sDem0
+
+    command: ["/bin/bash"]
+    args: ["-c", "bash mysql-liveness-check.sh; exit 0"]
+    tty: true 

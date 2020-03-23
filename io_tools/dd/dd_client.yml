@@ -1,0 +1,50 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: dd-client-
+  namespace: litmus 
+spec:
+  template:
+    metadata:
+      name: dd-client
+      namespace: litmus
+      labels:
+        app: dd-client
+    spec:
+      serviceAccountName: litmus
+      restartPolicy: Never
+ 
+      containers:
+      - name: dd-client 
+        image: litmuschaos/dd-client
+        imagePullPolicy: Always
+        tty: true
+
+        env:
+
+          - name: BLOCK_SIZE
+            value: "4k"
+ 
+          - name: COUNT
+            value: "1024"
+
+            # Namespace in which Application is running
+          - name: NAMESPACE
+            value: ''
+         
+            # Application label
+          - name: APP_LABEL
+            value: '' 
+            
+          - name: MOUNT_POINT
+            value: ''
+
+          - name: RETRY_COUNT
+            value: '5'
+
+          - name: RETRY_DURATION
+            value: '5'
+
+        command: ["/bin/bash"]
+        args: ["-c", "./io_runner.sh; exit 0"]
