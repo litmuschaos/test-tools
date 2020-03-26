@@ -29,14 +29,14 @@ spec:
 
       # Command timeout in seconds, when showmount command got struck
       - name: COMMAND_TIMEOUT
-        value: ''
+        value: ""
 
       # NFS PROVISIONER SERVICE IP
       - name: NFS_SVC_IP 
-        value: ''
+        value: ""
 
       # PERSISTENT VOLUME MOUNT USING NFS
       - name: VOLUME
-        value: ''
+        value: ""
         
-    command: ["python", "nfs-mount-liveness-check.py"]    
+    command: ["python3", "nfs-mount-liveness-check.py"]    
