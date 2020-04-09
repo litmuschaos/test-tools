@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: app-memory-stress
+spec:
+  template:
+    metadata:
+      labels:
+        app: app-memory-stress
+    spec:
+      #nodeName:
+        ## mandatory: provide name of host where target container resides
+        ## kubernetes.io/hostname: ""
+      restartPolicy: Never
+      containers:
+      - image: litmuschaos/app-memory-stress:latest
+        imagePullPolicy: Always
+        name: app-memory-stress
+        command: 
+        - /bin/sh
+        args:
+        - ./memory-hog.sh 
+        env:
+            ## mandatory: provide id of docker container
+          - name: CONTAINER_ID
+            value: ""
+            ## optional: provide duration for memory chaos 
+            ## default: 60 (in sec)
+          - name: DURATION
+            value: ""
+            ## optional: provide the amount of memory to be consumed in container
+            ## default: 500M (Megabytes)
+          - name: MEMORY_CONSUMPTION
+            value: ""
+        volumeMounts:
+          - name: dockersocket
+            mountPath: /var/run/docker.sock
+      volumes:
+        - hostPath:
+            path: /var/run/docker.sock
+          name: dockersocket
