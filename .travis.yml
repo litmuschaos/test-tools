@@ -100,6 +100,11 @@ jobs:
       name: build docker image app-cpu-stress
       script:
       - make app-cpu-stress
+
+    - stage: build app-memory-stress image
+      name: build docker image memory-stress
+      script:
+      - make app-memory-stress 
     
     - stage: build nfs-client image
       name: build docker image nfs-client

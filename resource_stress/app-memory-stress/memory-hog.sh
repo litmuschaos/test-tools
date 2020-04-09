@@ -6,7 +6,7 @@ container_id=${CONTAINER_ID}
 ## optional args
 memory_consumption=${MEMORY_CONSUMPTION:=500}
 duration=${DURATION:=60}
-ramp_time=${RAMP_TIME:=5}
+ramp_time=${RAMP_TIME:=10}
 
 ## Here /dev/null is a blockhole which maintains a temporary buffer in memory to write
 ## the chunk of data assigned in bs of the dd command. Timeout is exiting the command after

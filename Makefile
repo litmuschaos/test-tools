@@ -174,6 +174,16 @@ _push_tests_app_cpu_stress_image:
 
 app-cpu-stress: deps _build_tests_app_cpu_stress_image _push_tests_app_cpu_stress_image 
 
+_build_tests_app_memory_stress_image:
+	@echo "INFO: Building container image for performing app-memory-stress"
+	cd resource_stress/app-memory-stress && docker build -t litmuschaos/app-memory-stress .
+
+_push_tests_app_memory_stress_image:
+	@echo "INFO: Publish container litmuschaos/app-memory-stress"
+	cd resource_stress/app-memory-stress/buildscripts && ./push
+
+app-memory-stress: deps _build_tests_app_memory_stress_image _push_tests_app_memory_stress_image 
+
 _build_tests_chaostoolkit_image:
 	@echo "INFO: Building container image for performing chaostoolkit tests"
 	cd chaostoolkit && docker build -t litmuschaos/chaostoolkit .

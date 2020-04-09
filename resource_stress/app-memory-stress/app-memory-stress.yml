@@ -8,12 +8,12 @@ spec:
       labels:
         app: app-memory-stress
     spec:
-      nodeName:
+      #nodeName:
         ## mandatory: provide name of host where target container resides
-        kubernetes.io/hostname: ""
+        ## kubernetes.io/hostname: ""
       restartPolicy: Never
       containers:
-      - image: litmuschaos/app-memory-stress:ci
+      - image: litmuschaos/app-memory-stress:latest
         imagePullPolicy: Always
         name: app-memory-stress
         command: 
