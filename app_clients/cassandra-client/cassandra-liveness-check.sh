@@ -151,7 +151,7 @@ drop_keyspace()
 ###########
 
 # Verify availability of Required Variables
-if [[ -z ${CASSANDRA_PORT} || -z $CASSANDRA_SVC_NAME} || -z ${REPLICATION_FACTOR} ]]; then
+if [[ -z ${CASSANDRA_PORT} || -z ${CASSANDRA_SVC_NAME} || -z ${REPLICATION_FACTOR} ]]; then
  usage --help;
 fi
 
