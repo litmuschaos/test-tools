@@ -11,14 +11,18 @@
         "app_name": {
 		"type" : "env",
 		"key" : "LABEL_NAME"
-	},
+	    },
         "name_space": {
         	"type": "env",
         	"key": "NAME_SPACE"
-          },
+        },
         "service_url": {
             "type": "env",
             "key": "APP_ENDPOINT"
+        },
+        "percentage": {
+            "type": "env",
+            "key": "PERCENTAGE"
         }
     },
     "steady-state-hypothesis": {
@@ -45,12 +49,12 @@
                 "module": "chaosk8s.pod.actions",
                 "func": "terminate_pods",
                 "arguments": {
-                    "label_selector": "app=${app_name}",
+                    "label_selector": "${app_name}",
                     "name_pattern": "${app_name}",
                     "ns": "${name_space}",
                     "rand": true,
-                    "mode": "fixed",
-                    "qty": 1
+                    "mode": "percentage",
+                    "qty": 100
                 }
             },
             "pauses": {

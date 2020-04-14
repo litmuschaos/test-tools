@@ -1,0 +1,3 @@
+include templates/*.j2
+include json/*.json
+
