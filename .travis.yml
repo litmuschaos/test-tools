@@ -111,6 +111,11 @@ jobs:
       script:
       - make nfs-client
 
+    - stage: build cassandra-client image
+      name: build docker image cassandra-client
+      script:
+      - make cassandra-client
+
 notifications:
   email:
     recipients:
