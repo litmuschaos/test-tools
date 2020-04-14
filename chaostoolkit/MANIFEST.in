@@ -1,3 +1,4 @@
-include templates/*.j2
-include json/*.json
+include chaostest/templates/*.j2
+include chaostest/json/*.json
+
 

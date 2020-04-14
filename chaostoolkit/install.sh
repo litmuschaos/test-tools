@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Chaos toolkit litmus local package installation
-declare -a chaos_litmus_packages=("chaostoolkit")
+declare -a chaos_litmus_packages=("chaos")
 for chaos_litmus_package in "${chaos_litmus_packages[@]}"
 do
   pwd
@@ -16,7 +16,7 @@ do
   pip install -U .
 done
 
-# Preserve order for chaostoolkit and lib in the beginning, thats the core
+# Preserve order for chaostest and lib in the beginning, thats the core
 declare -a chaosexperiments=("chaostoolkit" "chaostoolkit-lib" "chaostoolkit-kubernetes" "chaostoolkit-reporting")
 for chaosexperiment in "${chaosexperiments[@]}"
 do

@@ -1,23 +1,24 @@
-import json
-import subprocess
-import sys
-import os
-import time
-import requests
 import logging
-import threading
-from jinja2 import Environment, FileSystemLoader, select_autoescape
-import yaml
+import os
+import subprocess
+
+from jinja2 import Environment, FileSystemLoader, select_autoescape, PackageLoader
 
 __author__ = 'Sumit_Nagal@intuit.com'
 
 logger = logging.getLogger(__name__)
 
 
-class Utils(object):
+class Helper(object):
 	####################################
 	#      Function definitions        #
 	####################################
+
+	TEST_RESULT_STATUS = {
+		True: "Success",
+		False: "Failed",
+		"Running": "Awaited"
+	}
 
 	"""
 	run_shell_task() runs a shell command and prints the output as it executes.
@@ -34,7 +35,7 @@ class Utils(object):
 	"""
 
 	def chaos_result_tracker(self, exp_name, exp_phase, exp_verdict, ns):
-		env_tmpl = Environment(loader=FileSystemLoader('./'), trim_blocks=True, lstrip_blocks=True,
+		env_tmpl = Environment(loader=PackageLoader('chaostest', 'templates'), trim_blocks=True, lstrip_blocks=True,
 							   autoescape=select_autoescape(['yaml']))
 		template = env_tmpl.get_template('chaos-result.j2')
 		updated_chaosresult_template = template.render(c_experiment=exp_name, phase=exp_phase, verdict=exp_verdict)
@@ -42,5 +43,3 @@ class Utils(object):
 			f.write(updated_chaosresult_template)
 		chaosresult_update_cmd_args_list = ['kubectl', 'apply', '-f', 'chaosresult.yaml', '-n', ns]
 		self.run_shell_task(chaosresult_update_cmd_args_list)
-
-
