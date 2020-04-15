@@ -19,10 +19,6 @@
         "service_url": {
             "type": "env",
             "key": "APP_ENDPOINT"
-        },
-        "percentage": {
-            "type": "env",
-            "key": "PERCENTAGE"
         }
     },
     "steady-state-hypothesis": {
@@ -54,7 +50,7 @@
                     "ns": "${name_space}",
                     "rand": true,
                     "mode": "percentage",
-                    "qty": "${percentage}"
+                    "qty": 100
                 }
             },
             "pauses": {
