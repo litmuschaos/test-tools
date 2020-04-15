@@ -117,4 +117,4 @@ class Report(object):
                 logger.info("Posting kubernetes to Kafka failed: {0}".format(e))
 
         else:
-            raise Exception("Unable to find report endpoint, value is -> " + report_endpoint)
+            logger.info("Not making http post request to Kafka %s", report_endpoint)
