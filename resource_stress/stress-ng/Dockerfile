@@ -1,7 +1,5 @@
 FROM ubuntu:18.04 as builder
 
-#FROM debian:jessie as builder
-
 # intall gcc and supporting packages
 RUN apt-get update && apt-get install -yq make gcc
 

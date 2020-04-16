@@ -34,15 +34,15 @@ _push_tests_forkbomb_image:
 
 forkbomb: deps _build_tests_forkbomb_image _push_tests_forkbomb_image
 
-_build_tests_stress_image:
-	@echo "INFO: Building container image for performing stress tests"
-	cd resource_stress/stress && docker build -t litmuschaos/cpu .
+_build_tests_stress-ng_image:
+	@echo "INFO: Building container image for performing stress-ng tests"
+	cd resource_stress/stress-ng && docker build -t litmuschaos/stress-ng .
 
-_push_tests_stress_image:
-	@echo "INFO: Publish container litmuschaos/cpu"
-	cd resource_stress/stress/buildscripts && ./push
+_push_tests_stress-ng_image:
+	@echo "INFO: Publish container litmuschaos/stress-ng"
+	cd resource_stress/stress-ng/buildscripts && ./push
 
-stress: deps _build_tests_stress_image _push_tests_stress_image
+stress-ng: deps _build_tests_stress-ng_image _push_tests_stress-ng_image
 
 _build_tests_fio_image:
 	@echo "INFO: Building container image for performing fio tests"
