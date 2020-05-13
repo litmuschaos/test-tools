@@ -51,10 +51,10 @@ jobs:
       script:
       - make tpcc
 
-    - stage: build stress image
-      name: build docker image stress
+    - stage: build stress-ng image
+      name: build docker image stress-ng
       script:
-      - make stress
+      - make stress-ng
 
     - stage: build mongo-client image
       name: build docker image mongo-client
@@ -111,10 +111,10 @@ jobs:
       script:
       - make nfs-client
 
-    - stage: build cassandra-client image
-      name: build docker image cassandra-client
-      script:
-      - make cassandra-client
+    - stage: build cassandra-client image	
+      name: build docker image cassandra-client	
+      script:	
+      - make cassandra-client	
 
 notifications:
   email:
