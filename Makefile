@@ -184,16 +184,6 @@ _push_tests_app_memory_stress_image:
 
 app-memory-stress: deps _build_tests_app_memory_stress_image _push_tests_app_memory_stress_image 
 
-_build_tests_chaostoolkit_image:
-	@echo "INFO: Building container image for performing chaostoolkit tests"
-	cd chaostoolkit && docker build -t litmuschaos/chaostoolkit .
-
-_push_tests_chaostoolkit_image:
-	@echo "INFO: Publish container litmuschaos/chaostoolkit"
-	cd chaostoolkit/buildscripts && ./push
-
-chaostoolkit: deps _build_tests_chaostoolkit_image _push_tests_chaostoolkit_image 
-
 _build_tests_nfs_client_image:
 	@echo "INFO: Building container image for performing nfs mount liveness check"
 	cd app_clients/nfs-client && docker build -t litmuschaos/nfs-client .

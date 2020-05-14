@@ -31,11 +31,6 @@ jobs:
       script:
       - make fio
       
-    - stage: build chaostoolkit images
-      name: build docker image chaostoolkit
-      script:
-      - make chaostoolkit
-
     - stage: build mysql-client image
       name: build docker image mysql-client
       script:
