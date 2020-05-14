@@ -1,4 +1,0 @@
-include chaostest/templates/*.j2
-include chaostest/json/*.json
-
-
