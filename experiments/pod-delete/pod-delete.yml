@@ -12,7 +12,6 @@ spec:
         ## mandatory: provide name of host where target container resides
         ## kubernetes.io/hostname: ""
       restartPolicy: Never
-      serviceAccountName: pod-delete-sa
       containers:
       - image: litmuschaos/pod-delete-chaos:latest
         imagePullPolicy: Always

@@ -15,6 +15,10 @@ k=0
 until [ "$k" -ge "${iterations}" ]
 do
 k=$((k+1))
+#############################################################
+###############    CHECKING KILL COUNT     ##################
+#############################################################
+
 ## When the kill count is not defined choose any single random pod with the given label and namesapce
 if [[ -z ${kill_count} ]]; then
 echo "[Inject]: Kill a random application"
@@ -39,53 +43,7 @@ if [[ "${force}" == "true" ]]
 then
 echo "[Inject]: Killing the application pod forcefullly"
 kubectl delete pod -n ${app_ns} --force --grace-period=0 --wait=false ${app_pod}
-
-echo "[Status]: Verification for the recreation of application pod"
-## checking the status of pod and wait for it to come in running state
-echo "[Status]: Checking the status of pods"
-n=0
-flag=0
-until [ "$n" -ge 90 ]
-do
-pod_status=$(kubectl get pods -n ${app_ns} -l ${app_label} -o custom-columns=:.status.phase --no-headers | uniq)
-    if [[ ${pod_status} == "Running" ]]
-    then
-        break;
-    else
-        n=$((n+1)) 
-        echo "pod is in ${pod_status} state please wait"
-        sleep 2
-        if [[ "$n" -eq 90 ]]; then
-        flag=1; fi
-    fi
-done
-if [[ $flag -eq 1 ]]; then 
-echo "Application pod fails to come in running state"
-exit 1; fi
-
-## checking the status of containers and wait for it to come in running state
-echo "[Status]: Checking the status of containers"
-n=0
-flag=0
-until [ "$n" -ge 90 ]
-do
-container_status=$(kubectl get pod -n ${app_ns} -l ${app_label} --no-headers -o jsonpath='{.items[*].status.containerStatuses[*].ready}' | tr ' ' '\n' | uniq)
-    if [[ ${container_status} == "true" ]]
-    then
-        break; 
-    else
-        n=$((n+1)) 
-        echo "pod status is: ${pod_status}"
-        sleep 2
-        if [[ "$n" -eq 90 ]]; then
-        flag=1; fi
-    fi
-done
-if [[ $flag -eq 1 ]]; then
-echo "Containers of application pod fails to come in running state"
-exit 1; fi
 fi
-
 
 #############################################################
 ###############    GRACEFUL POD DELETE     ##################
@@ -96,6 +54,11 @@ if [[ -z "$force" || "$force" == "false" ]]
 then
 echo "[Inject]: Killing the application pod gracefully"
 kubectl delete pod -n ${app_ns} ${app_pod}
+fi
+
+########################################################################
+###############    CHECKING STATUS FOR RECREATION     ##################
+########################################################################
 
 echo "[Status]: Verification for the recreation of application pod"
 ## checking the status of pod and wait for it to come in running state
@@ -126,8 +89,8 @@ flag=0
 until [ "$n" -ge 90 ]
 do
 echo "[Status]: Checking the status of containers"
-container_status=$(kubectl get pod -n {{ app_ns }} -l {{ app_label }} --no-headers -o jsonpath='{.items[*].status.containerStatuses[*].ready}' | tr ' ' '\n' | uniq)
-    if [[ ${container_status} == "true" ]]
+container_status=$(kubectl get pod -n ${app_ns} -l ${app_label} --no-headers -o jsonpath='{.items[*].status.containerStatuses[*].ready}' | tr ' ' '\n' | uniq)
+    if [[ "${container_status}" == "true" ]]
     then
         break;
     else
@@ -141,7 +104,11 @@ done
 if [[ $flag -eq 1 ]]; then 
 echo "Containers of application pod fails to come in running state"
 exit 1; fi
-fi
+
+###################################################################
+###############    WAITING FOR CHAOS INTERVAL    ##################
+###################################################################
+
 ## waiting for the chaos interval
 echo "[Wait]: Wait for the chaos interval ${interval}s"
 sleep ${interval}
