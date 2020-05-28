@@ -8,4 +8,4 @@ RUN curl -L -o /usr/bin/kubectl https://storage.googleapis.com/kubernetes-releas
 
 RUN curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.16.0/crictl-v1.16.0-linux-amd64.tar.gz --output crictl-v1.16.0-linux-amd64.tar.gz &&     tar zxvf crictl-v1.16.0-linux-amd64.tar.gz -C /usr/local/bin
 
-COPY crictl-kill.sh / 
+COPY crictl-kill.sh crictl / 

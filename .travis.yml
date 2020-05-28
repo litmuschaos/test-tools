@@ -116,6 +116,12 @@ jobs:
       script:	
       - make crictl
 
+    - stage: build container-kill helper image	
+      name: build docker image container-kill helper pod
+      script:	
+      - make go-build
+      - make container-kill-go
+
 notifications:
   email:
     recipients:

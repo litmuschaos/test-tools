@@ -213,3 +213,13 @@ _push_tests_crictl_image:
 	cd containerd/crictl/buildscripts && ./push
 
 crictl: deps _build_tests_crictl_image _push_tests_crictl_image 
+
+_build_tests_container_kill_go_image:
+	@echo "INFO: Building container image for performing container-kill chaos"
+	cd experiments/generic/container-kill && docker build -t litmuschaos/container-kill-helper .
+
+_push_tests_container_kill_go_image:
+	@echo "INFO: Publish container litmuschaos/container-kill-helper" 
+	cd experiments/generic/container-kill/buildscripts && ./push
+
+container-kill-go: deps _build_tests_container_kill_go_image _push_tests_container_kill_go_image

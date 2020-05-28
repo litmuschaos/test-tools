@@ -1,0 +1,2 @@
+# Building go binaries for container_kill experiment
+go build -o experiments/generic/container-kill/container-kill ./experiments/generic/container-kill
