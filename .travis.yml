@@ -116,6 +116,11 @@ jobs:
       script:	
       - make pod-delete
 
+    - stage: build crictl image	
+      name: build docker image crictl
+      script:	
+      - make crictl
+
 notifications:
   email:
     recipients:

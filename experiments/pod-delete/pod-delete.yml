@@ -13,7 +13,7 @@ spec:
         ## kubernetes.io/hostname: ""
       restartPolicy: Never
       containers:
-      - image: litmuschaos/pod-delete-chaos:latest
+      - image: litmuschaos/pod-deleter:latest
         imagePullPolicy: Always
         name: pod-delete
         command: 
@@ -46,10 +46,15 @@ spec:
             value: ""
           - name: CHAOS_UID
             value: ""  
-            ## optional: provide interval between pod-delete chaos
-            ## defalut: 5 seconds
+          ## optional: provide interval between pod-delete chaos
+          ## defalut: 5 seconds
           - name: INTERVAL
-            value: ""             
+            value: ""
+          ## helper pod name
+          - name: POD_NAME
+            value: ""
+          - name: ITERATIONS
+            value: ""              
         volumeMounts:
           - name: dockersocket
             mountPath: /var/run/docker.sock

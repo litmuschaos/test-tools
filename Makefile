@@ -206,10 +206,20 @@ cassandra-client: deps _build_tests_cassandra_client_image _push_tests_cassandra
 
 _build_tests_pod_delete_image:
 	@echo "INFO: Building container image for performing pod delete chaos"
-	cd experiments/pod-delete && docker build -t litmuschaos/pod-delete-chaos .
+	cd experiments/pod-delete && docker build -t litmuschaos/pod-deleter .
 
 _push_tests_pod_delete_image:
-	@echo "INFO: Publish container litmuschaos/pod-delete-chaos" 
+	@echo "INFO: Publish container litmuschaos/pod-deleter" 
 	cd experiments/pod-delete/buildscripts && ./push
 
-pod-delete: deps _build_tests_pod_delete_image _push_tests_pod_delete_image 
+pod-delete: deps _build_tests_pod_delete_image _push_tests_pod_delete_image
+
+_build_tests_crictl_image:
+	@echo "INFO: Building container image for performing crictl container-kill"
+	cd containerd/crictl && docker build -t litmuschaos/crictl .
+
+_push_tests_crictl_image:
+	@echo "INFO: Publish container litmuschaos/crictl"
+	cd containerd/crictl/buildscripts && ./push
+
+crictl: deps _build_tests_crictl_image _push_tests_crictl_image 
