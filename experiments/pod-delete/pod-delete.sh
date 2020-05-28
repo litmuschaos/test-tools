@@ -11,10 +11,14 @@ kill_count=${KILL_COUNT}
 app_label=${APP_LABEL}
 duration=${DURATION}
 
+c_engine=${CHAOS_ENGINE}
+c_ns=${CHAOS_NAMESPACE}
+c_uid=${CHAOS_UID}
+
 ## Capture Current time
 startTimeStamp=$(date +%s)
 diffTimeStamp=0
-while [ ${diffTimeStamp} -lt ${duration} ]
+while [[ "${diffTimeStamp}" -lt "${duration}" ]]
 do
     currentTimeStamp=$(date +%s)
     diffTimeStamp=$(( $currentTimeStamp - $startTimeStamp ))
@@ -34,6 +38,16 @@ else
     app_pod=${pod_list}
 fi
 
+#############################################################
+###############    GENERATING EVENTS     ####################
+#############################################################
+if [[ ! -z ${c_engine} ]]; then
+    NOW=$( date -u +"%Y-%m-%dT%H:%M:%SZ" )
+    jinja2 -D engine_ns=${c_ns} -D ts=${NOW} -D engine_name=${c_engine} -D engine_uid=${c_uid} pod-delete-event.yaml > helper-pod.yaml
+    echo "[Event]: Record event for Chaos Injection"
+    #creating event
+    kubectl apply -f helper-pod.yaml --validate=false
+fi
 ## printing the name of application pod to be killed
 echo "Name of application pod to be killed: ${app_pod}"
 

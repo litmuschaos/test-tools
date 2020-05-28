@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: event-chaosinject
+  namespace: "{{ engine_ns }}"
+source:
+  ## pod-name-via-downward-api-in-jinja
+  component: helper-pod
+## app-pod-name-that-we-derive-within-script
+message: Killing the app-pod
+reason: ChaosInject
+type: Normal
+count: 1
+firstTimestamp: "{{ ts }}"
+lastTimestamp: "{{ ts }}"
+involvedObject:
+  apiVersion: litmuschaos.io/v1alpha1
+  kind: ChaosEngine
+  name: "{{ engine_name }}"
+  namespace: "{{ engine_ns }}"
+  uid: "{{ engine_uid }}"
