@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
@@ -28,7 +28,7 @@ do
     #############################################################
 
     ## When the kill count is not defined choose any single random pod with the given label and namesapce
-    if [[ -z ${kill_count} ]] | [[ ${kill_count} -eq 0 ]]; then
+    if [[ -z ${kill_count} ]] || [[ "${kill_count}" -eq 0 ]]; then
         echo "[Inject]: Kill a random application"
         rand_pod=$(kubectl get pod -n ${app_ns} -l ${app_label} -o=custom-columns=NAME:".metadata.name" --no-headers | shuf -n1)
         app_pod=${rand_pod}
@@ -93,7 +93,7 @@ do
         if [[ "$n" -eq 90 ]]; then
         flag=1; fi
     done
-    if [[ $flag -eq 1 ]]; then 
+    if [[ "$flag" -eq 1 ]]; then 
     echo "Application pod fails to come in running state"
     exit 1; fi
 
@@ -112,7 +112,7 @@ do
         flag=1; fi
     done
 
-    if [[ $flag -eq 1 ]]; then 
+    if [[ "$flag" -eq 1 ]]; then 
         echo "Containers of application pod fails to come in running state"
         exit 1;
     fi
