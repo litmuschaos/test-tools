@@ -28,7 +28,7 @@ do
     #############################################################
 
     ## When the kill count is not defined choose any single random pod with the given label and namesapce
-    if [[ -z ${kill_count} || ${kill_count} -eq 0 ]]; then
+    if [[ -z ${kill_count} ]] | [[ ${kill_count} -eq 0 ]]; then
         echo "[Inject]: Kill a random application"
         rand_pod=$(kubectl get pod -n ${app_ns} -l ${app_label} -o=custom-columns=NAME:".metadata.name" --no-headers | shuf -n1)
         app_pod=${rand_pod}
@@ -68,7 +68,7 @@ do
     #############################################################
 
     ## killing the application pod gracefully when force is empty or force is set to false
-    if [[ -z "$force" || "$force" == "false" ]]
+    if [[ -z "$force" ]] | [[ "$force" == "false" ]]
     then
         echo "[Inject]: Killing the application pod gracefully"
         kubectl delete pod -n ${app_ns} ${app_pod}
@@ -86,7 +86,7 @@ do
     do
         echo "[Status]: Checking the status of pods"
         pod_status=$(kubectl get pods -n ${app_ns} -l ${app_label} -o custom-columns=:.status.phase --no-headers | uniq)
-        [[ ${pod_status} == "Running" ]] && break
+        [[ "${pod_status}" == "Running" ]] && break
         n=$((n+1))
         echo "pod is in ${pod_status} state please wait"
         sleep 2
