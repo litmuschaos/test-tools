@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: event-chaosinject
+  namespace: "{{ engine_ns }}"
+source:
+  component: "{{ chaos_pod }}"
+message: "Injecting container-kill chaos on {{ app_container }} container of {{ app_pod }} pod"
+reason: ChaosInject
+type: Normal
+count: {{ val }}
+firstTimestamp: "{{ ts }}"
+lastTimestamp: "{{ ts }}"
+involvedObject:
+  apiVersion: litmuschaos.io/v1alpha1
+  kind: ChaosEngine
+  name: "{{ engine_name }}"
+  namespace: "{{ engine_ns }}"
+  uid: "{{ engine_uid }}"

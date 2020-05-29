@@ -215,11 +215,14 @@ _push_tests_pod_delete_image:
 pod-delete: deps _build_tests_pod_delete_image _push_tests_pod_delete_image
 
 _build_tests_crictl_image:
-	@echo "INFO: Building container image for performing crictl container-kill"
-	cd containerd/crictl && docker build -t litmuschaos/crictl .
 
-_push_tests_crictl_image:
-	@echo "INFO: Publish container litmuschaos/crictl"
+_build_tests_container_killer_image:
+
+	@echo "INFO: Building container image for performing crictl container-kill"
+	cd containerd/crictl && docker build -t litmuschaos/container-killer .
+
+_push_tests_container_killer_image:
+	@echo "INFO: Publish container litmuschaos/container-killer"
 	cd containerd/crictl/buildscripts && ./push
 
-crictl: deps _build_tests_crictl_image _push_tests_crictl_image 
+container-killer: deps _build_tests_container_killer_image _push_tests_container_killer_image 

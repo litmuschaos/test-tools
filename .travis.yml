@@ -116,10 +116,10 @@ jobs:
       script:	
       - make pod-delete
 
-    - stage: build crictl image	
-      name: build docker image crictl
+    - stage: build container_killer image	
+      name: build docker image container-killer
       script:	
-      - make crictl
+      - make container-killer
 
 notifications:
   email:
