@@ -204,12 +204,12 @@ _push_tests_cassandra_client_image:
 
 cassandra-client: deps _build_tests_cassandra_client_image _push_tests_cassandra_client_image 
 
-_build_tests_crictl_image:
+_build_tests_container_killer_image:
 	@echo "INFO: Building container image for performing crictl container-kill"
-	cd containerd/crictl && docker build -t litmuschaos/crictl .
+	cd containerd/crictl && docker build -t litmuschaos/container-killer .
 
-_push_tests_crictl_image:
-	@echo "INFO: Publish container litmuschaos/crictl"
+_push_tests_container_killer_image:
+	@echo "INFO: Publish container litmuschaos/container-killer"
 	cd containerd/crictl/buildscripts && ./push
 
-crictl: deps _build_tests_crictl_image _push_tests_crictl_image 
+container-killer: deps _build_tests_container_killer_image _push_tests_container_killer_image 
