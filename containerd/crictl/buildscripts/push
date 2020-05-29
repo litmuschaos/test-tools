@@ -8,7 +8,7 @@ then
   docker login -u "${DNAME}" -p "${DPASS}"; 
   #Push to docker hub repository with latest tag
   docker tag ${IMAGEID} litmuschaos/container-killer:latest
-  docker push litmuschaos/crictl:latest; 
+  docker push litmuschaos/container-killer:latest; 
 else
   echo "No docker credentials provided. Skip uploading litmuschaos/container-killer:latest to docker hub"; 
 fi;
