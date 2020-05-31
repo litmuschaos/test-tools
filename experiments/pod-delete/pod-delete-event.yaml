@@ -6,7 +6,7 @@ metadata:
   namespace: "{{ engine_ns }}"
 source:
   component: "{{ c_pod }}"
-message: Killing the application pod
+message: Killing the application pods
 reason: ChaosInject
 type: Normal
 count: {{ count }}
