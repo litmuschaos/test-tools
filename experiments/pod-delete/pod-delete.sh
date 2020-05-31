@@ -44,7 +44,7 @@ do
     #############################################################
     if [[ ! -z ${c_engine} ]]; then
         NOW=$( date -u +"%Y-%m-%dT%H:%M:%SZ" )
-        jinja2 -D engine_ns=${c_ns} -D ts=${NOW} -D count=${count} -D engine_name=${c_engine} -D c_pod=${c_pod} -D app_pod=${app_pod} -D engine_uid=${c_uid} pod-delete-event.yaml > helper-pod.yaml
+        jinja2 -D engine_ns=${c_ns} -D ts=${NOW} -D count=${count} -D engine_name=${c_engine} -D c_pod=${c_pod} -D engine_uid=${c_uid} pod-delete-event.yaml > helper-pod.yaml
         echo "[Event]: Record event for Chaos Injection"
         #creating event
         kubectl apply -f helper-pod.yaml
