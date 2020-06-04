@@ -214,6 +214,16 @@ _push_tests_pod_delete_image:
 
 pod-delete: deps _build_tests_pod_delete_image _push_tests_pod_delete_image
 
+_build_tests_pod_delete_go_image:
+	@echo "INFO: Building container image for performing pod delete chaos"
+	cd experiments/generic/pod-delete && docker build -t litmuschaos/pod-delete-helper .
+
+_push_tests_pod_delete_go_image:
+	@echo "INFO: Publish container litmuschaos/pod-delete-helper" 
+	cd experiments/generic/pod-delete/buildscripts && ./push
+
+pod-delete-go: deps _build_tests_pod_delete_go_image _push_tests_pod_delete_go_image
+
 _build_tests_crictl_image:
 
 _build_tests_container_killer_image:
@@ -226,3 +236,12 @@ _push_tests_container_killer_image:
 	cd containerd/crictl/buildscripts && ./push
 
 container-killer: deps _build_tests_container_killer_image _push_tests_container_killer_image 
+
+PHONY: go-build
+go-build: experiment-go-binary
+
+experiment-go-binary:
+	@echo "------------------"
+	@echo "--> Build experiment go binary" 
+	@echo "------------------"
+	@sh build/generate_go_binary

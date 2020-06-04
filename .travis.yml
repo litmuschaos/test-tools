@@ -7,6 +7,9 @@ stages:
 env:
   global:
     - GOARCH=amd64
+language: go
+go:
+  - 1.13.1
 before_install:
   - sleep 15
   - sudo apt-get install -y
@@ -115,6 +118,12 @@ jobs:
       name: build docker image pod delete
       script:	
       - make pod-delete
+
+    - stage: build pod delete helper image	
+      name: build dockerimage pod delete helper pod
+      script:	
+      - make go-build
+      - make pod-delete-go
 
     - stage: build container_killer image	
       name: build docker image container-killer
