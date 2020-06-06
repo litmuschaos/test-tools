@@ -204,15 +204,26 @@ _push_tests_cassandra_client_image:
 
 cassandra-client: deps _build_tests_cassandra_client_image _push_tests_cassandra_client_image 
 
-_build_tests_crictl_image:
-	@echo "INFO: Building container image for performing crictl container-kill"
-	cd containerd/crictl && docker build -t litmuschaos/crictl .
+_build_tests_pod_delete_image:
+	@echo "INFO: Building container image for performing pod delete chaos"
+	cd experiments/pod-delete && docker build -t litmuschaos/pod-deleter .
 
-_push_tests_crictl_image:
-	@echo "INFO: Publish container litmuschaos/crictl"
+_push_tests_pod_delete_image:
+	@echo "INFO: Publish container litmuschaos/pod-deleter" 
+	cd experiments/pod-delete/buildscripts && ./push
+
+pod-delete: deps _build_tests_pod_delete_image _push_tests_pod_delete_image
+
+_build_tests_container_killer_image:
+
+	@echo "INFO: Building container image for performing crictl container-kill"
+	cd containerd/crictl && docker build -t litmuschaos/container-killer .
+
+_push_tests_container_killer_image:
+	@echo "INFO: Publish container litmuschaos/container-killer"
 	cd containerd/crictl/buildscripts && ./push
 
-crictl: deps _build_tests_crictl_image _push_tests_crictl_image 
+container-killer: deps _build_tests_container_killer_image _push_tests_container_killer_image 
 
 _build_tests_container_kill_go_image:
 	@echo "INFO: Building container image for performing container-kill chaos"
@@ -223,3 +234,12 @@ _push_tests_container_kill_go_image:
 	cd experiments/generic/container-kill/buildscripts && ./push
 
 container-kill-go: deps _build_tests_container_kill_go_image _push_tests_container_kill_go_image
+
+PHONY: go-build
+go-build: experiment-go-binary
+
+experiment-go-binary:
+	@echo "------------------"
+	@echo "--> Build experiment go binary" 
+	@echo "------------------"
+	@sh build/generate_go_binary
