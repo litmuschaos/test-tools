@@ -39,7 +39,7 @@ func main() {
 
 	//Fetching all the ENV passed for the runner pod
 	log.Info("[PreReq]: Getting the ENV variables")
-	environment.GetENV(&experimentsDetails)
+	environment.GetENV(&experimentsDetails, "container-kill")
 
 	//Obtain the pod ID of the application pod
 	podID, err := GetPodID(&experimentsDetails)

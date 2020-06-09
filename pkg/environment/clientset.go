@@ -6,9 +6,6 @@ import (
 	chaosClient "github.com/litmuschaos/chaos-operator/pkg/client/clientset/versioned/typed/litmuschaos/v1alpha1"
 	"github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
-
-	// auth plugin
-	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )

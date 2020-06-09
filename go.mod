@@ -14,7 +14,7 @@ require (
 	github.com/go-ini/ini v1.57.0 // indirect
 	github.com/gogo/googleapis v1.4.0 // indirect
 	github.com/litmuschaos/chaos-operator v0.0.0-20200415134554-796f3ffb366e
-	github.com/litmuschaos/litmus-go v0.0.0-20200527083837-322101c90905
+	github.com/litmuschaos/litmus-go v0.0.0-20200602043713-c70cdec25881
 	github.com/minio/minio-go v6.0.14+incompatible
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect

@@ -214,6 +214,16 @@ _push_tests_pod_delete_image:
 
 pod-delete: deps _build_tests_pod_delete_image _push_tests_pod_delete_image
 
+_build_tests_pod_delete_go_image:
+	@echo "INFO: Building container image for performing pod delete chaos"
+	cd experiments/generic/pod-delete && docker build -t litmuschaos/pod-delete-helper .
+
+_push_tests_pod_delete_go_image:
+	@echo "INFO: Publish container litmuschaos/pod-delete-helper" 
+	cd experiments/generic/pod-delete/buildscripts && ./push
+
+pod-delete-go: deps _build_tests_pod_delete_go_image _push_tests_pod_delete_go_image
+
 _build_tests_container_killer_image:
 
 	@echo "INFO: Building container image for performing crictl container-kill"

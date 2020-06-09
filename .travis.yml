@@ -119,6 +119,12 @@ jobs:
       script:	
       - make pod-delete
 
+    - stage: build pod delete helper image	
+      name: build dockerimage pod delete helper pod
+      script:	
+      - make go-build
+      - make pod-delete-go
+
     - stage: build container_killer image	
       name: build docker image container-killer
       script:	

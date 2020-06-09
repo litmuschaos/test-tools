@@ -11,6 +11,7 @@ const (
 type ExperimentDetails struct {
 	ExperimentName       string
 	AppNS                string
+	AppLabel             string
 	ApplicationContainer string
 	ChaosDuration        int
 	ChaosInterval        int
@@ -22,6 +23,8 @@ type ExperimentDetails struct {
 	ChaosPodName         string
 	ChaosNamespace       string
 	EngineName           string
+	KillCount            int
+	Force                bool
 }
 
 // EventDetails is for collecting all the events-related details

@@ -1,12 +1,10 @@
 package status
 
 import (
-	"strings"
 	"time"
 
-	environment "github.com/litmuschaos/litmus-go/pkg/environment"
 	"github.com/litmuschaos/litmus-go/pkg/log"
-	types "github.com/litmuschaos/litmus-go/pkg/types"
+	environment "github.com/litmuschaos/test-tools/pkg/environment"
 	"github.com/openebs/maya/pkg/util/retry"
 	"github.com/pkg/errors"
 	logrus "github.com/sirupsen/logrus"
@@ -27,22 +25,6 @@ func CheckApplicationStatus(appNs string, appLabel string, clients environment.C
 	err = CheckContainerStatus(appNs, appLabel, clients)
 	if err != nil {
 		return err
-	}
-	return nil
-}
-
-// CheckAuxiliaryApplicationStatus checks the status of the Auxiliary applications
-func CheckAuxiliaryApplicationStatus(experimentsDetails *types.ExperimentDetails, clients environment.ClientSets) error {
-
-	AuxiliaryAppInfo := strings.Split(experimentsDetails.AuxiliaryAppInfo, ",")
-
-	for _, val := range AuxiliaryAppInfo {
-		AppInfo := strings.Split(val, ":")
-		err := CheckApplicationStatus(AppInfo[0], AppInfo[1], clients)
-		if err != nil {
-			return err
-		}
-
 	}
 	return nil
 }

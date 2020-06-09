@@ -9,20 +9,23 @@ import (
 )
 
 //GetENV fetches all the env variables from the runner pod
-func GetENV(experimentDetails *types.ExperimentDetails) {
-	experimentDetails.ExperimentName = "container-kill"
-	experimentDetails.AppNS = Getenv("APP_NS", "test")
-	experimentDetails.Retry = 90
-	experimentDetails.Delay = 2
-	experimentDetails.ApplicationContainer = Getenv("APP_CONTAINER", "nginx")
-	experimentDetails.ApplicationPod = Getenv("APP_POD", "nginx-bfb66d6c9-x5gks")
+func GetENV(experimentDetails *types.ExperimentDetails, name string) {
+	experimentDetails.ExperimentName = name
+	experimentDetails.AppNS = os.Getenv("APP_NS")
+	experimentDetails.Retry, _ = strconv.Atoi(Getenv("RETRY", "90"))
+	experimentDetails.Delay, _ = strconv.Atoi(Getenv("DELAY", "2"))
+	experimentDetails.ApplicationContainer = os.Getenv("APP_CONTAINER")
+	experimentDetails.ApplicationPod = os.Getenv("APP_POD")
 	experimentDetails.ChaosDuration, _ = strconv.Atoi(Getenv("TOTAL_CHAOS_DURATION", "30"))
 	experimentDetails.ChaosInterval, _ = strconv.Atoi(Getenv("CHAOS_INTERVAL", "10"))
-	experimentDetails.Iterations, _ = strconv.Atoi(Getenv("CHAOS_ITERATION", "3"))
-	experimentDetails.ChaosNamespace = Getenv("CHAOS_NS", "test")
-	experimentDetails.EngineName = Getenv("ENGINE_NAME", "")
-	experimentDetails.ChaosUID = clientTypes.UID(Getenv("ENGINE_UID", ""))
-	experimentDetails.ChaosPodName = Getenv("CHAOS_POD", "test")
+	experimentDetails.Iterations, _ = strconv.Atoi(Getenv("ITERATIONS", "3"))
+	experimentDetails.ChaosNamespace = Getenv("CHAOS_NAMESPACE", "litmus")
+	experimentDetails.EngineName = os.Getenv("CHAOS_ENGINE")
+	experimentDetails.AppLabel = os.Getenv("APP_LABEL")
+	experimentDetails.KillCount, _ = strconv.Atoi(Getenv("KILL_COUNT", "1"))
+	experimentDetails.ChaosUID = clientTypes.UID(os.Getenv("CHAOS_UID"))
+	experimentDetails.ChaosPodName = os.Getenv("POD_NAME")
+	experimentDetails.Force, _ = strconv.ParseBool(Getenv("FORCE", "false"))
 }
 
 //SetEventAttributes initialise all the chaos result ENV
