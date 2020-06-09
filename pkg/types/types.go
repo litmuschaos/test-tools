@@ -9,18 +9,22 @@ const (
 
 // ExperimentDetails is for collecting all the experiment-related details
 type ExperimentDetails struct {
-	ExperimentName string
-	AppNS          string
-	AppLabel       string
-	EngineName     string
-	ChaosNamespace string
-	ChaosUID       clientTypes.UID
-	ChaosPodName   string
-	ChaosDuration  int
-	ChaosInterval  int
-	Iterations     int
-	KillCount      int
-	Force          bool
+	ExperimentName       string
+	AppNS                string
+	AppLabel             string
+	ApplicationContainer string
+	ChaosDuration        int
+	ChaosInterval        int
+	ApplicationPod       string
+	Delay                int
+	Retry                int
+	Iterations           int
+	ChaosUID             clientTypes.UID
+	ChaosPodName         string
+	ChaosNamespace       string
+	EngineName           string
+	KillCount            int
+	Force                bool
 }
 
 // EventDetails is for collecting all the events-related details

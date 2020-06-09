@@ -41,7 +41,7 @@ func main() {
 
 	//Fetching all the ENV passed for the runner pod
 	log.Info("[PreReq]: Getting the ENV variables")
-	environment.GetENV(&experimentsDetails)
+	environment.GetENV(&experimentsDetails, "pod-delete")
 
 	err = PodDeleteChaos(&experimentsDetails, clients, &eventsDetails)
 

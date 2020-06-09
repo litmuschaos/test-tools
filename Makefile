@@ -224,8 +224,6 @@ _push_tests_pod_delete_go_image:
 
 pod-delete-go: deps _build_tests_pod_delete_go_image _push_tests_pod_delete_go_image
 
-_build_tests_crictl_image:
-
 _build_tests_container_killer_image:
 
 	@echo "INFO: Building container image for performing crictl container-kill"
@@ -236,6 +234,16 @@ _push_tests_container_killer_image:
 	cd containerd/crictl/buildscripts && ./push
 
 container-killer: deps _build_tests_container_killer_image _push_tests_container_killer_image 
+
+_build_tests_container_kill_go_image:
+	@echo "INFO: Building container image for performing container-kill chaos"
+	cd experiments/generic/container-kill && docker build -t litmuschaos/container-kill-helper .
+
+_push_tests_container_kill_go_image:
+	@echo "INFO: Publish container litmuschaos/container-kill-helper" 
+	cd experiments/generic/container-kill/buildscripts && ./push
+
+container-kill-go: deps _build_tests_container_kill_go_image _push_tests_container_kill_go_image
 
 PHONY: go-build
 go-build: experiment-go-binary
