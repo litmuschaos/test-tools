@@ -3,7 +3,6 @@
 set -e
 
 ## mandatory arg
-container_id=${CONTAINER_ID}
 interval=${INTERVAL:=5}
 force=${FORCE:=false}
 app_ns=${APP_NS}
