@@ -24,115 +24,291 @@ jobs:
       script:
       - bash -c 'shopt -s globstar nullglob; shellcheck **/*.{sh,ksh,bash}' || true
 
-    - stage: build forkbomb image
+    - stage: build docker images
       name: build docker image forkbomb
+      before_install:
+        - |
+            echo "Checking if a forkbomb dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(resource_stress/forkbomb/)'
+            then
+              echo "Dockefile for forkbomb wasn't updated. Skipped."
+              exit
+            fi
       script:
       - make forkbomb
 
-    - stage: build fio image
+    - stage: build docker images
       name: build docker image fio
+      before_install:
+        - |
+            echo "Checking if a fio dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(io_tools/fio/)'
+            then
+              echo "Dockefile for fio wasn't updated. Skipped."
+              exit
+            fi
       script:
       - make fio
-      
-    - stage: build mysql-client image
+
+    - stage: build docker images
       name: build docker image mysql-client
+      before_install:
+        - |
+            echo "Checking if a mysql-client dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(app_clients/mysql-client/)'
+            then
+              echo "Dockefile for mysql-client wasn't updated. Skipped."
+              exit
+            fi
       script:
       - make mysql-client
 
-    - stage: build sysbench-client image
+    - stage: build docker images
       name: build docker image sysbench-client
+      before_install:
+        - |
+            echo "Checking if a sysbench dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(io_tools/sysbench/)'
+            then
+              echo "Dockefile for sysbench wasn't updated. Skipped."
+              exit
+            fi
       script:
       - make sysbench
 
-    - stage: build tpcc-client image
+    - stage: build docker images
       name: build docker image tpcc-client
+      before_install:
+        - |
+            echo "Checking if a tpcc dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(io_tools/tpcc/)'
+            then
+              echo "Dockefile for tpcc wasn't updated. Skipped."
+              exit
+            fi
       script:
       - make tpcc
 
-    - stage: build stress-ng image
+    - stage: build docker images
       name: build docker image stress-ng
+      before_install:
+        - |
+            echo "Checking if a stress-ng dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(resource_stress/stress-ng/)'
+            then
+              echo "Dockefile for stress-ng wasn't updated. Skipped."
+              exit
+            fi
       script:
       - make stress-ng
 
-    - stage: build mongo-client image
+    - stage: build docker images
       name: build docker image mongo-client
+      before_install:
+        - |
+            echo "Checking if a mongo-client dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(app_clients/mongo-client/)'
+            then
+              echo "Dockefile for mongo-client wasn't updated. Skipped."
+              exit
+            fi
       script:
       - make mongo-client
 
-    - stage: build postgres-client image
+    - stage: build docker images
       name: build docker image postgres-client
+      before_install:
+        - |
+            echo "Checking if a postgres-client dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(app_clients/postgres-client/)'
+            then
+              echo "Dockefile for postgres-client wasn't updated. Skipped."
+              exit
+            fi
       script:
       - make postgres-client
 
-    - stage: build custom-client image
+    - stage: build docker images
       name: build docker image custom-client
+      before_install:
+        - |
+            echo "Checking if a custom-client dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/custom-client/)'
+            then
+              echo "Dockefile for custom-client wasn't updated. Skipped."
+              exit
+            fi
       script:
       - make custom-client
 
-    - stage: build logger image
+    - stage: build docker images
       name: build docker image logger
+      before_install:
+        - |
+            echo "Checking if a logger dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(log_utils/logger/)'
+            then
+              echo "Dockefile for logger wasn't updated. Skipped."
+              exit
+            fi
       script:
       - make logger
 
-    - stage: build dd-client image
+    - stage: build docker images
       name: build docker image dd-client
+      before_install:
+        - |
+            echo "Checking if a dd dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(io_tools/dd/)'
+            then
+              echo "Dockefile for dd wasn't updated. Skipped."
+              exit
+            fi
       script:
       - make dd
 
-    - stage: build memleak image
+    - stage: build docker images
       name: build docker image memleak
+      before_install:
+        - |
+            echo "Checking if a memleak dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(resource_stress/memleak/)'
+            then
+              echo "Dockefile for memleak wasn't updated. Skipped."
+              exit
+            fi
       script:
       - make memleak
 
-    - stage: build elasticsearch-stress image
+    - stage: build docker images
       name: build docker image elasticsearch-stress
+      before_install:
+        - |
+            echo "Checking if a elasticsearch-stress dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(app_clients/elasticsearch-stress/)'
+            then
+              echo "Dockefile for elasticsearch-stress wasn't updated. Skipped."
+              exit
+            fi
       script:
       - make elasticsearch-stress
 
-    - stage: build kafka-client image
+    - stage: build docker images
       name: build docker image kafka-client
+      before_install:
+        - |
+            echo "Checking if a kafka-client dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(app_clients/kafka-client/)'
+            then
+              echo "Dockefile for kafka-client wasn't updated. Skipped."
+              exit
+            fi
       script:
       - make kafka-client
 
-    - stage: build app-cpu-stress image
+    - stage: build docker images
       name: build docker image app-cpu-stress
+      before_install:
+        - |
+            echo "Checking if a app-cpu-stress dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(resource_stress/app-cpu-stress/)'
+            then
+              echo "Dockefile for app-cpu-stress wasn't updated. Skipped."
+              exit
+            fi
       script:
       - make app-cpu-stress
 
-    - stage: build app-memory-stress image
+    - stage: build docker images
       name: build docker image memory-stress
+      before_install:
+        - |
+            echo "Checking if a app-memory-stress dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(resource_stress/app-memory-stress/)'
+            then
+              echo "Dockefile for app-memory-stress wasn't updated. Skipped."
+              exit
+            fi
       script:
-      - make app-memory-stress 
-    
-    - stage: build nfs-client image
+      - make app-memory-stress
+
+    - stage: build docker images
       name: build docker image nfs-client
+      before_install:
+        - |
+            echo "Checking if a nfs-client dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(app_clients/nfs-client/)'
+            then
+              echo "Dockefile for nfs-client wasn't updated. Skipped."
+              exit
+            fi
       script:
       - make nfs-client
 
-    - stage: build cassandra-client image	
-      name: build docker image cassandra-client	
-      script:	
+    - stage: build docker images
+      name: build docker image cassandra-client
+      before_install:
+        - |
+            echo "Checking if a cassandra-client dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(app_clients/cassandra-client/)'
+            then
+              echo "Dockefile for cassandra-client wasn't updated. Skipped."
+              exit
+            fi
+      script:
       - make cassandra-client
 
-    - stage: build pod delete image	
+    - stage: build docker images
       name: build docker image pod delete
-      script:	
+      before_install:
+        - |
+            echo "Checking if a pod-delete dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(experiments/pod-delete/)'
+            then
+              echo "Dockefile for pod-delete wasn't updated. Skipped."
+              exit
+            fi
+      script:
       - make pod-delete
 
-    - stage: build pod delete helper image	
+    - stage: build docker images
       name: build dockerimage pod delete helper pod
-      script:	
+      before_install:
+        - |
+            echo "Checking if a forkbomb dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(experiments/pod-delete/)'
+            then
+              echo "Dockefile for forkbomb wasn't updated. Skipped."
+              exit
+            fi
+      script:
       - make go-build
       - make pod-delete-go
 
-    - stage: build container_killer image	
+    - stage: build docker images
       name: build docker image container-killer
-      script:	
+      before_install:
+        - |
+            echo "Checking if a container-killer dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(containerd/crictl/)'
+            then
+              echo "Dockefile for container-killer wasn't updated. Skipped."
+              exit
+            fi
+      script:
       - make container-killer
 
-    - stage: build container-kill helper image	
+    - stage: build docker images
       name: build docker image container-kill helper pod
-      script:	
+      before_install:
+        - |
+            echo "Checking if a forkbomb dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(experiments/generic/container-kill/)'
+            then
+              echo "Dockefile for forkbomb wasn't updated. Skipped."
+              exit
+            fi
+      script:
       - make go-build
       - make container-kill-go
 
