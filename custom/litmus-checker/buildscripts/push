@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+IMAGEID=$( docker images -q litmuschaos/litmus-checker )
+
+if [ ! -z "${DNAME}" ] && [ ! -z "${DPASS}" ];
+then
+  docker login -u "${DNAME}" -p "${DPASS}";
+  #Push to docker hub repository with latest tag
+  docker tag ${IMAGEID} litmuschaos/litmus-checker:latest
+  docker push litmuschaos/litmus-checker:latest;
+else
+  echo "No docker credentials provided. Skip uploading litmuschaos/litmus-checker:latest to docker hub";
+fi;

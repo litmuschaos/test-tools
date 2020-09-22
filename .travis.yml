@@ -25,6 +25,19 @@ jobs:
       - bash -c 'shopt -s globstar nullglob; shellcheck **/*.{sh,ksh,bash}' || true
 
     - stage: build docker images
+      name: build docker image litmus-checker
+      before_install:
+        - |
+            echo "Checking if a litmus-checker dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/litmus-checker/)'
+            then
+              echo "Dockefile for litmus-checker wasn't updated. Skipped."
+              exit
+            fi
+      script:
+      - make litmus-checker
+
+    - stage: build docker images
       name: build docker image forkbomb
       before_install:
         - |
