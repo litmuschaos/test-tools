@@ -19,6 +19,7 @@ RUN curl -L https://storage.googleapis.com/kubernetes-release/release/${KUBE_LAT
 
 COPY resilient-sock-shop.yaml /var/run
 COPY weak-sock-shop.yaml /var/run
+COPY load-test.yaml /var/run
 
 COPY --from=builder /output/deployer /var/run
 ENTRYPOINT ["/var/run/deployer"]

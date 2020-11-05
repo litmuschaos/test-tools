@@ -19,9 +19,7 @@ import (
 
 func main() {
 
-	namespace := "sock-shop"
-
-	filePath, timeout := GetData()
+	namespace, filePath, timeout := GetData()
 
 	config, err := getKubeConfig()
 	if err != nil {
@@ -66,15 +64,16 @@ func getKubeConfig() (*rest.Config, error) {
 
 //GetData derive the sock-shop filePath and timeout
 //it derive the filePath based on sock-shop scenario(week vs resilient)
-func GetData() (string, int) {
+func GetData() (string, string, int) {
+	namespace := flag.String("namespace", "", "absolute type of the namespace")
 	typeName := flag.String("typeName", "", "absolute type of the sock-shop")
 	timeout := flag.Int("timeout", 300, "absolute time for application timeout")
 	flag.Parse()
 
 	if *typeName == "" || *typeName == "weak" {
-		return "weak-sock-shop.yaml", *timeout
+		return *namespace, "weak-sock-shop.yaml", *timeout
 	}
-	return *typeName + "-sock-shop.yaml", *timeout
+	return *namespace, *typeName + "-sock-shop.yaml", *timeout
 }
 
 // CreateNamespace creates a sock-shop namespace
