@@ -68,11 +68,9 @@ func getKubeConfig() (*rest.Config, error) {
 //it derive the filePath based on sock-shop scenario(week vs resilient)
 func GetData() (string, int) {
 	typeName := flag.String("typeName", "", "absolute type of the sock-shop")
-	timeout := flag.Int("timeout", 0, "absolute time for application timeout")
+	timeout := flag.Int("timeout", 300, "absolute time for application timeout")
 	flag.Parse()
-	if *timeout == 0 {
-		*timeout = 300
-	}
+
 	if *typeName == "" || *typeName == "weak" {
 		return "weak-sock-shop.yaml", *timeout
 	}
