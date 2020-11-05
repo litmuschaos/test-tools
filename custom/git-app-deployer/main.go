@@ -31,20 +31,20 @@ func main() {
 		panic(err.Error())
 	}
 
-	log.Info("[Status]: App-deployer is started...")
-	log.Infof("[Status]: App-deployer filePath is %v", filePath)
+	log.Info("[Status]: Starting App deployer...")
+	log.Infof("[Status]: App-deployer filePath for application is %v", filePath)
 
 	if err := CreateNamespace(clientset, namespace); err != nil {
 		log.Errorf("Failed to create the namespace, err: %v", err)
 		return
 	}
-	log.Infof("[Status]: %v namespace is successfully created!", namespace)
+	log.Infof("[Status]: %v namespace has been successfully created!", namespace)
 
 	if err := CreateSockShop("/var/run/"+filePath, namespace); err != nil {
 		log.Errorf("Failed to install sock-shop, err: %v", err)
 		return
 	}
-	log.Info("[Status]: Sock Shop applications is successfully created!")
+	log.Info("[Status]: Sock Shop applications has been successfully created!")
 
 	if err := CheckApplicationStatus(namespace, "app=sock-shop", timeout, 2, clientset); err != nil {
 		log.Errorf("err: %v", err)
@@ -65,9 +65,9 @@ func getKubeConfig() (*rest.Config, error) {
 //GetData derive the sock-shop filePath and timeout
 //it derive the filePath based on sock-shop scenario(week vs resilient)
 func GetData() (string, string, int) {
-	namespace := flag.String("namespace", "", "absolute type of the namespace")
-	typeName := flag.String("typeName", "", "absolute type of the sock-shop")
-	timeout := flag.Int("timeout", 300, "absolute time for application timeout")
+	namespace := flag.String("namespace", "", "namespace for the application")
+	typeName := flag.String("typeName", "", "type of the application")
+	timeout := flag.Int("timeout", 300, "timeout of application")
 	flag.Parse()
 
 	if *typeName == "" || *typeName == "weak" {
