@@ -31,8 +31,8 @@ func main() {
 		panic(err.Error())
 	}
 
-	log.Info("[Status]: Starting App deployer...")
-	log.Infof("[Status]: App-deployer filePath for application is %v", filePath)
+	log.Info("[Status]: Starting App Deployer...")
+	log.Infof("[Status]: FilePath for App Deployer is %v", filePath)
 
 	if err := CreateNamespace(clientset, namespace); err != nil {
 		log.Errorf("Failed to create the namespace, err: %v", err)
@@ -67,7 +67,7 @@ func getKubeConfig() (*rest.Config, error) {
 func GetData() (string, string, int) {
 	namespace := flag.String("namespace", "", "namespace for the application")
 	typeName := flag.String("typeName", "", "type of the application")
-	timeout := flag.Int("timeout", 300, "timeout of application")
+	timeout := flag.Int("timeout", 300, "timeout for application status")
 	flag.Parse()
 
 	if *typeName == "" || *typeName == "weak" {
