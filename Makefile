@@ -255,15 +255,15 @@ _push_tests_container_kill_go_image:
 
 container-kill-go: deps _build_tests_container_kill_go_image _push_tests_container_kill_go_image
 
-_build_tests_app-deployer_image:
-	@echo "INFO: Building container image for performing app-deployer check"
-	cd custom/git-app-deployer && docker build -t litmuschaos/app-deployer .
+_build_litmus_app_deployer:
+	@echo "INFO: Building container image for performing litmus-app-deployer check"
+	cd custom/git-app-deployer && docker build -t litmuschaos/litmus-app-deployer .
 
-_push_tests_app-deployer_image:
-	@echo "INFO: Publish container litmuschaos/app-deployer"
+_push_litmus_app_deployer:
+	@echo "INFO: Publish container litmuschaos/litmus-app-deployer"
 	cd custom/git-app-deployer/buildscripts && ./push
 
-app-deployer: deps _build_tests_app_deployer_image _push_tests_app_deployer_image 
+litmus-app-deployer: deps _build_litmus_app_deployer _push_litmus_app_deployer
 
 PHONY: go-build
 go-build: experiment-go-binary

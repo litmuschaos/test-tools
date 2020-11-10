@@ -272,7 +272,7 @@ jobs:
       - make cassandra-client
      
     - stage: build docker images
-      name: build docker image app-deployer
+      name: build docker image litmus-app-deployer
       before_install:
         - |
             echo "Checking if a git app deployer dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
@@ -282,7 +282,7 @@ jobs:
               exit
             fi
       script:
-      - make app-deployer  
+      - make litmus-app-deployer  
 
     - stage: build docker images
       name: build docker image pod delete

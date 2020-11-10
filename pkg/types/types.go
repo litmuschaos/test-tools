@@ -32,3 +32,34 @@ type EventDetails struct {
 	Message string
 	Reason  string
 }
+
+// ProbeDetails is for collecting all the probe details
+type ProbeDetails struct {
+	Name                   string
+	Type                   string
+	Status                 map[string]string
+	IsProbeFailedWithError error
+	RunID                  string
+}
+
+// ResultDetails is for collecting all the chaos-result-related details
+type ResultDetails struct {
+	Name             string
+	Verdict          string
+	FailStep         string
+	Phase            string
+	ResultUID        clientTypes.UID
+	ProbeDetails     []ProbeDetails
+	PassedProbeCount int
+	ProbeArtifacts   map[string]ProbeArtifact
+}
+
+// ProbeArtifact contains the probe artifacts
+type ProbeArtifact struct {
+	ProbeArtifacts RegisterDetails
+}
+
+// RegisterDetails contains the output of the corresponding probe
+type RegisterDetails struct {
+	Register string
+}
