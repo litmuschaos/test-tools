@@ -22,4 +22,5 @@ COPY weak-sock-shop.yaml /var/run
 COPY load-test.yaml /var/run
 
 COPY --from=builder /output/deployer /var/run
+
 ENTRYPOINT ["/var/run/deployer"]
