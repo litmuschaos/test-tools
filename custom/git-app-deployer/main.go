@@ -4,16 +4,14 @@ import (
 	"bytes"
 	"flag"
 	"os/exec"
-	"path/filepath"
 	"strconv"
 	"time"
 
 	"github.com/litmuschaos/chaos-operator/pkg/apis/litmuschaos/v1alpha1"
 	"github.com/litmuschaos/litmus-go/pkg/clients"
 	"github.com/litmuschaos/litmus-go/pkg/probe"
-	"github.com/litmuschaos/test-tools/pkg/environment"
+	types "github.com/litmuschaos/litmus-go/pkg/types"
 	"github.com/litmuschaos/test-tools/pkg/log"
-	"github.com/litmuschaos/test-tools/pkg/types"
 	"github.com/openebs/maya/pkg/util/retry"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -23,66 +21,45 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/util/homedir"
 )
 
 func main() {
 
 	namespace, filePath, timeout := GetData()
-	clients := environment.ClientSets{}
-	chaosDetails := types.ExperimentDetails{}
-	resultDetails := types.ResultDetails{}
 
-	/*
-		config, err := getKubeConfig()
-		if err != nil {
-			panic(err.Error())
-		}
-	*/
-	var kubeconfig *string
-	config, err := rest.InClusterConfig() // If In-Cluster is nil then it will go for Out-Cluster config
-	if config == nil {
-
-		//To get Out-Cluster config
-		if home := homedir.HomeDir(); home != "" {
-			kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "kubeconfig file it is out-of-cluster")
-		} else {
-			kubeconfig = flag.String("kubeconfig", "", "Path to the kubeconfig file")
-		}
-		//panic(err.Error())
-		flag.Parse()
-
-		// uses the current context in kubeconfig
-		config, err = clientcmd.BuildConfigFromFlags("", *kubeconfig)
-		if err != nil {
-			panic(err.Error())
-		}
+	config, err := getKubeConfig()
+	if err != nil {
+		panic(err.Error())
 	}
+
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		panic(err.Error())
 	}
 
+	clients := clients.ClientSets{}
+	chaosDetails := types.ChaosDetails{}
+	resultDetails := types.ResultDetails{}
+	experimentLabel := map[string]string{}
+	experimentLabel["name"] = resultDetails.Name
+
 	log.Info("[Status]: Starting App Deployer...")
 	log.Infof("[Status]: FilePath for App Deployer is %v", filePath)
+
 	if err := CreateNamespace(clientset, namespace); err != nil {
 		if k8serrors.IsAlreadyExists(err) {
 			chaosResult, err := clients.LitmusClient.ChaosResults(chaosDetails.ChaosNamespace).Get(resultDetails.Name, metav1.GetOptions{})
 			if err != nil {
-				log.Errorf("Unable to find the chaosresult with name %v, err: %v", resultDetails.Name, err)
+				log.Errorf("Unable to find the chaosresult, err: %v", err)
 			}
 
 			// updating the chaosresult with new values
-			err = PatchChaosResult(chaosResult, clients, chaosDetails, resultDetails, chaosDetails.AppLabel)
+			err = PatchChaosResult(chaosResult, clients, &chaosDetails, &resultDetails, experimentLabel)
 			if err != nil {
 				log.Errorf("err: %v", err)
 			}
-
 		}
-		log.Info("[Status]: Namespace is already exist")
-		return
-	} else {
-		log.Infof("[Status]: %v namespace has been successfully created!", namespace)
+		log.Infof("[Status]: %v namespace already exist!", namespace)
 	}
 	if err := CreateSockShop("/var/run/"+filePath, namespace); err != nil {
 		log.Errorf("Failed to install sock-shop, err: %v", err)
@@ -153,6 +130,9 @@ func GetData() (string, string, int) {
 	timeout := flag.Int("timeout", 300, "timeout for application status")
 	flag.Parse()
 
+	if *namespace == "loadtest" {
+		return *namespace, "load-test.yaml", *timeout
+	}
 	if *typeName == "" || *typeName == "weak" {
 		return *namespace, "weak-sock-shop.yaml", *timeout
 	}
