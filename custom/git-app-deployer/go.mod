@@ -6,6 +6,7 @@ require (
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/json-iterator/go v1.1.10 // indirect
+	github.com/litmuschaos/chaos-operator v0.0.0-20201005102541-be0f9bb115ce
 	github.com/litmuschaos/litmus-go v0.0.0-20201110082549-8337461ca9cf // indirect
 	github.com/litmuschaos/test-tools v1.8.0
 	github.com/onsi/gomega v1.10.1 // indirect
