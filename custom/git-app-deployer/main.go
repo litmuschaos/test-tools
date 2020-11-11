@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"flag"
 	"os/exec"
-	"path/filepath"
 	"time"
 
 	"github.com/litmuschaos/test-tools/pkg/log"
@@ -16,33 +15,15 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/util/homedir"
 )
 
 func main() {
 
 	namespace, filePath, timeout := GetData()
 
-	var kubeconfig *string
-
-	// To get In-CLuster config
-	config, err := rest.InClusterConfig() // If In-Cluster is nil then it will go for Out-Cluster config
-	if config == nil {
-
-		//To get Out-Cluster config
-		if home := homedir.HomeDir(); home != "" {
-			kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "kubeconfig file it is out-of-cluster")
-		} else {
-			kubeconfig = flag.String("kubeconfig", "", "Path to the kubeconfig file")
-		}
-		//panic(err.Error())
-		flag.Parse()
-
-		// uses the current context in kubeconfig
-		config, err = clientcmd.BuildConfigFromFlags("", *kubeconfig)
-		if err != nil {
-			panic(err.Error())
-		}
+	config, err := getKubeConfig()
+	if err != nil {
+		panic(err.Error())
 	}
 
 	clientset, err := kubernetes.NewForConfig(config)
