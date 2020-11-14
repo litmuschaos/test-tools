@@ -6,6 +6,8 @@ require (
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/json-iterator/go v1.1.10 // indirect
+	github.com/litmuschaos/chaos-operator v0.0.0-20201005102541-be0f9bb115ce
+	github.com/litmuschaos/litmus-go v0.0.0-20201110082549-8337461ca9cf // indirect
 	github.com/litmuschaos/test-tools v1.8.0
 	github.com/onsi/gomega v1.10.1 // indirect
 	github.com/openebs/maya v1.12.1
@@ -19,9 +21,9 @@ require (
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
-	k8s.io/api v0.19.3 // indirect
+	k8s.io/api v0.19.3
 	k8s.io/apimachinery v0.19.3
-	k8s.io/client-go v11.0.0+incompatible
+	k8s.io/client-go v12.0.0+incompatible
 	k8s.io/utils v0.0.0-20201015054608-420da100c033 // indirect
 )
 
@@ -51,3 +53,5 @@ replace (
 	k8s.io/sample-cli-plugin => k8s.io/kubernetes/staging/src/k8s.io/sample-cli-plugin v0.0.0-20190623232353-8c3b7d7679cc
 	k8s.io/sample-controller => k8s.io/kubernetes/staging/src/k8s.io/sample-controller v0.0.0-20190623232353-8c3b7d7679cc
 )
+
+replace github.com/docker/docker => github.com/moby/moby v0.7.3-0.20190826074503-38ab9da00309 // Required by Helm

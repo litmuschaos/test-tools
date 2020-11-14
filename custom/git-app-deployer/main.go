@@ -35,10 +35,8 @@ func main() {
 	log.Infof("[Status]: FilePath for App Deployer is %v", filePath)
 
 	if err := CreateNamespace(clientset, namespace); err != nil {
-		log.Errorf("Failed to create the namespace, err: %v", err)
-		return
+		log.Info("[Status]: Namespace already exist!")
 	}
-	log.Infof("[Status]: %v namespace has been successfully created!", namespace)
 
 	if err := CreateSockShop("/var/run/"+filePath, namespace); err != nil {
 		log.Errorf("Failed to install sock-shop, err: %v", err)
@@ -70,6 +68,9 @@ func GetData() (string, string, int) {
 	timeout := flag.Int("timeout", 300, "timeout for application status")
 	flag.Parse()
 
+	if *namespace == "loadtest" {
+		return *namespace, "load-test.yaml", *timeout
+	}
 	if *typeName == "" || *typeName == "weak" {
 		return *namespace, "weak-sock-shop.yaml", *timeout
 	}
