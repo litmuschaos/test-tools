@@ -282,7 +282,7 @@ jobs:
               exit
             fi
       script:
-      - make litmus-app-deployer  
+      - make litmus-app-deployer 
 
     - stage: build docker images
       name: build docker image pod delete
