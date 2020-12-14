@@ -3,7 +3,7 @@
 Git-App-Deployer has been used for installation of sock-shop applications.
 At first the user is asked to give the namespace, filePath and timeout.
 
-## For Namespace :
+## For -namespace :
 
 Namespace provides an additional qualification to a unique resource name. This is helpful when multiple teams are using the same cluster and there is a potential of name collision. It can be a virtual wall between multiple clusters.
 
