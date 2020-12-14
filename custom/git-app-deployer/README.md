@@ -3,7 +3,7 @@
 Git-App-Deployer has been used for installation of sock-shop applications.
 At first the user is asked to give the namespace, filePath and timeout.
 
-## For -namespace :
+### For -namespace :
 
 Namespace provides an additional qualification to a unique resource name. This is helpful when multiple teams are using the same cluster and there is a potential of name collision. It can be a virtual wall between multiple clusters.
 
@@ -14,7 +14,7 @@ For Load-Test
 
 - -namespace=loadtest
 
-## For -filePath
+### For -filePath
 
 For Weak Sock-Shop-Resilient check just pass:
 
@@ -28,15 +28,17 @@ For Resilient Sock-Shop-Resilient check just pass:
 
 In a resilient scenario it will create 2 replicas of pods with Statefulset for databases and Deployments for others.
 
-## For -timeout
+### For -timeout
 
 Timeout is used for termination of application. The exceeding time by default is 300s.
 You may change the default time value e.g
 
 - -timeout=400
 
+### How the git app deployer works in the workflow:
 A kubeconfig file is a file used to configure access to Kubernetes when used in conjunction with the kubectl command line tool (or other clients).
 It creates a namespace and then installs the required application on the basis of the given -namespace and -filepath.
+
 If namespace is already in exist then it shows log and start installing sock-shop.
 
  - [Status]: Namespace already exist!
@@ -121,6 +123,7 @@ user-load-dc4586796-wsh59       1/1     Running   0          3m47s
 The load test packages a test script in a container for Locust that simulates user traffic to Sock Shop, please run it against the front-end service. The address and port of the frontend will be different and depend on which platform you've deployed to. See the notes for each deployment.
 It has been used parallely with a chaos engine which loads against the catalogue front-end service.
 
+### How the loadtest works in the workflow:
 In manifest it is written as :
 ```
 - name: install-application
