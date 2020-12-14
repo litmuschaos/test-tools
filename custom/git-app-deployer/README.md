@@ -43,7 +43,6 @@ If namespace is already in exist then it shows log and start installing sock-sho
 
 Sock-shop installation will basically deploy all 14 manifest of sock-shop microservices.
 
-## Now let’s see, how the git app deployer works in the workflow:
 At first the installation of Git-App-Deployer(Application installation) is done .
 ```
 - name: install-application
