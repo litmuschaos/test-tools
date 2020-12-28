@@ -36,27 +36,25 @@ You may change the default time value e.g
 - -timeout=400
 
 ### How the git app deployer works in the workflow:
-A kubeconfig file is a file used to configure access to Kubernetes when used in conjunction with the kubectl command line tool (or other clients).
-It creates a namespace and then installs the required application on the basis of the given -namespace and -filepath.
+It creates a namespace and then installs the required application based on the given -namespace and -filepath.
 
-If namespace is already in exist then it shows log and start installing sock-shop.
-
- - [Status]: Namespace already exist!
+If namespace  already exists then it shows info in a log message and starts installing sock-shop.
+- [Status]: Namespace already exist!
 
 Sock-shop installation will basically deploy all 14 manifest of sock-shop microservices.
 
 At first the installation of Git-App-Deployer(Application installation) is done .
 ```
 - name: install-application
-      container:
-        image: litmuschaos/litmus-app-deployer:latest
-        args: ["-namespace=sock-shop","-typeName=weak", "-timeout=400"] 
+     container:
+       image: litmuschaos/litmus-app-deployer:latest
+       args: ["-namespace=sock-shop","-typeName=weak", "-timeout=400"] 
 ```
 
 Note :
 - for resilient provide type flagName as resilient(-typeName=resilient)
 
-In weak scenario single replica will be there. You may check using this command:
+In weak scenario a single replica will be there. You may check using this command:
 - kubectl get po -n sock-shop
 
 
@@ -121,15 +119,15 @@ user-load-dc4586796-wsh59       1/1     Running   0          3m47s
 
 # **Load-Test**:
 The load test packages a test script in a container for Locust that simulates user traffic to Sock Shop, please run it against the front-end service. The address and port of the frontend will be different and depend on which platform you've deployed to. See the notes for each deployment.
-It has been used parallely with a chaos engine which loads against the catalogue front-end service.
+It has been used parallel with a chaos engine which loads against the catalogue front-end service.
 
 ### How the loadtest works in the workflow:
 In manifest it is written as :
 ```
 - name: install-application
-      container:
-        image: litmuschaos/litmus-app-deployer:latest
-        args: ["-namespace=loadtest"] 
+     container:
+       image: litmuschaos/litmus-app-deployer:latest
+       args: ["-namespace=loadtest"] 
 ```
 
 - Load-test have 2 replicas as shown below :
