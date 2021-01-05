@@ -21,6 +21,7 @@ var (
 	qps        string
 	prevReq    int
 	sum        int
+	totalCount string
 )
 
 func main() {
@@ -39,11 +40,10 @@ func main() {
 // once per second.
 // Create a handler that will read-lock the mutext and
 // write the summed time to the client
-
 func runDataLoop() {
 	queue := list.New()
-	timeInt := os.Getenv("TIME") //The number of seconds to calculate mean value of QPS.
-	url := os.Getenv("URI")      // URL of endpoint
+	timeInt := os.Getenv("TIME") //The time period to calculate mean value of QPS.
+	url := os.Getenv("URL")      // URL of endpoint
 	flag.Parse()
 
 	timeOfInt, _ := strconv.Atoi(timeInt)
@@ -58,35 +58,29 @@ func runDataLoop() {
 		timeSumsMu.Unlock()
 		prevReq = 0
 		for i := 1; ; i++ {
-			req, err := GetRequests(url)
 
-			fmt.Println(req)
+			req, err := GetRequests(url)
 			if err != nil {
 				qps = strconv.Itoa(0)
 				fmt.Printf("%s", err)
-				return
 			}
-			now := time.Now()
-			diff := now.Sub(start)
-			second := int(diff.Seconds())
-			reqs, err := strconv.Atoi(req)
-			qps = string(strconv.Itoa(reqs - prevReq))
-			prevReq = reqs
 
-			if second < 20 {
-				sum = reqs
+			second := int(time.Now().Sub(start).Seconds())
+			reqs, _ := strconv.Atoi(req)
+			sum = reqs
+
+			if second < timeOfInt+1 {
+				qps = string(strconv.Itoa(reqs - prevReq))
 				queue.PushBack(reqs)
-				//	fmt.Println("QPS :%d Sec : %d", qps, second)
 			} else {
 				front := queue.Front()
 				queue.Remove(front)
 				queue.PushBack(reqs)
-				sum = reqs
 				sum -= front.Value.(int)
-				qps = string(sum / timeOfInt)
-				fmt.Println("QPS :", sum/timeOfInt)
-				fmt.Println("Sec :", second)
+				qps = string(strconv.Itoa(sum / timeOfInt))
 			}
+			prevReq = reqs
+
 			log.Infof("[Status]: Current total requests : ", req)
 			log.Infof("[Status]: Current QPS value is : ", qps)
 		}
@@ -95,9 +89,8 @@ func runDataLoop() {
 
 //GetRequests will fetch the responce from metrics and calculate the total requests from front-end of sock-shop.
 func GetRequests(url string) (string, error) {
-	var totalCount string
+
 	time.Sleep(1 * time.Second)
-	//"http://front-end.sock-shop.svc.cluster.local/metrics"
 	response, err := http.Get(url)
 	if err != nil {
 		qps = strconv.Itoa(0)
@@ -107,7 +100,7 @@ func GetRequests(url string) (string, error) {
 		defer response.Body.Close()
 		metric, err := ioutil.ReadAll(response.Body)
 		if err != nil {
-			fmt.Printf("%s", err)
+			log.Errorf("Failed to read responce, err: %v", err)
 			return "", err
 		}
 

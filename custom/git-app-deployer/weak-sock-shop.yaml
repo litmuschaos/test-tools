@@ -921,7 +921,12 @@ spec:
     spec:
       containers:
       - name: sock-shop-qps
-        image: kaleoum/qpstest:ci
+        image: litmuschaos/litmus-qps-cmd:latest
+        env:
+        - name: URL
+          value: 'http://front-end.sock-shop.svc.cluster.local:80/metrics'
+        - name: TIME
+          value: '19'
         ports:
           - containerPort: 8080
 ---

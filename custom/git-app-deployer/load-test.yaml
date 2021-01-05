@@ -21,6 +21,6 @@ spec:
       - name: load-test
         image: weaveworksdemos/load-test:0.1.1
         command: ["/bin/sh"]
-        args: ["-c", "while true; do locust --host http://front-end.sock-shop.svc.cluster.local -f /config/locustfile.py --clients 5 --hatch-rate 5 --num-request 100 --no-web; done"]
+        args: ["-c", "while true; do locust --host http://front-end.sock-shop.svc.cluster.local -f /config/locustfile.py --clients 20 --hatch-rate 20 --num-request 1000 --no-web; done"]
       nodeSelector:
         beta.kubernetes.io/os: linux
