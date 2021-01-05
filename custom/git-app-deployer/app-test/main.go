@@ -42,8 +42,9 @@ func main() {
 // write the summed time to the client
 func runDataLoop() {
 	queue := list.New()
-	timeInt := os.Getenv("TIME") //The time period to calculate mean value of QPS.
-	url := os.Getenv("URL")      // URL of endpoint
+	timeInt := os.Getenv("TIME") //The time period in second to calculate mean value of QPS.
+	url := os.Getenv("URL")      //URL of endpoint metics
+	route := os.Getenv("ROUTE")  //route is a endpoint of application to get qps
 	flag.Parse()
 
 	timeOfInt, _ := strconv.Atoi(timeInt)
@@ -53,16 +54,14 @@ func runDataLoop() {
 		// increment our value, then sleep for 1 second until
 		// the next time we need to get a value.
 		start := time.Now()
-		timeSumsMu.Lock()
 		timeSums += time.Now().Unix()
-		timeSumsMu.Unlock()
 		prevReq = 0
 		for i := 1; ; i++ {
 
-			req, err := GetRequests(url)
+			req, err := GetRequests(url, route)
 			if err != nil {
 				qps = strconv.Itoa(0)
-				fmt.Printf("%s", err)
+				log.Errorf("Failed to fetch responce, err: %v", err)
 			}
 
 			second := int(time.Now().Sub(start).Seconds())
@@ -88,7 +87,7 @@ func runDataLoop() {
 }
 
 //GetRequests will fetch the responce from metrics and calculate the total requests from front-end of sock-shop.
-func GetRequests(url string) (string, error) {
+func GetRequests(url string, route string) (string, error) {
 
 	time.Sleep(1 * time.Second)
 	response, err := http.Get(url)
@@ -105,18 +104,18 @@ func GetRequests(url string) (string, error) {
 		}
 
 		metrics := string(metric)
-		count := 92
-		it := strings.Index(metrics, "request_duration_seconds_count")
 
-		var str string
-		for i := it + count + 1; ; i++ {
-			if string(metrics[i]) >= "0" && string(metrics[i]) <= "9" {
-				str += string(metrics[i])
-			} else {
-				break
+		value := strings.Split(metrics, "\n")
+		flag := 0
+		for i := 0; i < len(value) && flag == 0; i++ {
+
+			if true == strings.Contains(string(value[i]), `request_duration_seconds_count{service="front-end",method="get",route="`+route+`",status_code="200`) {
+				val := strings.Split(value[i], " ")
+				totalCount = (val[1])
+				flag = 1
 			}
 		}
-		totalCount = str
+
 	}
 	return totalCount, nil
 }
