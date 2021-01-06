@@ -57,7 +57,6 @@ func runDataLoop() {
 		timeSums += time.Now().Unix()
 		prevReq = 0
 		for i := 1; ; i++ {
-
 			req, err := GetRequests(url, route)
 			if err != nil {
 				qps = strconv.Itoa(0)
@@ -111,7 +110,7 @@ func GetRequests(url string, route string) (string, error) {
 
 			if true == strings.Contains(string(value[i]), `request_duration_seconds_count{service="front-end",method="get",route="`+route+`",status_code="200`) {
 				val := strings.Split(value[i], " ")
-				totalCount = (val[1])
+				totalCount = val[1]
 				flag = 1
 			}
 		}
