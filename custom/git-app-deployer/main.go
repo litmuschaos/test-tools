@@ -40,7 +40,7 @@ func main() {
 	InstallationJaeger(timeout, clientset)
 	log.Info("[Status]: Jaeger has been successfully created!")
 
-	log.Info("[Status]: Applications Is Running !")
+	log.Info("[Status]: Application Is Running !")
 }
 
 // GetKubeConfig function derive the kubeconfig
