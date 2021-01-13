@@ -34,10 +34,13 @@ func main() {
 	log.Info("[Status]: Starting App Deployer...")
 	log.Infof("[Status]: FilePath for App Deployer is %v", filePath)
 
-	InstallationSockShop(filePath, namespace, timeout, clientset)
-	InstallationJaeger(timeout, clientset)
-
+	InstallationApplication(filePath, namespace, timeout, clientset)
 	log.Info("[Status]: Sock Shop applications has been successfully created!")
+
+	InstallationJaeger(timeout, clientset)
+	log.Info("[Status]: Jaeger has been successfully created!")
+
+	log.Info("[Status]: Applications has been successfully created!")
 }
 
 // GetKubeConfig function derive the kubeconfig
@@ -66,7 +69,8 @@ func GetData() (string, string, int) {
 	return *namespace, *typeName + "-sock-shop.yaml", *timeout
 }
 
-func InstallationSockShop(path string, namespace string, timeout int, clientset *kubernetes.Clientset) {
+//InstallationApplication is creating and checking status of sock-shop application
+func InstallationApplication(path string, namespace string, timeout int, clientset *kubernetes.Clientset) {
 	if err := CreateNamespace(clientset, namespace); err != nil {
 		log.Info("[Status]: Namespace already exist!")
 	}
@@ -81,6 +85,7 @@ func InstallationSockShop(path string, namespace string, timeout int, clientset 
 	}
 }
 
+//InstallationJaeger is creating and checking status of Jaeger service
 func InstallationJaeger(timeout int, clientset *kubernetes.Clientset) {
 	if err := CreateNamespace(clientset, "jaeger"); err != nil {
 		log.Info("[Status]: Namespace already exist!")
