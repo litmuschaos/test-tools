@@ -34,21 +34,10 @@ func main() {
 	log.Info("[Status]: Starting App Deployer...")
 	log.Infof("[Status]: FilePath for App Deployer is %v", filePath)
 
-	if err := CreateNamespace(clientset, namespace); err != nil {
-		log.Info("[Status]: Namespace already exist!")
-	}
+	InstallationSockShop(filePath, namespace, timeout, clientset)
+	InstallationJaeger(timeout, clientset)
 
-	if err := CreateSockShop("/var/run/"+filePath, namespace); err != nil {
-		log.Errorf("Failed to install sock-shop, err: %v", err)
-		return
-	}
 	log.Info("[Status]: Sock Shop applications has been successfully created!")
-
-	if err := CheckApplicationStatus(namespace, "app=sock-shop", timeout, 2, clientset); err != nil {
-		log.Errorf("err: %v", err)
-		return
-	}
-
 }
 
 // GetKubeConfig function derive the kubeconfig
@@ -75,6 +64,36 @@ func GetData() (string, string, int) {
 		return *namespace, "weak-sock-shop.yaml", *timeout
 	}
 	return *namespace, *typeName + "-sock-shop.yaml", *timeout
+}
+
+func InstallationSockShop(path string, namespace string, timeout int, clientset *kubernetes.Clientset) {
+	if err := CreateNamespace(clientset, namespace); err != nil {
+		log.Info("[Status]: Namespace already exist!")
+	}
+
+	if err := CreateSockShop("/var/run/"+path, namespace); err != nil {
+		log.Errorf("Failed to install sock-shop, err: %v", err)
+		return
+	}
+	if err := CheckApplicationStatus(namespace, "app=sock-shop", timeout, 2, clientset); err != nil {
+		log.Errorf("err: %v", err)
+		return
+	}
+}
+
+func InstallationJaeger(timeout int, clientset *kubernetes.Clientset) {
+	if err := CreateNamespace(clientset, "jaeger"); err != nil {
+		log.Info("[Status]: Namespace already exist!")
+	}
+
+	if err := CreateSockShop("/var/run/jaeger.yaml", "jaeger"); err != nil {
+		log.Errorf("Failed to install jaeger, err: %v", err)
+		return
+	}
+	if err := CheckApplicationStatus("jaeger", "app=jaeger", timeout, 2, clientset); err != nil {
+		log.Errorf("err: %v", err)
+		return
+	}
 }
 
 // CreateNamespace creates a sock-shop namespace
