@@ -90,8 +90,6 @@ spec:
     spec:
       containers:
       - env:
-        - name: ZIPKIN
-          value: zipkin.jaeger.svc.cluster.local
         - name: JAVA_OPTS
           value: -Xms64m -Xmx128m -XX:PermSize=32m -XX:MaxPermSize=64m -XX:+UseG1GC
             -Djava.security.egd=file:/dev/urandom
@@ -421,8 +419,6 @@ spec:
     spec:
       containers:
       - env:
-        - name: ZIPKIN
-          value: zipkin.jaeger.svc.cluster.local
         - name: JAVA_OPTS
           value: -Xms64m -Xmx128m -XX:PermSize=32m -XX:MaxPermSize=64m -XX:+UseG1GC
             -Djava.security.egd=file:/dev/urandom
@@ -687,8 +683,6 @@ spec:
     spec:
       containers:
       - env:
-        - name: ZIPKIN
-          value: zipkin.jaeger.svc.cluster.local
         - name: JAVA_OPTS
           value: -Xms64m -Xmx128m -XX:PermSize=32m -XX:MaxPermSize=64m -XX:+UseG1GC
             -Djava.security.egd=file:/dev/urandom
@@ -728,7 +722,6 @@ spec:
           medium: Memory
         name: tmp-volume
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -811,34 +804,6 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    name: user-load
-  name: user-load
-  namespace: sock-shop
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      name: user-load
-  template:
-    metadata:
-      creationTimestamp: null
-      labels:
-        name: user-load
-    spec:
-      containers:
-      - args:
-        - -h
-        - front-end:80
-        - -r
-        - "9999999"
-        image: weaveworksdemos/load-test
-        imagePullPolicy: Always
-        name: user-load
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
   annotations:
     litmuschaos.io/chaos: "true"
   labels:
@@ -908,23 +873,25 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: qpstest
+  name: qps-test
   labels:
-    app: sock-shop-qps
+    app: sock-shop
     name: qps-test
   namespace: sock-shop
 spec:
   replicas: 1
   selector:
     matchLabels:
-      name: sock-shop-qps
+      name: qps-test
+      app: sock-shop
   template:
     metadata:
       labels:
-        name: sock-shop-qps
+        app: sock-shop
+        name: qps-test
     spec:
       containers:
-      - name: sock-shop-qps
+      - name: sock-shop
         image: litmuschaos/litmus-qps-cmd:latest
         env:
         - name: URL
@@ -932,7 +899,7 @@ spec:
         - name: TIME
           value: '20'
         - name: ROUTE
-          value: '/'  
+          value: '/'
         ports:
           - containerPort: 8080
 ---
@@ -941,7 +908,7 @@ kind: Service
 metadata:
   name: qps-test
   labels:
-    name: sock-shop-qps
+    name: qps-test
   namespace: sock-shop
 spec:
   type: NodePort
@@ -950,4 +917,4 @@ spec:
     port: 80
     targetPort: 8080
   selector:
-    name: sock-shop-qps
+    name: qps-test

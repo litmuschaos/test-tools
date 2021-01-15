@@ -54,7 +54,7 @@ func initialiseVars() (vars *QPSVars) {
 }
 
 // It will count the mean value of total queries available in given time interval and update
-// end point qith query per second.
+// end point with query per second(qpsValue).
 func runDataLoop(vars *QPSVars) {
 	queue := list.New()
 
@@ -97,7 +97,7 @@ func runDataLoop(vars *QPSVars) {
 	}
 }
 
-//GetRequests will fetch the responce from metrics and calculate the total requests from front-end of sock-shop.
+//GetRequests will fetch the response from metrics and calculate the total requests from front-end of sock-shop.
 func GetRequests(url string, route string, vars *QPSVars) (string, error) {
 
 	response, err := http.Get(url)
