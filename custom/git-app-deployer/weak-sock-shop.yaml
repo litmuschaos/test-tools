@@ -926,7 +926,7 @@ spec:
         - name: URL
           value: 'http://front-end.sock-shop.svc.cluster.local:80/metrics'
         - name: TIME
-          value: '19'
+          value: '20'
         - name: ROUTE
           value: '/'
         ports:
