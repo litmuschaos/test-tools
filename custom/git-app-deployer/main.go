@@ -89,6 +89,7 @@ func InstallationApplication(path string, namespace string, timeout int, clients
 		log.Errorf("err: %v", err)
 		return err
 	}
+	return nil
 }
 
 //InstallationJaeger is creating and checking status of Jaeger service
@@ -105,6 +106,7 @@ func InstallationJaeger(timeout int, clientset *kubernetes.Clientset) error {
 		log.Errorf("err: %v", err)
 		return err
 	}
+	return nil
 }
 
 // CreateNamespace creates a sock-shop namespace
