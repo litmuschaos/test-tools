@@ -265,6 +265,17 @@ _push_litmus_app_deployer:
 
 litmus-app-deployer: deps _build_litmus_app_deployer _push_litmus_app_deployer
 
+_build_litmus_qps_cmd:
+	@echo "INFO: Building container image for performing litmus-qps-cmd check"
+	cd custom/git-app-deployer/app-test && docker build -t litmuschaos/litmus-qps-cmd .
+
+_push_litmus_qps_cmd:
+	@echo "INFO: Publish container litmuschaos/litmus-qps-cmd"
+	cd custom/git-app-deployer/app-test/buildscripts && ./push
+
+litmus-qps-cmd: deps _build_litmus_qps_cmd _push_litmus_qps_cmd
+
+
 PHONY: go-build
 go-build: experiment-go-binary
 

@@ -865,3 +865,52 @@ spec:
     targetPort: 80
   selector:
     name: user
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qps-test
+  labels:
+    app: sock-shop
+    name: qps-test
+  namespace: sock-shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: qps-test
+      app: sock-shop
+  template:
+    metadata:
+      labels:
+        app: sock-shop
+        name: qps-test
+    spec:
+      containers:
+      - name: sock-shop
+        image: litmuschaos/litmus-qps-cmd:latest
+        env:
+        - name: URL
+          value: 'http://front-end.sock-shop.svc.cluster.local:80/metrics'
+        - name: TIME
+          value: '20'
+        - name: ROUTE
+          value: '/'
+        ports:
+          - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qps-test
+  labels:
+    name: qps-test
+  namespace: sock-shop
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  selector:
+    name: qps-test
