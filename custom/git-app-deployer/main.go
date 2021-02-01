@@ -17,9 +17,17 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+//APPVars maintaining all parameters during application installation and uninstallation
+type APPVars struct {
+	namespace string
+	filePath  string
+	timeout   int
+	operation string
+}
+
 func main() {
 
-	namespace, filePath, timeout := GetData()
+	appVars := GetData()
 
 	config, err := getKubeConfig()
 	if err != nil {
@@ -32,23 +40,25 @@ func main() {
 	}
 
 	log.Info("[Status]: Starting App Deployer...")
-	log.Infof("[Status]: FilePath for App Deployer is %v", filePath)
 
-	if err := CreateNamespace(clientset, namespace); err != nil {
-		log.Info("[Status]: Namespace already exist!")
-	}
-
-	if err := CreateSockShop("/var/run/"+filePath, namespace); err != nil {
-		log.Errorf("Failed to install sock-shop, err: %v", err)
+	//operations for application
+	switch appVars.operation {
+	case "apply", "create":
+		if err := CreateApplication(appVars, 2, clientset); err != nil {
+			log.Errorf("err: %v", err)
+			return
+		}
+		log.Info("[Status]: Sock Shop applications has been successfully created!")
+	case "delete":
+		if err := DeleteApplication(appVars, 2, clientset); err != nil {
+			log.Errorf("err: %v", err)
+			return
+		}
+		log.Info("[Status]: Sock Shop applications has been successfully deleted!")
+	default:
+		log.Infof("operation '%s' not supported in app-deployer", appVars.operation)
 		return
 	}
-	log.Info("[Status]: Sock Shop applications has been successfully created!")
-
-	if err := CheckApplicationStatus(namespace, "app=sock-shop", timeout, 2, clientset); err != nil {
-		log.Errorf("err: %v", err)
-		return
-	}
-
 }
 
 // GetKubeConfig function derive the kubeconfig
@@ -62,31 +72,52 @@ func getKubeConfig() (*rest.Config, error) {
 
 //GetData derive the sock-shop filePath and timeout
 //it derive the filePath based on sock-shop scenario(week vs resilient)
-func GetData() (string, string, int) {
+func GetData() (vars *APPVars) {
+
+	//Initialise the variables
+	appVars := APPVars{}
+
 	namespace := flag.String("namespace", "", "namespace for the application")
-	typeName := flag.String("typeName", "", "type of the application")
+	filePath := flag.String("typeName", "weak", "type of the application")
 	timeout := flag.Int("timeout", 300, "timeout for application status")
+	operation := flag.String("operation", "apply", "type of operation for application")
 	flag.Parse()
 
-	if *namespace == "loadtest" {
-		return *namespace, "load-test.yaml", *timeout
+	appVars.namespace = *namespace
+	appVars.timeout = *timeout
+	appVars.operation = *operation
+
+	//For sock-shop namespace weak/resilient filePath is
+	//required and for loadtest namespace load-test filePath
+	switch appVars.namespace {
+	case "loadtest":
+		appVars.filePath = "load-test.yaml"
+	case "sock-shop":
+		appVars.filePath = *filePath + "-sock-shop.yaml"
+	default:
+		log.Infof("namespace '%s' not supported in app-deployer", appVars.operation)
+		return
 	}
-	if *typeName == "" || *typeName == "weak" {
-		return *namespace, "weak-sock-shop.yaml", *timeout
-	}
-	return *namespace, *typeName + "-sock-shop.yaml", *timeout
+
+	return &appVars
 }
 
-// CreateNamespace creates a sock-shop namespace
+// CreateNamespace creates a namespace
 func CreateNamespace(clientset *kubernetes.Clientset, namespaceName string) error {
 	nsSpec := &v1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: namespaceName}}
 	_, err := clientset.CoreV1().Namespaces().Create(nsSpec)
 	return err
 }
 
-//CreateSockShop creates sock-shop application
-func CreateSockShop(path string, ns string) error {
-	command := exec.Command("kubectl", "apply", "-f", path, "-n", ns)
+// DeleteNamespace delete a namespace
+func DeleteNamespace(clientset *kubernetes.Clientset, namespaceName string) error {
+	err := clientset.CoreV1().Namespaces().Delete(namespaceName, &metav1.DeleteOptions{})
+	return err
+}
+
+//CreateSockShop install the application
+func CreateSockShop(path string, ns string, operation string) error {
+	command := exec.Command("kubectl", operation, "-f", path, "-n", ns)
 	var out, stderr bytes.Buffer
 	command.Stdout = &out
 	command.Stderr = &stderr
@@ -97,21 +128,95 @@ func CreateSockShop(path string, ns string) error {
 	return nil
 }
 
+//DeleteSockShop uninstall the application
+func DeleteSockShop(path string, ns string, operation string) error {
+	command := exec.Command("kubectl", operation, "-f", path, "-n", ns)
+	var out, stderr bytes.Buffer
+	command.Stdout = &out
+	command.Stderr = &stderr
+	if err := command.Run(); err != nil {
+		log.Infof(" %v", stderr.String())
+		return err
+	}
+	return nil
+}
+
+//CreateApplication install the application and add  all corresponding resources
+func CreateApplication(appVars *APPVars, delay int, clientset *kubernetes.Clientset) error {
+
+	log.Infof("[Status]: FilePath for App Deployer is %v", appVars.filePath)
+
+	if err := CreateNamespace(clientset, appVars.namespace); err != nil {
+		log.Info("[Status]: Namespace already exist!")
+	}
+
+	if err := CreateSockShop("/var/run/"+appVars.filePath, appVars.namespace, appVars.operation); err != nil {
+		log.Errorf("Failed to install sock-shop, err: %v", err)
+		return err
+	}
+
+	if err := CheckApplicationStatus(appVars.namespace, "app=sock-shop", appVars.timeout, 2, appVars.operation, clientset); err != nil {
+		log.Errorf("err: %v", err)
+		return err
+	}
+
+	return nil
+}
+
+//DeleteApplication deletes the application and remove all corresponding resources
+func DeleteApplication(appVars *APPVars, delay int, clientset *kubernetes.Clientset) error {
+
+	log.Infof("[Status]: FilePath for App Deployer is %v", appVars.filePath)
+
+	if err := DeleteSockShop("/var/run/"+appVars.filePath, appVars.namespace, appVars.operation); err != nil {
+		return err
+	}
+
+	if err := CheckPodStatusForRevert(appVars.namespace, appVars.timeout, 2, clientset); err != nil {
+		return err
+	}
+
+	if err := DeleteNamespace(clientset, appVars.namespace); err != nil {
+		log.Info("[Status]: Namespace not found!")
+	}
+
+	return nil
+}
+
 // CheckApplicationStatus checks the status of the AUT
-func CheckApplicationStatus(appNs, appLabel string, timeout, delay int, clientset *kubernetes.Clientset) error {
-	// Checking whether application containers are in ready state
-	log.Info("[Status]: Checking whether application containers are in ready state")
+func CheckApplicationStatus(appNs, appLabel string, timeout, delay int, operation string, clientset *kubernetes.Clientset) error {
+	//  Checking application containers state
+	log.Info("[Status]: Checking application containers state")
 	err := CheckContainerStatus(appNs, appLabel, timeout, delay, clientset)
 	if err != nil {
 		return err
 	}
-	// Checking whether application pods are in running state
-	log.Info("[Status]: Checking whether application pods are in running state")
+	// Checking application pods state
+	log.Info("[Status]: Checking application pods state")
 	err = CheckPodStatus(appNs, appLabel, timeout, delay, clientset)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+//CheckPodStatusForRevert wait for the application to terminate all pods
+func CheckPodStatusForRevert(appNs string, timeout, delay int, clientset *kubernetes.Clientset) error {
+	err := retry.
+		Times(uint(timeout / delay)).
+		Wait(time.Duration(delay) * time.Second).
+		Try(func(attempt uint) error {
+			podSpec, err := clientset.CoreV1().Pods(appNs).List(metav1.ListOptions{})
+			if err != nil {
+				return errors.Errorf("Unable to find the pods in namespace, err: %v", err)
+			}
+
+			if len(podSpec.Items) != 0 {
+				return errors.Errorf("[Status]: Pods are yet to be terminated")
+			}
+			return nil
+		})
+	return err
 }
 
 // CheckPodStatus checks the running status of the application pod
