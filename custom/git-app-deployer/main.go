@@ -27,6 +27,7 @@ type APPVars struct {
 
 func main() {
 
+	//GetData is initialling required variables for app-deployer
 	appVars := GetData()
 
 	config, err := getKubeConfig()
@@ -42,6 +43,7 @@ func main() {
 	log.Info("[Status]: Starting App Deployer...")
 
 	//operations for application
+	//if false operation exist then default case handles it
 	switch appVars.operation {
 	case "apply", "create":
 		if err := CreateApplication(appVars, 2, clientset); err != nil {
@@ -155,7 +157,7 @@ func CreateApplication(appVars *APPVars, delay int, clientset *kubernetes.Client
 		return err
 	}
 
-	if err := CheckApplicationStatus(appVars.namespace, "app=sock-shop", appVars.timeout, 2, appVars.operation, clientset); err != nil {
+	if err := CheckApplicationStatus(appVars.namespace, "app=sock-shop", appVars.timeout, 2, clientset); err != nil {
 		log.Errorf("err: %v", err)
 		return err
 	}
@@ -167,7 +169,7 @@ func CreateApplication(appVars *APPVars, delay int, clientset *kubernetes.Client
 func DeleteApplication(appVars *APPVars, delay int, clientset *kubernetes.Clientset) error {
 
 	log.Infof("[Status]: FilePath for App Deployer is %v", appVars.filePath)
-
+	log.Info("[Status]: Revert application has been started")
 	if err := DeleteSockShop("/var/run/"+appVars.filePath, appVars.namespace, appVars.operation); err != nil {
 		return err
 	}
@@ -175,24 +177,24 @@ func DeleteApplication(appVars *APPVars, delay int, clientset *kubernetes.Client
 	if err := CheckPodStatusForRevert(appVars.namespace, appVars.timeout, 2, clientset); err != nil {
 		return err
 	}
-
+	log.Info("[Status]: Application pods are terminated")
 	if err := DeleteNamespace(clientset, appVars.namespace); err != nil {
 		log.Info("[Status]: Namespace not found!")
 	}
-
+	log.Info("[Status]: Application Namespace is deleted")
 	return nil
 }
 
 // CheckApplicationStatus checks the status of the AUT
-func CheckApplicationStatus(appNs, appLabel string, timeout, delay int, operation string, clientset *kubernetes.Clientset) error {
-	//  Checking application containers state
-	log.Info("[Status]: Checking application containers state")
+func CheckApplicationStatus(appNs, appLabel string, timeout, delay int, clientset *kubernetes.Clientset) error {
+	// Checking whether application containers are in ready state
+	log.Info("[Status]: Checking whether application containers are in ready state")
 	err := CheckContainerStatus(appNs, appLabel, timeout, delay, clientset)
 	if err != nil {
 		return err
 	}
-	// Checking application pods state
-	log.Info("[Status]: Checking application pods state")
+	// Checking whether application pods are in running state
+	log.Info("[Status]: Checking whether application pods are in running state")
 	err = CheckPodStatus(appNs, appLabel, timeout, delay, clientset)
 	if err != nil {
 		return err
