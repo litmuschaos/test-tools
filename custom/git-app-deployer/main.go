@@ -100,7 +100,7 @@ func GetData() (*AppVars, error) {
 	case "sock-shop":
 		appVars.filePath = *filePath + "-sock-shop.yaml"
 	default:
-		return &appVars, fmt.Errorf("namespace not supported in app-deployer")
+		return &appVars, fmt.Errorf("namespace '%v' not supported in app-deployer", appVars.namespace)
 	}
 
 	return &appVars, nil
