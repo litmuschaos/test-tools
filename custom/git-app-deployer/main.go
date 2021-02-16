@@ -29,7 +29,10 @@ type AppVars struct {
 func main() {
 
 	//GetData is initializing required variables for app-deployer
-	appVars := GetData()
+	appVars, err := GetData()
+	if err != nil {
+		panic(err.Error())
+	}
 
 	config, err := getKubeConfig()
 	if err != nil {
