@@ -244,7 +244,7 @@ func CheckPodStatus(appNs, appLabel string, timeout, delay int, clientset *kuber
 
 // CheckContainerStatus checks the status of the application container
 func CheckContainerStatus(appNs, appLabel string, timeout, delay int, clientset *kubernetes.Clientset) error {
-	err := retry.
+	return retry.
 		Times(uint(timeout / delay)).
 		Wait(time.Duration(delay) * time.Second).
 		Try(func(attempt uint) error {
@@ -266,8 +266,4 @@ func CheckContainerStatus(appNs, appLabel string, timeout, delay int, clientset 
 			}
 			return nil
 		})
-	if err != nil {
-		return err
-	}
-	return nil
 }
