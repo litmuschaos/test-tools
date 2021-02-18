@@ -151,10 +151,10 @@ func CreateApplication(appVars *AppVars, delay int, clientset *kubernetes.Client
 	log.Infof("[Status]: FilePath for App Deployer is %v", appVars.filePath)
 
 	if err := CreateNamespace(clientset, appVars.namespace); err != nil {
-		if k8serrors.IsAlreadyExists(err) {
-			log.Info("[Status]: Namespace already exist!")
-			err = nil
+		if !k8serrors.IsAlreadyExists(err) {
+			return err
 		}
+		log.Info("[Status]: Namespace already exist!")
 	}
 
 	if err := CreateSockShop("/var/run/"+appVars.filePath, appVars.namespace, appVars.operation); err != nil {
@@ -184,10 +184,10 @@ func DeleteApplication(appVars *AppVars, delay int, clientset *kubernetes.Client
 	}
 	log.Info("[Status]: Application pods are terminated")
 	if err := DeleteNamespace(clientset, appVars.namespace); err != nil {
-		if !k8serrors.IsAlreadyExists(err) {
-			log.Info("[Status]: Namespace not found!")
-			err = nil
+		if k8serrors.IsAlreadyExists(err) {
+			return err
 		}
+		log.Info("[Status]: Namespace not found!")
 	}
 	log.Info("[Status]: Application Namespace is deleted")
 	return nil
