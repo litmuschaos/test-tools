@@ -184,7 +184,10 @@ func DeleteApplication(appVars *AppVars, delay int, clientset *kubernetes.Client
 	}
 	log.Info("[Status]: Application pods are terminated")
 	if err := DeleteNamespace(clientset, appVars.namespace); err != nil {
-		log.Info("[Status]: Namespace not found!")
+		if !k8serrors.IsAlreadyExists(err) {
+			log.Info("[Status]: Namespace not found!")
+			err = nil
+		}
 	}
 	log.Info("[Status]: Application Namespace is deleted")
 	return nil
