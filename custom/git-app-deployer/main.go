@@ -12,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	v1 "k8s.io/api/core/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -150,7 +151,10 @@ func CreateApplication(appVars *AppVars, delay int, clientset *kubernetes.Client
 	log.Infof("[Status]: FilePath for App Deployer is %v", appVars.filePath)
 
 	if err := CreateNamespace(clientset, appVars.namespace); err != nil {
-		log.Info("[Status]: Namespace already exist!")
+		if k8serrors.IsAlreadyExists(err) {
+			log.Info("[Status]: Namespace already exist!")
+			err = nil
+		}
 	}
 
 	if err := CreateSockShop("/var/run/"+appVars.filePath, appVars.namespace, appVars.operation); err != nil {
