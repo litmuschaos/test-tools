@@ -12,7 +12,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	v1 "k8s.io/api/core/v1"
-	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -151,9 +150,6 @@ func CreateApplication(appVars *AppVars, delay int, clientset *kubernetes.Client
 	log.Infof("[Status]: FilePath for App Deployer is %v", appVars.filePath)
 
 	if err := CreateNamespace(clientset, appVars.namespace); err != nil {
-		if !k8serrors.IsAlreadyExists(err) {
-			return err
-		}
 		log.Info("[Status]: Namespace already exist!")
 	}
 
@@ -184,9 +180,6 @@ func DeleteApplication(appVars *AppVars, delay int, clientset *kubernetes.Client
 	}
 	log.Info("[Status]: Application pods are terminated")
 	if err := DeleteNamespace(clientset, appVars.namespace); err != nil {
-		if k8serrors.IsAlreadyExists(err) {
-			return err
-		}
 		log.Info("[Status]: Namespace not found!")
 	}
 	log.Info("[Status]: Application Namespace is deleted")
