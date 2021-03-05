@@ -170,6 +170,11 @@ spec:
           value: fake_password
         - name: MYSQL_DATABASE
           value: socksdb
+        resources:
+          requests:
+            ephemeral-storage: "500Mi"
+          limits:
+            ephemeral-storage: "1Gi"
         image: weaveworksdemos/catalogue-db:0.3.0
         imagePullPolicy: IfNotPresent
         name: catalogue-db
