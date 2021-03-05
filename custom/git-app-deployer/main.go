@@ -12,13 +12,14 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	v1 "k8s.io/api/core/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-//AppVars maintaining all parameters during application installation and uninstallation
+//AppVars maintaining all parameters require during application installation/deletion
 type AppVars struct {
 	namespace string
 	filePath  string
@@ -44,7 +45,7 @@ func main() {
 		panic(err.Error())
 	}
 
-	log.Info("[Status]: Starting App Deployer...")
+	log.Info("[Start]: Starting App Deployer...")
 
 	//operations for application
 	//if false operation exist then default case handles it
@@ -54,15 +55,15 @@ func main() {
 			log.Errorf("err: %v", err)
 			return
 		}
-		log.Info("[Status]: Sock Shop applications has been successfully created!")
+		log.Info("[Status]: Sock Shop applications has been successfully created")
 	case "delete":
 		if err := DeleteApplication(appVars, 2, clientset); err != nil {
 			log.Errorf("err: %v", err)
 			return
 		}
-		log.Info("[Status]: Sock Shop applications has been successfully deleted!")
+		log.Info("[Status]: Sock Shop applications has been successfully deleted")
 	default:
-		log.Infof("operation '%s' not supported in app-deployer", appVars.operation)
+		log.Infof("Operation '%s' not supported in app-deployer", appVars.operation)
 		return
 	}
 }
@@ -92,8 +93,8 @@ func GetData() (*AppVars, error) {
 		timeout:   *timeout,
 		operation: *operation,
 	}
-	//For sock-shop namespace weak/resilient filePath is
-	//required and for loadtest namespace load-test filePath
+	//sock-shop namespace having weak and resilient filePath
+	//loadtest namespace having load-test filePath
 	switch appVars.namespace {
 	case "loadtest":
 		appVars.filePath = "load-test.yaml"
@@ -113,12 +114,12 @@ func CreateNamespace(clientset *kubernetes.Clientset, namespaceName string) erro
 	return err
 }
 
-// DeleteNamespace delete a namespace
+// DeleteNamespace deletes a namespace
 func DeleteNamespace(clientset *kubernetes.Clientset, namespaceName string) error {
 	return clientset.CoreV1().Namespaces().Delete(namespaceName, &metav1.DeleteOptions{})
 }
 
-//CreateSockShop install the application
+//CreateSockShop create the sock-shop application
 func CreateSockShop(path, ns, operation string) error {
 	command := exec.Command("kubectl", operation, "-f", path, "-n", ns)
 	var out, stderr bytes.Buffer
@@ -131,7 +132,7 @@ func CreateSockShop(path, ns, operation string) error {
 	return nil
 }
 
-//DeleteSockShop uninstall the application
+//DeleteSockShop delete the sock-shop application
 func DeleteSockShop(path, ns string) error {
 	command := exec.Command("kubectl", "delete", "-f", path, "-n", ns)
 	var out, stderr bytes.Buffer
@@ -144,13 +145,18 @@ func DeleteSockShop(path, ns string) error {
 	return nil
 }
 
-//CreateApplication install the application and add  all corresponding resources
+//CreateApplication creates the application and add all corresponding resources
 func CreateApplication(appVars *AppVars, delay int, clientset *kubernetes.Clientset) error {
 
 	log.Infof("[Status]: FilePath for App Deployer is %v", appVars.filePath)
 
 	if err := CreateNamespace(clientset, appVars.namespace); err != nil {
-		log.Info("[Status]: Namespace already exist!")
+		if !k8serrors.IsAlreadyExists(err) {
+			return err
+		}
+		log.Info("[Status]: Namespace already exist")
+	} else {
+		log.Info("[Status]: Namespace created successfully")
 	}
 
 	if err := CreateSockShop("/var/run/"+appVars.filePath, appVars.namespace, appVars.operation); err != nil {
@@ -178,11 +184,15 @@ func DeleteApplication(appVars *AppVars, delay int, clientset *kubernetes.Client
 	if err := CheckPodStatusForRevert(appVars.namespace, appVars.timeout, 2, clientset); err != nil {
 		return err
 	}
-	log.Info("[Status]: Application pods are terminated")
+	log.Info("[Status]: Application pods are in terminating state")
 	if err := DeleteNamespace(clientset, appVars.namespace); err != nil {
-		log.Info("[Status]: Namespace not found!")
+		if k8serrors.IsNotFound(err) {
+			log.Infof("[Status]: %v Namespace not exist", appVars.namespace)
+		} else {
+			return err
+		}
 	}
-	log.Info("[Status]: Application Namespace is deleted")
+	log.Info("[Status]: Namespace deleted successfully")
 	return nil
 }
 
