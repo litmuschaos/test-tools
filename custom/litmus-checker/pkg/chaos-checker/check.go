@@ -26,9 +26,14 @@ func CheckChaos(kubeconfig *string, res k8s.ResourceDef) {
 			continue
 		}
 		engStat, ok := status["engineStatus"].(string)
-		if ok && (strings.ToLower(engStat) == "completed" || strings.ToLower(engStat) == "stopped") {
-			log.Print("ENGINE COMPLETED")
-			return
+		if ok {
+			if strings.ToLower(engStat) == "completed" {
+				log.Print("[*] ENGINE COMPLETED")
+				return
+			} else if strings.ToLower(engStat) == "stopped" {
+				log.Print("[!] ERROR : ENGINE STATUS STOPPED")
+				return
+			}
 		}
 	}
 }
