@@ -275,6 +275,16 @@ _push_litmus_qps_cmd:
 
 litmus-qps-cmd: deps _build_litmus_qps_cmd _push_litmus_qps_cmd
 
+_build_litmus_k8s:
+	@echo "INFO: Building container image for litmus-k8s"
+	cd custom/k8s && docker build -t litmuschaos/k8s .
+
+_push_litmus_k8s:
+	@echo "INFO: Publish container litmuschaos/k8s"
+	cd custom/k8s/buildscripts && ./push
+
+litmus-k8s: deps _build_litmus_k8s _push_litmus_k8s
+
 
 PHONY: go-build
 go-build: experiment-go-binary
