@@ -350,6 +350,19 @@ jobs:
       script:
       - make go-build
       - make container-kill-go
+    
+    - stage: build docker images
+      name: build docker image litmus-k8s
+      before_install:
+        - |
+            echo "Checking if a litmus-k8s dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/k8s/)'
+            then
+              echo "Dockefile for litmus-k8s wasn't updated. Skipped."
+              exit
+            fi
+      script:
+      - make litmus-k8s
 
 notifications:
   email:
