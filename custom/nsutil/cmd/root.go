@@ -23,8 +23,8 @@ var t int // target pid
 // rootCmd represents the base command
 var rootCmd = &cobra.Command{
 	Use:   "nsutil",
-	Short: "A cli tool to execute commands in specified ns",
-	Long: `A cli tool to execute commands in specified ns, very similar to nsenter . 
+	Short: "A cli tool to execute commands in target namespace",
+	Long: `A cli tool to execute commands in target namespace, very similar to nsenter. 
 This tool also forwards any kill signals to the executed command 
 and also pipes the standard input and output from the target command`,
 	Run: nsutil,
