@@ -919,3 +919,29 @@ spec:
     targetPort: 8080
   selector:
     name: qps-test
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: git-app-checker
+  labels:
+    app: sock-shop
+    name: git-app-checker
+  namespace: 'sock-shop'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sock-shop
+  template:
+    metadata:
+      labels:
+        app: sock-shop
+        name: git-app-checker
+    spec:
+      containers:
+      - name: git-app-checker
+        image: litmuschaos/git-app-checker:latest
+        env:
+          - name: URL
+            value: 'http://front-end.sock-shop.svc.cluster.local:80'

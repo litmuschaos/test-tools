@@ -352,6 +352,19 @@ jobs:
       - make container-kill-go
     
     - stage: build docker images
+      name: build docker image litmus-git-app-checker
+      before_install:
+        - |
+            echo "Checking if an api checker dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/git-app-deployer/)'
+            then
+              echo "Dockefile for api checker wasn't updated. Skipped."
+              exit
+            fi
+      script:
+      - make litmus-git-app-checker
+  
+    - stage: build docker images
       name: build docker image litmus-k8s
       before_install:
         - |
