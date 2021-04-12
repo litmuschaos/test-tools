@@ -1,2 +1,3 @@
 experiments/generic/container-kill/container-kill
 experiments/generic/pod-delete/pod-delete
+.idea/
