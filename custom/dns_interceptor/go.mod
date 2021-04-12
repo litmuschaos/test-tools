@@ -1,4 +1,4 @@
-module github.com/gdsoumya/dns_interceptor
+module github.com/litmuschaos/dns_interceptor
 
 go 1.14
 

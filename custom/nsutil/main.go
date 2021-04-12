@@ -1,6 +1,6 @@
 package main
 
-import "github.com/gdsoumya/nsutil/cmd"
+import "github.com/litmuschaos/nsutil/cmd"
 
 func main() {
 	cmd.Execute()

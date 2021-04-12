@@ -1,7 +1,7 @@
 # NSUtil
 
 NSUtil is a cli tool that can be used to execute commands in target namespaces, very similar to nsenter. This tool also forwards any kill signals to the executed command
-and also pipes the standard input and output from the target command. Currently this doesn not support mount and user namespaces.
+and also pipes the standard input and output from the target command. Currently, this does not support mount and user namespaces.
 
 ## Usage
 

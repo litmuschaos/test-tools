@@ -1,4 +1,4 @@
-module github.com/gdsoumya/nsutil
+module github.com/litmuschaos/nsutil
 
 go 1.14
 

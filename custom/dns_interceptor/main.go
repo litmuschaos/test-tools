@@ -31,7 +31,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gdsoumya/dns_interceptor/server"
+	"github.com/litmuschaos/dns_interceptor/server"
 	log "github.com/sirupsen/logrus"
 )
 
