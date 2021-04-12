@@ -25,6 +25,8 @@ type AppVars struct {
 	filePath  string
 	timeout   int
 	operation string
+	label     string
+	app       string
 }
 
 func main() {
@@ -55,13 +57,13 @@ func main() {
 			log.Errorf("err: %v", err)
 			return
 		}
-		log.Info("[Status]: Sock Shop applications has been successfully created")
+		log.Infof("[Status]: %s applications has been successfully created", appVars.app)
 	case "delete":
 		if err := DeleteApplication(appVars, 2, clientset); err != nil {
 			log.Errorf("err: %v", err)
 			return
 		}
-		log.Info("[Status]: Sock Shop applications has been successfully deleted")
+		log.Infof("[Status]: %s applications has been successfully deleted", appVars.app)
 	default:
 		log.Infof("Operation '%s' not supported in app-deployer", appVars.operation)
 		return
@@ -77,8 +79,8 @@ func getKubeConfig() (*rest.Config, error) {
 	return config, err
 }
 
-//GetData derive the sock-shop filePath and timeout
-//it derive the filePath based on sock-shop scenario(week vs resilient)
+//GetData derive the application filePath and timeout
+//it derive the filePath based on application scenario(week vs resilient)
 func GetData() (*AppVars, error) {
 
 	//Initialise the variables
@@ -86,22 +88,30 @@ func GetData() (*AppVars, error) {
 	filePath := flag.String("typeName", "weak", "type of the application")
 	timeout := flag.Int("timeout", 300, "timeout for application status")
 	operation := flag.String("operation", "apply", "type of operation for application")
+	app := flag.String("app", "", "type of app for application")
+
 	flag.Parse()
 
 	appVars := AppVars{
 		namespace: *namespace,
 		timeout:   *timeout,
 		operation: *operation,
+		label:     "app=" + *app,
+		app:       *app
 	}
-	//sock-shop namespace having weak and resilient filePath
-	//loadtest namespace having load-test filePath
-	switch appVars.namespace {
-	case "loadtest":
-		appVars.filePath = "load-test.yaml"
-	case "sock-shop":
+	//application namespace having weak and resilient filePath
+	//loadtest namespace having loadtest filePath
+	//sock-shop namespace having sock-shop filePath
+	//podtato-head namespace having podtato-head filePath
+	switch appVars.label {
+	case "app=loadtest":
+		appVars.filePath = "loadtest.yaml"
+	case "app=sock-shop":
 		appVars.filePath = *filePath + "-sock-shop.yaml"
+	case "app=podtato-head":
+		appVars.filePath = *filePath + "-podtato-head.yaml"
 	default:
-		return &appVars, fmt.Errorf("namespace '%v' not supported in app-deployer", appVars.namespace)
+		return &appVars, fmt.Errorf("app '%v' not supported in app-deployer", appVars.app)
 	}
 
 	return &appVars, nil
@@ -119,8 +129,8 @@ func DeleteNamespace(clientset *kubernetes.Clientset, namespaceName string) erro
 	return clientset.CoreV1().Namespaces().Delete(namespaceName, &metav1.DeleteOptions{})
 }
 
-//CreateSockShop create the sock-shop application
-func CreateSockShop(path, ns, operation string) error {
+//CreateApp create the application
+func CreateApp(path, ns, operation string) error {
 	command := exec.Command("kubectl", operation, "-f", path, "-n", ns)
 	var out, stderr bytes.Buffer
 	command.Stdout = &out
@@ -132,8 +142,8 @@ func CreateSockShop(path, ns, operation string) error {
 	return nil
 }
 
-//DeleteSockShop delete the sock-shop application
-func DeleteSockShop(path, ns string) error {
+//DeleteApp delete the application
+func DeleteApp(path, ns string) error {
 	command := exec.Command("kubectl", "delete", "-f", path, "-n", ns)
 	var out, stderr bytes.Buffer
 	command.Stdout = &out
@@ -159,16 +169,14 @@ func CreateApplication(appVars *AppVars, delay int, clientset *kubernetes.Client
 		log.Info("[Status]: Namespace created successfully")
 	}
 
-	if err := CreateSockShop("/var/run/"+appVars.filePath, appVars.namespace, appVars.operation); err != nil {
-		log.Errorf("Failed to install sock-shop, err: %v", err)
-		return err
-	}
+	if err := CreateApp("/var/run/"+appVars.filePath, appVars.namespace, appVars.operation); err != nil {
+		return fmt.Errorf("Failed to install %s", appVars.namespace)
 
-	if err := CheckApplicationStatus(appVars.namespace, "app=sock-shop", appVars.timeout, 2, clientset); err != nil {
+	}
+	if err := CheckApplicationStatus(appVars.namespace, appVars.label, appVars.timeout, 2, clientset); err != nil {
 		log.Errorf("err: %v", err)
 		return err
 	}
-
 	return nil
 }
 
@@ -177,22 +185,13 @@ func DeleteApplication(appVars *AppVars, delay int, clientset *kubernetes.Client
 
 	log.Infof("[Status]: FilePath for App Deployer is %v", appVars.filePath)
 	log.Info("[Status]: Revert application has been started")
-	if err := DeleteSockShop("/var/run/"+appVars.filePath, appVars.namespace); err != nil {
+	if err := DeleteApp("/var/run/"+appVars.filePath, appVars.namespace); err != nil {
 		return err
 	}
 
-	if err := CheckPodStatusForRevert(appVars.namespace, appVars.timeout, 2, clientset); err != nil {
+	if err := CheckPodStatusForRevert(appVars.namespace, appVars.label, appVars.timeout, 2, clientset); err != nil {
 		return err
 	}
-	log.Info("[Status]: Application pods are in terminating state")
-	if err := DeleteNamespace(clientset, appVars.namespace); err != nil {
-		if k8serrors.IsNotFound(err) {
-			log.Infof("[Status]: %v Namespace not exist", appVars.namespace)
-		} else {
-			return err
-		}
-	}
-	log.Info("[Status]: Namespace deleted successfully")
 	return nil
 }
 
@@ -214,12 +213,12 @@ func CheckApplicationStatus(appNs, appLabel string, timeout, delay int, clientse
 }
 
 //CheckPodStatusForRevert wait for the application to terminate all pods
-func CheckPodStatusForRevert(appNs string, timeout, delay int, clientset *kubernetes.Clientset) error {
+func CheckPodStatusForRevert(appNs, appLabel string, timeout, delay int, clientset *kubernetes.Clientset) error {
 	return retry.
 		Times(uint(timeout / delay)).
 		Wait(time.Duration(delay) * time.Second).
 		Try(func(attempt uint) error {
-			podSpec, err := clientset.CoreV1().Pods(appNs).List(metav1.ListOptions{})
+			podSpec, err := clientset.CoreV1().Pods(appNs).List(metav1.ListOptions{LabelSelector: appLabel})
 			if err != nil {
 				return errors.Errorf("Unable to find the pods in namespace, err: %v", err)
 			}
