@@ -97,7 +97,7 @@ func GetData() (*AppVars, error) {
 		timeout:   *timeout,
 		operation: *operation,
 		label:     "app=" + *app,
-		app:       *app
+		app:       *app,
 	}
 	//application namespace having weak and resilient filePath
 	//loadtest namespace having loadtest filePath
