@@ -1,0 +1,55 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    litmuschaos.io/chaos: "true"
+  labels:
+    app: podtato-head
+    name: podtato
+  name: podtato
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: podtato-head
+      name: podtato
+  template:
+    metadata:
+      labels:
+        app: podtato-head
+        name: podtato
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: podtato
+        image: ghcr.io/podtato-head/podtatoserver:v0.1.1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9000
+        env:
+        - name: PORT
+          value: "9000"
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 9000
+          initialDelaySeconds: 10
+          periodSeconds: 3
+                    
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: podtato
+  labels:
+    name: podtato
+spec:
+  selector:
+    app: podtato-head
+  ports:
+  - name: http
+    port: 9000
+    protocol: TCP
+    targetPort: 9000
+  type: LoadBalancer
