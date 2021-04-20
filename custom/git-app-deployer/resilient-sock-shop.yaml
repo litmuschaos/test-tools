@@ -945,7 +945,7 @@ spec:
     spec:
       containers:
       - name: git-app-checker
-        image: litmuschaos/git-app-checker:latest
+        image: litmuschaos/litmus-git-app-checker
         env:
           - name: URL
             value: 'http://front-end.sock-shop.svc.cluster.local:80'
