@@ -27,6 +27,7 @@ type AppVars struct {
 	operation string
 	label     string
 	app       string
+	scope     string
 }
 
 func main() {
@@ -89,7 +90,7 @@ func GetData() (*AppVars, error) {
 	timeout := flag.Int("timeout", 300, "timeout for application status")
 	operation := flag.String("operation", "apply", "type of operation for application")
 	app := flag.String("app", "", "type of app for application")
-
+	scope := flag.String("scope", "", "type of scope for application")
 	flag.Parse()
 
 	appVars := AppVars{
@@ -98,6 +99,7 @@ func GetData() (*AppVars, error) {
 		operation: *operation,
 		label:     "app=" + *app,
 		app:       *app,
+		scope:     *scope,
 	}
 	//application namespace having weak and resilient filePath
 	//loadtest namespace having loadtest filePath
@@ -160,13 +162,20 @@ func CreateApplication(appVars *AppVars, delay int, clientset *kubernetes.Client
 
 	log.Infof("[Status]: FilePath for App Deployer is %v", appVars.filePath)
 
-	if err := CreateNamespace(clientset, appVars.namespace); err != nil {
-		if !k8serrors.IsAlreadyExists(err) {
-			return err
+	switch appVars.scope {
+	case "cluster":
+		if err := CreateNamespace(clientset, appVars.namespace); err != nil {
+			if !k8serrors.IsAlreadyExists(err) {
+				return err
+			}
+			log.Info("[Status]: Namespace already exist")
+		} else {
+			log.Info("[Status]: Namespace created successfully")
 		}
-		log.Info("[Status]: Namespace already exist")
-	} else {
-		log.Info("[Status]: Namespace created successfully")
+	case "namespace":
+		log.Infof("[Status]: Application is using namespace %v", appVars.namespace)
+	default:
+		return fmt.Errorf("Scope '%v' not supported in app-deployer", appVars.scope)
 	}
 
 	if err := CreateApp("/var/run/"+appVars.filePath, appVars.namespace, appVars.operation); err != nil {
