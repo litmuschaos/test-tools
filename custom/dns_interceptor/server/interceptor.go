@@ -75,46 +75,48 @@ func (d *DNSInterceptor) Shutdown() {
 // dnsHandler is responsible to handle the dns queries intercepted by dns interceptor
 func (d *DNSInterceptor) dnsHandler(writer dns.ResponseWriter, msg *dns.Msg) {
 	// in theory there can be multiple questions in a dns query but practically nameservers handle only 1 question
-	question := msg.Question[0]
-	queryName := strings.TrimRight(question.Name, ".")
-	switch d.settings.ChaosType {
-	case Error:
-		if d.isChaosTarget(queryName) {
-			log.WithField("query", question.Name).Info("Chaos target found")
-			writer.WriteMsg(msg)
-			return
-		}
-	case Spoof:
-		if d.settings.SpoofMap != nil && (question.Qtype == dns.TypeA || question.Qtype == dns.TypeAAAA) {
-			copyQuestion := msg.Question[0]
-			if target, ok := d.settings.SpoofMap[queryName]; ok {
+	if len(msg.Question) > 0 {
+		question := msg.Question[0]
+		queryName := strings.TrimRight(question.Name, ".")
+		switch d.settings.ChaosType {
+		case Error:
+			if d.isChaosTarget(queryName) {
 				log.WithField("query", question.Name).Info("Chaos target found")
-				if !strings.HasSuffix(target, ".") {
-					target += "."
-				}
-				msg.Question[0].Name = target
-				r, _, err := d.client.Exchange(msg, d.config.Servers[0]+":"+d.config.Port)
-				if err != nil {
-					log.WithError(err).WithField("server", d.config.Servers[0]+":"+d.config.Port).Error("Error while forwarding query to dns server")
-					writer.WriteMsg(msg)
-					return
-				}
-				if len(r.Answer) > 0 {
-					ans, err := dns.NewRR(strings.Replace(r.Answer[0].String(), target, copyQuestion.Name, -1))
+				writer.WriteMsg(msg)
+				return
+			}
+		case Spoof:
+			if d.settings.SpoofMap != nil && (question.Qtype == dns.TypeA || question.Qtype == dns.TypeAAAA) {
+				copyQuestion := msg.Question[0]
+				if target, ok := d.settings.SpoofMap[queryName]; ok {
+					log.WithField("query", question.Name).Info("Chaos target found")
+					if !strings.HasSuffix(target, ".") {
+						target += "."
+					}
+					msg.Question[0].Name = target
+					r, _, err := d.client.Exchange(msg, d.config.Servers[0]+":"+d.config.Port)
 					if err != nil {
-						log.WithError(err).Error("Error while updating RR")
+						log.WithError(err).WithField("server", d.config.Servers[0]+":"+d.config.Port).Error("Error while forwarding query to dns server")
 						writer.WriteMsg(msg)
 						return
 					}
-					r.Answer[0] = ans
+					if len(r.Answer) > 0 {
+						ans, err := dns.NewRR(strings.Replace(r.Answer[0].String(), target, copyQuestion.Name, -1))
+						if err != nil {
+							log.WithError(err).Error("Error while updating RR")
+							writer.WriteMsg(msg)
+							return
+						}
+						r.Answer[0] = ans
+					}
+					r.Question[0] = copyQuestion
+					writer.WriteMsg(r)
+					return
 				}
-				r.Question[0] = copyQuestion
-				writer.WriteMsg(r)
-				return
 			}
 		}
+		log.WithField("query", question.Name).Info("Query received")
 	}
-	log.WithField("query", question.Name).Info("Query received")
 	r, _, err := d.client.Exchange(msg, d.config.Servers[0]+":"+d.config.Port)
 	if err != nil {
 		log.WithError(err).WithField("server", d.config.Servers[0]+":"+d.config.Port).Error("Error while forwarding query to dns server")
