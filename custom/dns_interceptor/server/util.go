@@ -42,6 +42,7 @@ func getInterceptorSettings() (*InterceptorSettings, error) {
 	} else {
 		interceptorSettings.ChaosType = ChaosType(chaosType)
 	}
+
 	log.WithField("chaos-type", interceptorSettings.ChaosType).Info("Chaos type")
 
 	// defaults to Exact
