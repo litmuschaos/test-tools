@@ -4,6 +4,7 @@ type ChaosType string
 
 const (
 	Error            ChaosType = "error"
+	Spoof            ChaosType = "spoof"
 	RandomResolution ChaosType = "random"
 )
 
@@ -16,6 +17,7 @@ const (
 
 type InterceptorSettings struct {
 	TargetHostNames []string
+	SpoofMap        map[string]string
 	MatchType
 	ChaosType
 }
