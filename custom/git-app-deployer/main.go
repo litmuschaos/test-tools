@@ -90,7 +90,7 @@ func GetData() (*AppVars, error) {
 	timeout := flag.Int("timeout", 300, "timeout for application status")
 	operation := flag.String("operation", "apply", "type of operation for application")
 	app := flag.String("app", "", "type of app for application")
-	scope := flag.String("scope", "", "type of scope for application")
+	scope := flag.String("scope", "cluster", "scope of the application")
 	flag.Parse()
 
 	appVars := AppVars{
@@ -162,7 +162,7 @@ func CreateApplication(appVars *AppVars, delay int, clientset *kubernetes.Client
 
 	log.Infof("[Status]: FilePath for App Deployer is %v", appVars.filePath)
 
-	switch appVars.scope {
+	switch strings.ToLower(appVars.scope) {
 	case "cluster":
 		if err := CreateNamespace(clientset, appVars.namespace); err != nil {
 			if !k8serrors.IsAlreadyExists(err) {
@@ -173,7 +173,7 @@ func CreateApplication(appVars *AppVars, delay int, clientset *kubernetes.Client
 			log.Info("[Status]: Namespace created successfully")
 		}
 	case "namespace":
-		log.Infof("[Status]: Application is using namespace %v", appVars.namespace)
+		log.Infof("[Status]: Application is using %v namespace", appVars.namespace)
 	default:
 		return fmt.Errorf("Scope '%v' not supported in app-deployer", appVars.scope)
 	}
