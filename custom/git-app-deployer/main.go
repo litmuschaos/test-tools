@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/litmuschaos/test-tools/pkg/log"
