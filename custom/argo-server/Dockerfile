@@ -1,0 +1,1 @@
+FROM argoproj/argocli:v2.9.3

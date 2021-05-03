@@ -377,6 +377,45 @@ jobs:
       script:
       - make litmus-k8s
 
+    - stage: build docker images
+      name: build docker image litmus-argocli
+      before_install:
+        - |
+            echo "Checking if a litmus-argocli dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/argo-server/)'
+            then
+              echo "Dockefile for litmus-argocli wasn't updated. Skipped."
+              exit
+            fi
+      script:
+      - make litmus-argocli
+
+    - stage: build docker images
+      name: build docker image litmuschaos/workflow-controller
+      before_install:
+        - |
+            echo "Checking if a litmuschaos/workflow-controller dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/argo-workflow-controller/)'
+            then
+              echo "Dockefile for litmuschaos/workflow-controller wasn't updated. Skipped."
+              exit
+            fi
+      script:
+      - make litmus-argo-workflow-controller
+
+    - stage: build docker images
+      name: build docker image litmuschaos/argoexec
+      before_install:
+        - |
+            echo "Checking if a litmuschaos/argoexec dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/argo-workflow-executor/)'
+            then
+              echo "Dockefile for litmuschaos/argoexec wasn't updated. Skipped."
+              exit
+            fi
+      script:
+      - make litmus-argo-workflow-executor
+
 notifications:
   email:
     recipients:

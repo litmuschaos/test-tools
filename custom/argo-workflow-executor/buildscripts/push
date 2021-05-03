@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+IMAGEID=$( docker images -q litmuschaos/argoexec )
+
+if [ ! -z "${DNAME}" ] && [ ! -z "${DPASS}" ];
+then
+  docker login -u "${DNAME}" -p "${DPASS}";
+  #Push to docker hub repository with latest tag
+  docker tag ${IMAGEID} litmuschaos/argoexec:v2.9.3
+  docker push litmuschaos/argoexec:v2.9.3;
+else
+  echo "No docker credentials provided. Skip uploading litmuschaos/argoexec:v2.9.3 to docker hub";
+fi;
