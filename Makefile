@@ -284,6 +284,7 @@ _push_litmus_api_checker:
 	cd custom/git-app-deployer/git-app-checker/buildscripts && ./push
 
 litmus-git-app-checker: deps _build_litmus_api_checker _push_litmus_api_checker
+
 _build_litmus_k8s:
 	@echo "INFO: Building container image for litmus-k8s"
 	cd custom/k8s && docker build -t litmuschaos/k8s .
@@ -294,6 +295,46 @@ _push_litmus_k8s:
 
 litmus-k8s: deps _build_litmus_k8s _push_litmus_k8s
 
+
+_build_litmus_argocli:
+	@echo "INFO: Building container image for litmuschaos/argocli"
+	cd custom/argo-server && docker build -t litmuschaos/argocli .
+
+_push_litmus_argocli:
+	@echo "INFO: Publish container litmuschaos/argocli"
+	cd custom/argo-server/buildscripts && ./push
+
+litmus-argocli: deps _build_litmus_argocli _push_litmus_argocli
+
+_build_litmus_argo_workflow_controller:
+	@echo "INFO: Building container image for litmuschaos/workflow-controller"
+	cd custom/argo-workflow-controller && docker build -t litmuschaos/workflow-controller .
+
+_push_litmus_argo_workflow_controller:
+	@echo "INFO: Publish container litmuschaos/workflow-controller"
+	cd custom/argo-workflow-controller/buildscripts && ./push
+
+litmus-argo-workflow-controller: deps _build_litmus_argo_workflow_controller _push_litmus_argo_workflow_controller
+
+_build_litmus_argo_workflow_executor:
+	@echo "INFO: Building container image for litmuschaos/argoexec"
+	cd custom/argo-workflow-executor && docker build -t litmuschaos/argoexec .
+
+_push_litmus_argo_workflow_executor:
+	@echo "INFO: Publish container litmuschaos/argoexec"
+	cd custom/argo-workflow-executor/buildscripts && ./push
+
+litmus-argo-workflow-executor: deps _build_litmus_argo_workflow_executor _push_litmus_argo_workflow_executor
+
+_build_litmus_mongo:
+	@echo "INFO: Building container image for litmuschaos/mongo"
+	cd custom/mongo && docker build -t litmuschaos/mongo .
+
+_push_litmus_mongo:
+	@echo "INFO: Publish container litmuschaos/mongo"
+	cd custom/mongo/buildscripts && ./push
+
+litmus-mongo: deps _build_litmus_mongo _push_litmus_mongo
 
 PHONY: go-build
 go-build: experiment-go-binary

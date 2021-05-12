@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+IMAGEID=$( docker images -q litmuschaos/mongo )
+
+if [ ! -z "${DNAME}" ] && [ ! -z "${DPASS}" ];
+then
+  docker login -u "${DNAME}" -p "${DPASS}";
+  #Push to docker hub repository with latest tag
+  docker tag ${IMAGEID} litmuschaos/mongo:4.2.8
+  docker push litmuschaos/mongo:4.2.8;
+else
+  echo "No docker credentials provided. Skip uploading litmuschaos/mongo:4.2.8 to docker hub";
+fi;
