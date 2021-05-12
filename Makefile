@@ -326,6 +326,16 @@ _push_litmus_argo_workflow_executor:
 
 litmus-argo-workflow-executor: deps _build_litmus_argo_workflow_executor _push_litmus_argo_workflow_executor
 
+_build_litmus_mongo:
+	@echo "INFO: Building container image for litmuschaos/mongo"
+	cd custom/mongo && docker build -t litmuschaos/mongo .
+
+_push_litmus_mongo:
+	@echo "INFO: Publish container litmuschaos/mongo"
+	cd custom/mongo/buildscripts && ./push
+
+litmus-mongo: deps _build_litmus_mongo _push_litmus_mongo
+
 PHONY: go-build
 go-build: experiment-go-binary
 

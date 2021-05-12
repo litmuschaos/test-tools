@@ -416,6 +416,18 @@ jobs:
       script:
       - make litmus-argo-workflow-executor
 
+    - stage: build docker images
+      name: build docker image litmuschaos/mongo
+      before_install:
+        - |
+          echo "Checking if a litmuschaos/mongo dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+          if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/mongo/)'
+          then
+            echo "Dockefile for litmuschaos/mongo wasn't updated. Skipped."
+            exit
+          fi
+      script:
+        - make litmus-mongo
 notifications:
   email:
     recipients:
