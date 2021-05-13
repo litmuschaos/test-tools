@@ -276,7 +276,7 @@ jobs:
       before_install:
         - |
             echo "Checking if a git app deployer dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
-            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/git-app-deployer/)'
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/workflow-helper/app-deployer/)'
             then
               echo "Dockefile for git app deployer wasn't updated. Skipped."
               exit
@@ -289,7 +289,7 @@ jobs:
       before_install:
         - |
             echo "Checking if a git app deployer dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
-            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/git-app-deployer/app-test)'
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/workflow-helper/app-qps-test)'
             then
               echo "Dockefile for git app deployer wasn't updated. Skipped."
               exit
@@ -356,7 +356,7 @@ jobs:
       before_install:
         - |
             echo "Checking if an api checker dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
-            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/git-app-deployer/)'
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/workflow-helper/app-checker/)'
             then
               echo "Dockefile for api checker wasn't updated. Skipped."
               exit

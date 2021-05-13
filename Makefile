@@ -257,31 +257,31 @@ container-kill-go: deps _build_tests_container_kill_go_image _push_tests_contain
 
 _build_litmus_app_deployer:
 	@echo "INFO: Building container image for performing litmus-app-deployer check"
-	cd custom/git-app-deployer && docker build -t litmuschaos/litmus-app-deployer .
+	cd custom/workflow-helper/app-deployer && docker build -t litmuschaos/litmus-app-deployer .
 
 _push_litmus_app_deployer:
 	@echo "INFO: Publish container litmuschaos/litmus-app-deployer"
-	cd custom/git-app-deployer/buildscripts && ./push
+	cd custom/workflow-helper/app-deployer/buildscripts && ./push
 
 litmus-app-deployer: deps _build_litmus_app_deployer _push_litmus_app_deployer
 
 _build_litmus_qps_cmd:
 	@echo "INFO: Building container image for performing litmus-qps-cmd check"
-	cd custom/git-app-deployer/app-test && docker build -t litmuschaos/litmus-qps-cmd .
+	cd custom/workflow-helper/app-qps-test && docker build -t litmuschaos/litmus-qps-cmd .
 
 _push_litmus_qps_cmd:
 	@echo "INFO: Publish container litmuschaos/litmus-qps-cmd"
-	cd custom/git-app-deployer/app-test/buildscripts && ./push
+	cd custom/workflow-helper/app-qps-test/buildscripts && ./push
 
 litmus-qps-cmd: deps _build_litmus_qps_cmd _push_litmus_qps_cmd
 
 _build_litmus_api_checker:
 	@echo "INFO: Building container image for performing litmus-git-app-checker check"
-	cd custom/git-app-deployer/git-app-checker && docker build -t litmuschaos/litmus-git-app-checker .
+	cd custom/workflow-helper/app-checker && docker build -t litmuschaos/litmus-git-app-checker .
 
 _push_litmus_api_checker:
 	@echo "INFO: Publish container litmuschaos/litmus-git-app-checker"
-	cd custom/git-app-deployer/git-app-checker/buildscripts && ./push
+	cd custom/workflow-helper/app-checker/buildscripts && ./push
 
 litmus-git-app-checker: deps _build_litmus_api_checker _push_litmus_api_checker
 
