@@ -99,6 +99,13 @@ spec:
         ports:
         - containerPort: 80
           protocol: TCP
+        resources:
+          requests:
+            cpu: 100m
+            memory: 500Mi
+          limits:
+            cpu: 1000m
+            memory: 1000Mi
         securityContext:
           capabilities:
             add:
@@ -433,7 +440,13 @@ spec:
         ports:
         - containerPort: 80
           protocol: TCP
-        resources: {}
+        resources:
+          requests:
+            cpu: 100m
+            memory: 500Mi
+          limits:
+            cpu: 1000m
+            memory: 1000Mi
         securityContext:
           capabilities:
             add:
