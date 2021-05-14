@@ -1,16 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  annotations:
+    litmuschaos.io/chaos: "true"
   name: podtato-main
+  labels:
+    app: podtato-head
+    name: podtato-main
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: podtato-main
+      app: podtato-head
+      name: podtato-main
   template:
     metadata:
       labels:
-        app: podtato-main
+        app: podtato-head
+        name: podtato-main
     spec:
       terminationGracePeriodSeconds: 5
       containers:
@@ -21,37 +28,46 @@ spec:
         - containerPort: 9000
         env:
         - name: PORT
-          value: "9000"
-                    
+          value: "9000"              
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: podtato-main
+  labels:
+    app: podtato-head
+    name: podtato-main
 spec:
   selector:
-    app: podtato-main
+    app: podtato-head
+    name: podtato-main
   ports:
   - name: http
     port: 9000
     protocol: TCP
     targetPort: 9000
   type: LoadBalancer
-
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  annotations:
+    litmuschaos.io/chaos: "true"
   name: podtato-hats
+  labels:
+    app: podtato-head
+    name: podtato-hats
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: podtato-hats
+      app: podtato-head
+      name: podtato-hats
   template:
     metadata:
       labels:
-        app: podtato-hats
+        app: podtato-head
+        name: podtato-hats
     spec:
       terminationGracePeriodSeconds: 5
       containers:
@@ -63,36 +79,45 @@ spec:
           env:
             - name: PORT
               value: "9000"
-
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: podtato-hats
+  labels:
+    app: podtato-head
+    name: podtato-hats
 spec:
   selector:
-    app: podtato-hats
+    app: podtato-head
+    name: podtato-hats
   ports:
     - name: http
       port: 9001
       protocol: TCP
       targetPort: 9000
   type: ClusterIP
-
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  annotations:
+    litmuschaos.io/chaos: "true"
   name: podtato-left-leg
+  labels:
+    app: podtato-head
+    name: podtato-left-leg
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: podtato-left-leg
+      app: podtato-head
+      name: podtato-left-leg
   template:
     metadata:
       labels:
-        app: podtato-left-leg
+        app: podtato-head
+        name: podtato-left-leg
     spec:
       terminationGracePeriodSeconds: 5
       containers:
@@ -104,36 +129,45 @@ spec:
           env:
             - name: PORT
               value: "9000"
-
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: podtato-left-leg
+  labels:
+    app: podtato-head
+    name: podtato-left-leg
 spec:
   selector:
-    app: podtato-left-leg
+    app: podtato-head
+    name: podtato-left-leg
   ports:
     - name: http
       port: 9002
       protocol: TCP
       targetPort: 9000
   type: ClusterIP
-
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  annotations:
+    litmuschaos.io/chaos: "true"
   name: podtato-left-arm
+  labels:
+    app: podtato-head
+    name: podtato-left-arm
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: podtato-left-arm
+      app: podtato-head
+      name: podtato-left-arm
   template:
     metadata:
       labels:
-        app: podtato-left-arm
+        app: podtato-head
+        name: podtato-left-arm
     spec:
       terminationGracePeriodSeconds: 5
       containers:
@@ -145,36 +179,45 @@ spec:
           env:
             - name: PORT
               value: "9000"
-
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: podtato-left-arm
+  labels:
+    app: podtato-head
+    name: podtato-left-arm
 spec:
   selector:
-    app: podtato-left-arm
+    app: podtato-head
+    name: podtato-left-arm
   ports:
     - name: http
       port: 9003
       protocol: TCP
       targetPort: 9000
   type: ClusterIP
-
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  annotations:
+    litmuschaos.io/chaos: "true"
   name: podtato-right-leg
+  labels:
+    app: podtato-head
+    name: podtato-right-leg
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: podtato-right-leg
+      app: podtato-head
+      name: podtato-right-leg
   template:
     metadata:
       labels:
-        app: podtato-right-leg
+        app: podtato-head
+        name: podtato-right-leg
     spec:
       terminationGracePeriodSeconds: 5
       containers:
@@ -186,36 +229,45 @@ spec:
           env:
             - name: PORT
               value: "9000"
-
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: podtato-right-leg
+  labels:
+    app: podtato-head
+    name: podtato-right-leg
 spec:
   selector:
-    app: podtato-right-leg
+    app: podtato-head
+    name: podtato-right-leg
   ports:
     - name: http
       port: 9004
       protocol: TCP
       targetPort: 9000
   type: ClusterIP
-
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  annotations:
+    litmuschaos.io/chaos: "true"
   name: podtato-right-arm
+  labels:
+    app: podtato-head
+    name: podtato-right-arm
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: podtato-right-arm
+      app: podtato-head
+      name: podtato-right-arm
   template:
     metadata:
       labels:
-        app: podtato-right-arm
+        app: podtato-head
+        name: podtato-right-arm
     spec:
       terminationGracePeriodSeconds: 5
       containers:
@@ -227,15 +279,18 @@ spec:
           env:
             - name: PORT
               value: "9000"
-
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: podtato-right-arm
+  labels:
+    app: podtato-head
+    name: podtato-right-arm
 spec:
   selector:
-    app: podtato-right-arm
+    app: podtato-head
+    name: podtato-right-arm
   ports:
     - name: http
       port: 9005
