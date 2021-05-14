@@ -21,20 +21,20 @@ spec:
     spec:
       terminationGracePeriodSeconds: 5
       containers:
-        - name: server
-          image:  gdsoumya/podtato-main:v0.1.0
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 9000
-          env:
-            - name: PORT
-              value: "9000"
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 9000
-            initialDelaySeconds: 10
-            periodSeconds: 3            
+      - name: server
+        image:  gdsoumya/podtato-main:v0.1.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9000
+        env:
+        - name: PORT
+          value: "9000"
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 9000
+          initialDelaySeconds: 10
+          periodSeconds: 3       
 ---
 apiVersion: v1
 kind: Service
@@ -85,12 +85,6 @@ spec:
           env:
             - name: PORT
               value: "9000"
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 9000
-            initialDelaySeconds: 10
-            periodSeconds: 3
 ---
 apiVersion: v1
 kind: Service
@@ -141,12 +135,6 @@ spec:
           env:
             - name: PORT
               value: "9000"
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 9000
-            initialDelaySeconds: 10
-            periodSeconds: 3   
 ---
 apiVersion: v1
 kind: Service
@@ -197,12 +185,6 @@ spec:
           env:
             - name: PORT
               value: "9000"
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 9000
-            initialDelaySeconds: 10
-            periodSeconds: 3
 ---
 apiVersion: v1
 kind: Service
@@ -253,12 +235,6 @@ spec:
           env:
             - name: PORT
               value: "9000"
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 9000
-            initialDelaySeconds: 10
-            periodSeconds: 3
 ---
 apiVersion: v1
 kind: Service
@@ -309,12 +285,6 @@ spec:
           env:
             - name: PORT
               value: "9000"
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 9000
-            initialDelaySeconds: 10
-            periodSeconds: 3
 ---
 apiVersion: v1
 kind: Service
