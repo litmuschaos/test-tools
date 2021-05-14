@@ -9,7 +9,6 @@ metadata:
   name: carts-db
   namespace: sock-shop
 spec:
-  serviceName: "carts-db"
   replicas: 1
   selector:
     matchLabels:
@@ -161,7 +160,6 @@ metadata:
   name: catalogue-db
   namespace: sock-shop
 spec:
-  serviceName: "catalogue-db"
   replicas: 1
   selector:
     matchLabels:
@@ -354,7 +352,6 @@ metadata:
   name: orders-db
   namespace: sock-shop
 spec:
-  serviceName: "orders-db"
   replicas: 1
   selector:
     matchLabels:
@@ -766,7 +763,6 @@ metadata:
   name: user-db
   namespace: sock-shop
 spec:
-  serviceName: "user-db"
   replicas: 1
   selector:
     matchLabels:
