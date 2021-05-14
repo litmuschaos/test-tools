@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"math"
 	"net/http"
 	"os"
 	"strconv"
@@ -83,13 +84,13 @@ func runDataLoop(vars *QPSVars) {
 
 		if second <= timeInterval {
 			queue.PushBack(reqs)
-			vars.qpsValue = strconv.Itoa(100 * (reqs / queue.Len()))
+			vars.qpsValue = strconv.Itoa(int(math.Abs(float64(100 * (reqs / queue.Len())))))
 		} else {
 			front := queue.Front()
 			queue.Remove(front)
 			queue.PushBack(reqs)
 			vars.totalQueries -= front.Value.(int)
-			vars.qpsValue = strconv.Itoa(100 * (vars.totalQueries / timeInterval))
+			vars.qpsValue = strconv.Itoa(int(math.Abs(float64(100 * (vars.totalQueries / timeInterval)))))
 		}
 		log.Infof("[Status]: Current total requests : ", req)
 		log.Infof("[Status]: Current QPS value is   : ", vars.qpsValue)
