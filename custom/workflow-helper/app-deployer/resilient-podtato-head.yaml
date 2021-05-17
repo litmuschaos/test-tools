@@ -22,7 +22,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
-        image:  gdsoumya/podtato-main:v0.1.0
+        image:  gdsoumya/podtato-main-js:v0.1.0
         imagePullPolicy: Always
         ports:
         - containerPort: 9000
@@ -53,6 +53,7 @@ spec:
     protocol: TCP
     targetPort: 9000
   type: LoadBalancer
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -64,7 +65,7 @@ metadata:
     app: podtato-head
     name: podtato-hats
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: podtato-head
@@ -85,6 +86,7 @@ spec:
           env:
             - name: PORT
               value: "9000"
+
 ---
 apiVersion: v1
 kind: Service
@@ -103,6 +105,7 @@ spec:
       protocol: TCP
       targetPort: 9000
   type: ClusterIP
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -114,7 +117,7 @@ metadata:
     app: podtato-head
     name: podtato-left-leg
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: podtato-head
@@ -135,6 +138,7 @@ spec:
           env:
             - name: PORT
               value: "9000"
+
 ---
 apiVersion: v1
 kind: Service
@@ -153,6 +157,7 @@ spec:
       protocol: TCP
       targetPort: 9000
   type: ClusterIP
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -164,7 +169,7 @@ metadata:
     app: podtato-head
     name: podtato-left-arm
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: podtato-head
@@ -185,6 +190,7 @@ spec:
           env:
             - name: PORT
               value: "9000"
+
 ---
 apiVersion: v1
 kind: Service
@@ -203,6 +209,7 @@ spec:
       protocol: TCP
       targetPort: 9000
   type: ClusterIP
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -214,7 +221,7 @@ metadata:
     app: podtato-head
     name: podtato-right-leg
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: podtato-head
@@ -235,6 +242,7 @@ spec:
           env:
             - name: PORT
               value: "9000"
+
 ---
 apiVersion: v1
 kind: Service
@@ -253,6 +261,7 @@ spec:
       protocol: TCP
       targetPort: 9000
   type: ClusterIP
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -264,7 +273,7 @@ metadata:
     app: podtato-head
     name: podtato-right-arm
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: podtato-head
@@ -285,6 +294,7 @@ spec:
           env:
             - name: PORT
               value: "9000"
+
 ---
 apiVersion: v1
 kind: Service
@@ -300,6 +310,56 @@ spec:
   ports:
     - name: http
       port: 9005
+      protocol: TCP
+      targetPort: 9000
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    litmuschaos.io/chaos: "true"
+  name: podtato-hats-new
+  labels:
+    app: podtato-head
+    name: podtato-hats-new
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: podtato-head
+      name: podtato-hats-new
+  template:
+    metadata:
+      labels:
+        app: podtato-head
+        name: podtato-hats-new
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+        - name: server
+          image:  gdsoumya/podtato-hats:v0.1.4
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9000
+          env:
+            - name: PORT
+              value: "9000"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: podtato-hats-new
+  labels:
+    app: podtato-head
+    name: podtato-hats-new
+spec:
+  selector:
+    app: podtato-head
+    name: podtato-hats-new
+  ports:
+    - name: http
+      port: 9001
       protocol: TCP
       targetPort: 9000
   type: ClusterIP
