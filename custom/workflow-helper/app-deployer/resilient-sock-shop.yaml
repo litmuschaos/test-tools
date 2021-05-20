@@ -1,0 +1,964 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    litmuschaos.io/chaos: "true"
+  labels:
+    app: sock-shop
+    name: carts-db
+  name: carts-db
+  namespace: sock-shop
+spec:
+  serviceName: "carts-db"
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sock-shop
+      name: carts-db
+  template:
+    metadata:
+      labels:
+        app: sock-shop
+        name: carts-db
+    spec:
+      containers:
+      - image: mongo
+        imagePullPolicy: Always
+        name: carts-db
+        ports:
+        - containerPort: 27017
+          name: mongo
+          protocol: TCP
+        resources:
+          limits:
+            ephemeral-storage: 2Gi
+          requests:
+            ephemeral-storage: 1Gi
+        securityContext:
+          capabilities:
+            add:
+            - CHOWN
+            - SETGID
+            - SETUID
+            drop:
+            - all
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-volume
+      volumes:
+      - emptyDir:
+          medium: Memory
+        name: tmp-volume
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: carts-db
+  labels:
+    name: carts-db
+  namespace: sock-shop
+spec:
+  ports:
+    # the port that this service should serve on
+  - port: 27017
+    targetPort: 27017
+  selector:
+    name: carts-db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    litmuschaos.io/chaos: "true"
+  labels:
+    app: sock-shop
+    name: carts
+  name: carts
+  namespace: sock-shop
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sock-shop
+      name: carts
+  template:
+    metadata:
+      labels:
+        app: sock-shop
+        name: carts
+    spec:
+      containers:
+      - env:
+        - name: JAVA_OPTS
+          value: -Xms64m -Xmx128m -XX:PermSize=32m -XX:MaxPermSize=64m -XX:+UseG1GC
+            -Djava.security.egd=file:/dev/urandom
+        image: weaveworksdemos/carts:0.4.8
+        imagePullPolicy: IfNotPresent
+        name: carts
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 100m
+            memory: 500Mi
+          limits:
+            cpu: 1000m
+            memory: 1000Mi
+        securityContext:
+          capabilities:
+            add:
+            - NET_BIND_SERVICE
+            drop:
+            - all
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 10001
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 300
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 180
+          periodSeconds: 3
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-volume
+      volumes:
+      - emptyDir:
+          medium: Memory
+        name: tmp-volume
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: carts
+  labels:
+    name: carts
+  namespace: sock-shop
+spec:
+  ports:
+    # the port that this service should serve on
+  - port: 80
+    targetPort: 80
+  selector:
+    name: carts
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    litmuschaos.io/chaos: "true"
+  labels:
+    app: sock-shop
+    name: catalogue-db
+  name: catalogue-db
+  namespace: sock-shop
+spec:
+  serviceName: "catalogue-db"
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sock-shop
+      name: catalogue-db
+  template:
+    metadata:
+      labels:
+        app: sock-shop
+        name: catalogue-db
+    spec:
+      containers:
+      - env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: fake_password
+        - name: MYSQL_DATABASE
+          value: socksdb
+        resources:
+          requests:
+            ephemeral-storage: "500Mi"
+          limits:
+            ephemeral-storage: "1Gi"
+        image: weaveworksdemos/catalogue-db:0.3.0
+        imagePullPolicy: IfNotPresent
+        name: catalogue-db
+        ports:
+        - containerPort: 3306
+          name: mysql
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalogue-db
+  labels:
+    name: catalogue-db
+  namespace: sock-shop
+spec:
+  ports:
+    # the port that this service should serve on
+  - port: 3306
+    targetPort: 3306
+  selector:
+    name: catalogue-db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    litmuschaos.io/chaos: "true"
+  labels:
+    app: sock-shop
+    name: catalogue
+  name: catalogue
+  namespace: sock-shop
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sock-shop
+      name: catalogue
+  template:
+    metadata:
+      labels:
+        app: sock-shop
+        name: catalogue
+    spec:
+      containers:
+      - image: weaveworksdemos/catalogue:0.3.5
+        imagePullPolicy: IfNotPresent
+        name: catalogue
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        resources: {}
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 300
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 180
+          periodSeconds: 3
+        securityContext:
+          capabilities:
+            add:
+            - NET_BIND_SERVICE
+            drop:
+            - all
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 10001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalogue
+  labels:
+    name: catalogue
+  namespace: sock-shop
+spec:
+  ports:
+    # the port that this service should serve on
+  - port: 80
+    targetPort: 80
+  selector:
+    name: catalogue
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    litmuschaos.io/chaos: "true"
+  labels:
+    app: sock-shop
+    name: front-end
+  name: front-end
+  namespace: sock-shop
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sock-shop
+      name: front-end
+  template:
+    metadata:
+      labels:
+        app: sock-shop
+        name: front-end
+    spec:
+      containers:
+      - image: weaveworksdemos/front-end:0.3.12
+        imagePullPolicy: IfNotPresent
+        name: front-end
+        ports:
+        - containerPort: 8079
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8079
+          initialDelaySeconds: 300
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8079
+          initialDelaySeconds: 30
+          periodSeconds: 3
+        securityContext:
+          capabilities:
+            drop:
+            - all
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 10001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: front-end
+  labels:
+    name: front-end
+  namespace: sock-shop
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8079
+    nodePort: 30001
+  selector:
+    name: front-end
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    litmuschaos.io/chaos: "true"
+  labels:
+    app: sock-shop
+    name: orders-db
+  name: orders-db
+  namespace: sock-shop
+spec:
+  serviceName: "orders-db"
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sock-shop
+      name: orders-db
+  template:
+    metadata:
+      labels:
+        app: sock-shop
+        name: orders-db
+    spec:
+      containers:
+      - image: mongo
+        imagePullPolicy: Always
+        name: orders-db
+        ports:
+        - containerPort: 27017
+          name: mongo
+          protocol: TCP
+        resources: {}
+        securityContext:
+          capabilities:
+            add:
+            - CHOWN
+            - SETGID
+            - SETUID
+            drop:
+            - all
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-volume
+      volumes:
+      - emptyDir:
+          medium: Memory
+        name: tmp-volume
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders-db
+  labels:
+    name: orders-db
+  namespace: sock-shop
+spec:
+  ports:
+    # the port that this service should serve on
+  - port: 27017
+    targetPort: 27017
+  selector:
+    name: orders-db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    litmuschaos.io/chaos: "true"
+  labels:
+    app: sock-shop
+    name: orders
+  name: orders
+  namespace: sock-shop
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sock-shop
+      name: orders
+  template:
+    metadata:
+      labels:
+        app: sock-shop
+        name: orders
+    spec:
+      containers:
+      - env:
+        - name: JAVA_OPTS
+          value: -Xms64m -Xmx128m -XX:PermSize=32m -XX:MaxPermSize=64m -XX:+UseG1GC
+            -Djava.security.egd=file:/dev/urandom
+        image: weaveworksdemos/orders:0.4.7
+        imagePullPolicy: IfNotPresent
+        name: orders
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 100m
+            memory: 500Mi
+          limits:
+            cpu: 1000m
+            memory: 1000Mi
+        securityContext:
+          capabilities:
+            add:
+            - NET_BIND_SERVICE
+            drop:
+            - all
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 10001
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-volume
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 300
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 180
+          periodSeconds: 3
+      volumes:
+      - emptyDir:
+          medium: Memory
+        name: tmp-volume
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders
+  labels:
+    name: orders
+  namespace: sock-shop
+spec:
+  ports:
+    # the port that this service should serve on
+  - port: 80
+    targetPort: 80
+  selector:
+    name: orders    
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    litmuschaos.io/chaos: "true"
+  labels:
+    app: sock-shop
+    name: payment
+  name: payment
+  namespace: sock-shop
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sock-shop
+      name: payment
+  template:
+    metadata:
+      labels:
+        app: sock-shop
+        name: payment
+    spec:
+      containers:
+      - image: weaveworksdemos/payment:0.4.3
+        imagePullPolicy: IfNotPresent
+        name: payment
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        securityContext:
+          capabilities:
+            add:
+            - NET_BIND_SERVICE
+            drop:
+            - all
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 10001
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 300
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 180
+          periodSeconds: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment
+  labels:
+    name: payment
+  namespace: sock-shop
+spec:
+  ports:
+    # the port that this service should serve on
+  - port: 80
+    targetPort: 80
+  selector:
+    name: payment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    litmuschaos.io/chaos: "true"
+  labels:
+    app: sock-shop
+    name: queue-master
+  name: queue-master
+  namespace: sock-shop
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sock-shop
+      name: queue-master
+  template:
+    metadata:
+      labels:
+        app: sock-shop
+        name: queue-master
+    spec:
+      containers:
+      - image: weaveworksdemos/queue-master:0.3.1
+        imagePullPolicy: IfNotPresent
+        name: queue-master
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 300
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 180
+          periodSeconds: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: queue-master
+  labels:
+    name: queue-master
+  annotations:
+    prometheus.io/path: "/prometheus"
+  namespace: sock-shop
+spec:
+  ports:
+    # the port that this service should serve on
+  - port: 80
+    targetPort: 80
+  selector:
+    name: queue-master
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    litmuschaos.io/chaos: "true"
+  labels:
+    app: sock-shop
+    name: rabbitmq
+  name: rabbitmq
+  namespace: sock-shop
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sock-shop
+      name: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: sock-shop
+        name: rabbitmq
+    spec:
+      containers:
+      - image: rabbitmq:3.6.8
+        imagePullPolicy: IfNotPresent
+        name: rabbitmq
+        ports:
+        - containerPort: 5672
+          protocol: TCP
+        resources: {}
+        securityContext:
+          capabilities:
+            add:
+            - CHOWN
+            - SETGID
+            - SETUID
+            - DAC_OVERRIDE
+            drop:
+            - all
+          readOnlyRootFilesystem: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  labels:
+    name: rabbitmq
+  namespace: sock-shop
+spec:
+  ports:
+    # the port that this service should serve on
+  - port: 5672
+    name: rabbitmq
+    targetPort: 5672
+  - port: 9090
+    name: exporter
+    targetPort: exporter
+    protocol: TCP
+  selector:
+    name: rabbitmq
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    litmuschaos.io/chaos: "true"
+  labels:
+    app: sock-shop
+    name: shipping
+  name: shipping
+  namespace: sock-shop
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sock-shop
+      name: shipping
+  template:
+    metadata:
+      labels:
+        app: sock-shop
+        name: shipping
+    spec:
+      containers:
+      - env:
+        - name: JAVA_OPTS
+          value: -Xms64m -Xmx128m -XX:PermSize=32m -XX:MaxPermSize=64m -XX:+UseG1GC
+            -Djava.security.egd=file:/dev/urandom
+        image: weaveworksdemos/shipping:0.4.8
+        imagePullPolicy: IfNotPresent
+        name: shipping
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        resources: {}
+        securityContext:
+          capabilities:
+            add:
+            - NET_BIND_SERVICE
+            drop:
+            - all
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 10001
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 300
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 180
+          periodSeconds: 3
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-volume
+      volumes:
+      - emptyDir:
+          medium: Memory
+        name: tmp-volume
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shipping
+  labels:
+    name: shipping
+  namespace: sock-shop
+spec:
+  ports:
+    # the port that this service should serve on
+  - port: 80
+    targetPort: 80
+  selector:
+    name: shipping
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    litmuschaos.io/chaos: "true"
+  labels:
+    app: sock-shop
+    name: user-db
+  name: user-db
+  namespace: sock-shop
+spec:
+  serviceName: "user-db"
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sock-shop
+      name: user-db
+  template:
+    metadata:
+      labels:
+        app: sock-shop
+        name: user-db
+    spec:
+      containers:
+      - image: weaveworksdemos/user-db:0.4.0
+        imagePullPolicy: IfNotPresent
+        name: user-db
+        ports:
+        - containerPort: 27017
+          name: mongo
+          protocol: TCP
+        resources: {}
+        securityContext:
+          capabilities:
+            add:
+            - CHOWN
+            - SETGID
+            - SETUID
+            drop:
+            - all
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-volume
+      volumes:
+      - emptyDir:
+          medium: Memory
+        name: tmp-volume
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-db
+  labels:
+    name: user-db
+  namespace: sock-shop
+spec:
+  ports:
+    # the port that this service should serve on
+  - port: 27017
+    targetPort: 27017
+  selector:
+    name: user-db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    litmuschaos.io/chaos: "true"
+  labels:
+    app: sock-shop
+    name: user
+  name: user
+  namespace: sock-shop
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sock-shop
+      name: user
+  template:
+    metadata:
+      labels:
+        app: sock-shop
+        name: user
+    spec:
+      containers:
+      - env:
+        - name: MONGO_HOST
+          value: user-db:27017
+        image: weaveworksdemos/user:0.4.7
+        imagePullPolicy: IfNotPresent
+        name: user
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 300
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 180
+          periodSeconds: 3
+        securityContext:
+          capabilities:
+            add:
+            - NET_BIND_SERVICE
+            drop:
+            - all
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 10001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user
+  labels:
+    name: user
+  namespace: sock-shop
+spec:
+  ports:
+    # the port that this service should serve on
+  - port: 80
+    targetPort: 80
+  selector:
+    name: user
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qps-test
+  labels:
+    app: sock-shop
+    name: qps-test
+  namespace: sock-shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: qps-test
+      app: sock-shop
+  template:
+    metadata:
+      labels:
+        app: sock-shop
+        name: qps-test
+    spec:
+      containers:
+      - name: sock-shop
+        image: litmuschaos/litmus-qps-cmd:latest
+        env:
+        - name: URL
+          value: 'http://front-end.sock-shop.svc.cluster.local:80/metrics'
+        - name: TIME
+          value: '20'
+        - name: ROUTE
+          value: '/'
+        ports:
+          - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qps-test
+  labels:
+    name: qps-test
+  namespace: sock-shop
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  selector:
+    name: qps-test
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: git-app-checker
+  labels:
+    app: sock-shop
+    name: git-app-checker
+  namespace: 'sock-shop'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sock-shop
+  template:
+    metadata:
+      labels:
+        app: sock-shop
+        name: git-app-checker
+    spec:
+      containers:
+      - name: git-app-checker
+        image: litmuschaos/litmus-git-app-checker
+        env:
+          - name: URL
+            value: 'http://front-end.sock-shop.svc.cluster.local:80'

@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+IMAGEID=$( docker images -q litmuschaos/litmus-app-deployer )
+
+if [ ! -z "${DNAME}" ] && [ ! -z "${DPASS}" ];
+then
+  docker login -u "${DNAME}" -p "${DPASS}";
+  #Push to docker hub repository with latest tag
+  docker tag ${IMAGEID} litmuschaos/litmus-app-deployer:latest
+  docker push litmuschaos/litmus-app-deployer:latest;
+else
+  echo "No docker credentials provided. Skip uploading litmuschaos/litmus-app-deployer:latest to docker hub";
+fi;

@@ -12,9 +12,11 @@ import (
 // getInterceptorSettings generates the interceptor settings from the env
 func getInterceptorSettings() (*InterceptorSettings, error) {
 	targets := os.Getenv("TARGET_HOSTNAMES")
-	//chaosType := os.Getenv("CHAOS_TYPE")
+	spoofMap := os.Getenv("SPOOF_MAP")
+	chaosType := os.Getenv("CHAOS_TYPE")
 	matchType := os.Getenv("MATCH_SCHEME")
 	interceptorSettings := InterceptorSettings{}
+
 	if targets == "" {
 		interceptorSettings.TargetHostNames = nil
 	} else {
@@ -23,14 +25,24 @@ func getInterceptorSettings() (*InterceptorSettings, error) {
 			return nil, errors.New("failed to parse target hostname list : " + err.Error())
 		}
 	}
-	log.WithField("targets", interceptorSettings.TargetHostNames).Info("Chaos targets")
-	// currently only Error type is supported
-	//if ChaosType(chaosType) != Error && ChaosType(chaosType) != RandomResolution {
-	//	return nil, errors.New("wrong chaos type for dns chaos")
-	//} else {
-	//	interceptorSettings.ChaosType = ChaosType(chaosType)
-	//}
-	interceptorSettings.ChaosType = Error
+
+	if spoofMap == "" {
+		interceptorSettings.SpoofMap = nil
+	} else {
+		err := json.Unmarshal([]byte(spoofMap), &interceptorSettings.SpoofMap)
+		if err != nil {
+			return nil, errors.New("failed to parse target hostname list : " + err.Error())
+		}
+	}
+
+	log.WithField("spoof_map", interceptorSettings.SpoofMap).Info("Chaos Spoof Map")
+	//currently only Error type is supported
+	if ChaosType(chaosType) != Error && ChaosType(chaosType) != Spoof {
+		return nil, errors.New("wrong chaos type for dns chaos")
+	} else {
+		interceptorSettings.ChaosType = ChaosType(chaosType)
+	}
+
 	log.WithField("chaos-type", interceptorSettings.ChaosType).Info("Chaos type")
 
 	// defaults to Exact

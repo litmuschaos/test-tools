@@ -276,7 +276,7 @@ jobs:
       before_install:
         - |
             echo "Checking if a git app deployer dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
-            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/git-app-deployer/)'
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/workflow-helper/app-deployer/)'
             then
               echo "Dockefile for git app deployer wasn't updated. Skipped."
               exit
@@ -289,7 +289,7 @@ jobs:
       before_install:
         - |
             echo "Checking if a git app deployer dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
-            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/git-app-deployer/app-test)'
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/workflow-helper/app-qps-test)'
             then
               echo "Dockefile for git app deployer wasn't updated. Skipped."
               exit
@@ -356,7 +356,7 @@ jobs:
       before_install:
         - |
             echo "Checking if an api checker dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
-            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/git-app-deployer/)'
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/workflow-helper/app-checker/)'
             then
               echo "Dockefile for api checker wasn't updated. Skipped."
               exit
@@ -377,6 +377,57 @@ jobs:
       script:
       - make litmus-k8s
 
+    - stage: build docker images
+      name: build docker image litmus-argocli
+      before_install:
+        - |
+            echo "Checking if a litmus-argocli dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/argo-server/)'
+            then
+              echo "Dockefile for litmus-argocli wasn't updated. Skipped."
+              exit
+            fi
+      script:
+      - make litmus-argocli
+
+    - stage: build docker images
+      name: build docker image litmuschaos/workflow-controller
+      before_install:
+        - |
+            echo "Checking if a litmuschaos/workflow-controller dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/argo-workflow-controller/)'
+            then
+              echo "Dockefile for litmuschaos/workflow-controller wasn't updated. Skipped."
+              exit
+            fi
+      script:
+      - make litmus-argo-workflow-controller
+
+    - stage: build docker images
+      name: build docker image litmuschaos/argoexec
+      before_install:
+        - |
+            echo "Checking if a litmuschaos/argoexec dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/argo-workflow-executor/)'
+            then
+              echo "Dockefile for litmuschaos/argoexec wasn't updated. Skipped."
+              exit
+            fi
+      script:
+      - make litmus-argo-workflow-executor
+
+    - stage: build docker images
+      name: build docker image litmuschaos/mongo
+      before_install:
+        - |
+          echo "Checking if a litmuschaos/mongo dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+          if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/mongo/)'
+          then
+            echo "Dockefile for litmuschaos/mongo wasn't updated. Skipped."
+            exit
+          fi
+      script:
+        - make litmus-mongo
 notifications:
   email:
     recipients:
