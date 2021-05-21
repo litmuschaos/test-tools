@@ -1,0 +1,43 @@
+---
+name: release
+
+on:
+  workflow_dispatch:
+    inputs:   
+      release_tag:
+        description: 'release tag'
+        required: true
+      release_title:
+        description: 'release title'
+        required: false
+      release_notes:
+        description: 'release notes'     
+        required: false
+        default: ''         
+
+jobs:
+  create_release:
+    name: create_release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: prepare binaries for release artifact
+        run: |
+          mkdir -p binaries
+          declare -a ARCH=("amd64" "arm64")
+          for val in ${ARCH[@]}; do
+            mv custom/nsutil/nsutil-linux-${val} binaries/nsutil-linux-${val}
+            mv custom/promql-cli/promql-linux-${val} binaries/promql-linux-${val}
+            mv custom/pause/pause-linux-${val} binaries/pause-linux-${val}
+          done
+          mv custom/dns_interceptor/dns_interceptor binaries/dns_interceptor
+      
+      - name: create release along with artifact
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "binaries/*"
+          body: "${{ github.event.inputs.release_notes }}"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: "${{ github.event.inputs.release_title }}"
+          tag: ${{ github.event.inputs.release_tag }}
+
