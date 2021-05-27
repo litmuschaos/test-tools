@@ -1,0 +1,77 @@
+---
+- name: "[Info]: Cloning the git repository of litmus "
+  git:
+                    repo: https://github.com/litmuschaos/litmus.git
+                    dest: litmus
+                    force: true
+- name: "[Info]: creating  Prometheus Namespace as monitoring "
+  community.kubernetes.k8s:
+                   name: monitoring
+                   api_version: v1
+                   kind: Namespace
+                   state: present
+        
+- name: "[Install]: Installing prometheus-operator"
+  command: kubectl apply -f litmus/monitoring/utils/prometheus/prometheus-operator -n monitoring
+- pause:
+                  seconds: 5
+
+- name: "[CleanUp]: Removing Unused file"
+  file:
+                 path: litmus/monitoring/utils/prometheus/prometheus-configuration/prometheus.yaml
+                 state: absent
+- name: "[Info]:  prometheus-configuration"
+  command: kubectl apply -f litmus/monitoring/utils/prometheus/prometheus-configuration -n monitoring
+
+- name: "[Info]: Wait till prometheus operatior is created"
+  community.kubernetes.k8s_info:
+    kind: Deployment
+    wait: yes
+    name: prometheus-operator 
+    namespace: monitoring
+    wait_sleep: 10
+    wait_timeout: 360 
+  register: prometheus_status
+- debug:
+        var: prometheus_status.resources[0].status
+- name: "[Info]: Wait till prometheus-k8s created "
+  community.kubernetes.k8s_info:
+    kind: StatefulSet
+    wait: yes
+    name: prometheus-k8s
+    namespace: monitoring
+    wait_sleep: 10
+    wait_timeout: 360
+  register: prometheus_k8s
+- debug:
+        var: prometheus_k8s.resources[0].status
+
+        
+- name: "[Info]: Getting all the  pods"
+  command: kubectl get pods -n monitoring
+  register: list_pods
+- debug:
+                  var: list_pods
+
+- name: "[Info]: Getting all the  services"
+  command: kubectl get svc -n monitoring
+  register: list_svc
+- debug:
+                  var: list_svc.stdout_lines
+          
+
+
+- name: "[Install]: Installing Grafana "
+  command: kubectl apply -f litmus/monitoring/utils/grafana -n monitoring
+
+- pause:
+                  seconds: 2
+- name: "[Info]: getting all the services"  
+  command: kubectl get svc -n monitoring
+  register: list_svc
+- debug:
+                  var: list_svc.stdout_lines
+          
+- debug:
+                  msg: "Monitoring Part Completed"
+

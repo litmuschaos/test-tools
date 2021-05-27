@@ -428,6 +428,18 @@ jobs:
           fi
       script:
         - make litmus-mongo
+    - stage: build docker images
+      name: build docker image litmuschaos/kafka-deployer
+      before_install:
+        - |
+            echo "Checking if a litmuschaos/kafka-deployer dockerfile changed: ${TRAVIS_COMMIT_RANGE}"
+            if ! git diff --name-only ${TRAVIS_COMMIT_RANGE} | grep -Eq '(custom/app-setup/kafka/)'
+            then
+              echo "Dockefile for litmuschaos/kafka-deployer wasn't updated. Skipped."
+              exit
+            fi
+      script:
+      - make litmus-kafka-deployer
 notifications:
   email:
     recipients:

@@ -1,0 +1,41 @@
+- name: "[CleanUp]"
+  hosts: localhost
+  vars:
+         ansible_python_interpreter: /usr/bin/python3
+
+  tasks:
+          - name: "[CleanUp]: Removing  the deployments of prometheus"
+            community.kubernetes.k8s:
+                    state: absent
+                    name: prometheus-operator
+                    kind: Deployment
+                    namespace: monitoring
+
+          - name: "[CleanUp: Removing Grafana deployment"
+            community.kubernetes.k8s:
+                     state: absent
+                     name: grafana
+                     kind: Deployment
+                     namespace: monitoring
+
+          - name: "[CleanUp: Removing prometheus-k8s Statefulsets"
+            community.kubernetes.k8s:
+                     api_version: apps/v1
+                     state: absent
+                     name: prometheus-k8s
+                     kind: StatefulSet
+                     namespace: monitoring
+ 
+          - name: "[CleanUp: Removing monitoring namespace"
+            community.kubernetes.k8s:
+                     state: absent
+                     name: monitoring
+                     kind: namespace
+                     
+          - name: "[CleanUp: Removing prometheus-k8s Statefulsets"
+            community.kubernetes.k8s:
+                     state: absent
+                     name: kafka
+                     kind: namespace
+
+
