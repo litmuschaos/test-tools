@@ -7,8 +7,7 @@ if [ ! -z "${DNAME}" ] && [ ! -z "${DPASS}" ];
 then
   docker login -u "${DNAME}" -p "${DPASS}";
   #Push to docker hub repository with latest tag
-  docker tag ${IMAGEID} litmuschaos/workflow-controller:v2.9.3
-  docker push litmuschaos/workflow-controller:v2.9.3;
+  docker buildx build --file custom/argo-workflow-controller/Dockerfile --progress plane --push --no-cache --platform linux/arm64,linux/amd64 --tag litmuschaos/workflow-controller:v2.9.3 .
 else
   echo "No docker credentials provided. Skip uploading litmuschaos/workflow-controller:v2.9.3 to docker hub";
 fi;

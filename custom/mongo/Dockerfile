@@ -1,1 +1,2 @@
-FROM mongo:4.2.8
+FROM --platform=$BUILDPLATFORM mongo:4.2.8
+ARG BUILDPLATFORM

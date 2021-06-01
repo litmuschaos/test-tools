@@ -1,15 +1,13 @@
-dist: trusty
+os: linux
+dist: bionic
 sudo: required
 install: true
 stages:
   - shell check
   - build docker images
-env:
-  global:
-    - GOARCH=amd64
 language: go
 go:
-  - 1.13.1
+  - 1.14.2
 before_install:
   - sleep 15
   - sudo apt-get install -y
@@ -388,6 +386,7 @@ jobs:
               exit
             fi
       script:
+      - ./build/buildx-setup.sh
       - make litmus-argocli
 
     - stage: build docker images
@@ -401,6 +400,7 @@ jobs:
               exit
             fi
       script:
+      - ./build/buildx-setup.sh
       - make litmus-argo-workflow-controller
 
     - stage: build docker images
@@ -414,6 +414,7 @@ jobs:
               exit
             fi
       script:
+      - ./build/buildx-setup.sh
       - make litmus-argo-workflow-executor
 
     - stage: build docker images
@@ -427,6 +428,7 @@ jobs:
             exit
           fi
       script:
+        - ./build/buildx-setup.sh
         - make litmus-mongo
 notifications:
   email:
