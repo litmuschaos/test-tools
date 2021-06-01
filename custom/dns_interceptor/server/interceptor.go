@@ -28,13 +28,14 @@ func NewDNSInterceptor(resolvConfPath, upstreamServer string) (*DNSInterceptor, 
 		for _, srv := range conf.Servers {
 			if checkValidUpstream(srv) {
 				upstreamServer = srv
+				break
 			}
 		}
 		if upstreamServer == "" {
 			log.Fatal("Failed to get a valid upstream server address, add a custom UPSTREAM_SERVER")
 		}
 	}
-	log.WithField("server", upstreamServer+":53").Info("Upstream DNS Server")
+	log.WithField("server", upstreamServer+":"+DefaultDNSPort).Info("Upstream DNS Server")
 	settings, err := getInterceptorSettings()
 	if err != nil {
 		return nil, err
@@ -104,9 +105,9 @@ func (d *DNSInterceptor) dnsHandler(writer dns.ResponseWriter, msg *dns.Msg) {
 						target += "."
 					}
 					msg.Question[0].Name = target
-					r, _, err := d.client.Exchange(msg, d.upstreamServer+":53")
+					r, _, err := d.client.Exchange(msg, d.upstreamServer+":"+DefaultDNSPort)
 					if err != nil {
-						log.WithError(err).WithField("server", d.upstreamServer+":53").Error("Error while forwarding query to dns server")
+						log.WithError(err).WithField("server", d.upstreamServer+":"+DefaultDNSPort).Error("Error while forwarding query to dns server")
 						writer.WriteMsg(msg)
 						return
 					}
@@ -127,9 +128,9 @@ func (d *DNSInterceptor) dnsHandler(writer dns.ResponseWriter, msg *dns.Msg) {
 		}
 		log.WithField("query", question.Name).Info("Query received")
 	}
-	r, _, err := d.client.Exchange(msg, d.upstreamServer+":53")
+	r, _, err := d.client.Exchange(msg, d.upstreamServer+":"+DefaultDNSPort)
 	if err != nil {
-		log.WithError(err).WithField("server", d.upstreamServer+":53").Error("Error while forwarding query to dns server")
+		log.WithError(err).WithField("server", d.upstreamServer+":"+DefaultDNSPort).Error("Error while forwarding query to dns server")
 		writer.WriteMsg(msg)
 		return
 	}

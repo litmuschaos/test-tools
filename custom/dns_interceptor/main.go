@@ -54,7 +54,7 @@ func main() {
 		chaosDuration = time.Duration(seconds) * time.Second
 	}
 	if port == "" {
-		port = "53"
+		port = server.DefaultDNSPort
 	} else if _, err := strconv.Atoi(port); err != nil {
 		log.WithError(err).Fatal("Invalid port")
 	}
