@@ -386,7 +386,7 @@ jobs:
               exit
             fi
       script:
-      - ./build/buildx-setup.sh
+      - if ! docker buildx ls | grep -q multibuilder; then ./build/buildx-setup.sh; fi
       - make litmus-argocli
 
     - stage: build docker images
@@ -400,7 +400,7 @@ jobs:
               exit
             fi
       script:
-      - ./build/buildx-setup.sh
+      - if ! docker buildx ls | grep -q multibuilder; then ./build/buildx-setup.sh; fi
       - make litmus-argo-workflow-controller
 
     - stage: build docker images
@@ -414,7 +414,7 @@ jobs:
               exit
             fi
       script:
-      - ./build/buildx-setup.sh
+      - if ! docker buildx ls | grep -q multibuilder; then ./build/buildx-setup.sh; fi
       - make litmus-argo-workflow-executor
 
     - stage: build docker images
@@ -428,7 +428,7 @@ jobs:
             exit
           fi
       script:
-        - ./build/buildx-setup.sh
+        - if ! docker buildx ls | grep -q multibuilder; then ./build/buildx-setup.sh; fi
         - make litmus-mongo
 notifications:
   email:
