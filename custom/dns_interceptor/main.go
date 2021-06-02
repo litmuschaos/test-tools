@@ -13,7 +13,12 @@ package main
 #include <stdlib.h>
 __attribute__((constructor)) void enter_namespace(void) {
 	char *ns = (char*)malloc(30 * sizeof(char));
-	sprintf(ns, "/proc/%s/ns/mnt", getenv("TARGET_PID"));
+	char *pid = getenv("TARGET_PID");
+	if(pid==NULL){
+		printf("[INFO] No PID mentioned running in current ns\n");
+		return;
+	}
+	sprintf(ns, "/proc/%s/ns/mnt", pid);
 	int fd = open(ns, O_RDONLY);
 	int res = setns(fd, 0);
 	if(res!=0){
@@ -40,6 +45,7 @@ const resolvConfPath = "/etc/resolv.conf"
 func main() {
 	chaosDuration := 2 * time.Minute
 	duration := os.Getenv("CHAOS_DURATION")
+	port := os.Getenv("PORT")
 	if duration != "" {
 		seconds, err := strconv.Atoi(duration)
 		if err != nil {
@@ -47,12 +53,18 @@ func main() {
 		}
 		chaosDuration = time.Duration(seconds) * time.Second
 	}
-	dnsInterceptor, err := server.NewDNSInterceptor(resolvConfPath)
+	if port == "" {
+		port = server.DefaultDNSPort
+	} else if _, err := strconv.Atoi(port); err != nil {
+		log.WithError(err).Fatal("Invalid port")
+	}
+	log.WithField("port", port).Info("DNS Interceptor Port")
+	dnsInterceptor, err := server.NewDNSInterceptor(resolvConfPath, os.Getenv("UPSTREAM_SERVER"))
 	if err != nil {
 		log.WithError(err).Fatal("Failed to create Interceptor")
 	}
 
-	dnsInterceptor.Serve(".")
+	dnsInterceptor.Serve(".", port)
 
 	sig := make(chan os.Signal)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
