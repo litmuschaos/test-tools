@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: litmus-kafka-deployer
+  labels:
+    app: litmus-kafka-deployer
+spec:
+  serviceAccountName: litmus-kafka-sa
+  containers:
+  - name: litmus-kafka-deployer-container
+    image: aady12/demotest:latest
+    imagePullPolicy: Always
+    envFrom:
+        - secretRef:
+              name: aws-secret
+    env:
+        ##  It defines the mode of the experiment
+        ##Supported values: setup, cleanup
+        - name: MODE
+          value: "setup"
+          
+         ## It defines the platform of the k8s cluster
+         ## Supported value: eks
+        - name: PLATFORM
+          value: "eks"
+        
+        ## It defines the kubectl-Kudo version
+        - name: KUDO_VERSION
+          value: 0.12.0
+ 

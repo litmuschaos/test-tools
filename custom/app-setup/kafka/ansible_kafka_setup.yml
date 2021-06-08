@@ -1,4 +1,4 @@
-- name: "[Configuring Kafka along with exporter and monitoring]]"
+- name: "[Install]: Configuring Kafka along with exporter and monitoring]"
   hosts: localhost
   vars:
     ansible_python_interpreter: /usr/bin/python3

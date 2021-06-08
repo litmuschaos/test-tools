@@ -1,4 +1,4 @@
-- name: "[CleanUp]"
+- name: "[CleanUp]: Removing kafka cluster along with monitoring"
   hosts: localhost
   vars:
          ansible_python_interpreter: /usr/bin/python3
@@ -11,14 +11,14 @@
                     kind: Deployment
                     namespace: monitoring
 
-          - name: "[CleanUp: Removing Grafana deployment"
+          - name: "[CleanUp]: Removing Grafana deployment"
             community.kubernetes.k8s:
                      state: absent
                      name: grafana
                      kind: Deployment
                      namespace: monitoring
 
-          - name: "[CleanUp: Removing prometheus-k8s Statefulsets"
+          - name: "[CleanUp]: Removing prometheus-k8s Statefulsets"
             community.kubernetes.k8s:
                      api_version: apps/v1
                      state: absent
@@ -26,13 +26,13 @@
                      kind: StatefulSet
                      namespace: monitoring
  
-          - name: "[CleanUp: Removing monitoring namespace"
+          - name: "[CleanUp]: Removing monitoring namespace"
             community.kubernetes.k8s:
                      state: absent
                      name: monitoring
                      kind: namespace
                      
-          - name: "[CleanUp: Removing prometheus-k8s Statefulsets"
+          - name: "[CleanUp]: Removing prometheus-k8s Statefulsets"
             community.kubernetes.k8s:
                      state: absent
                      name: kafka

@@ -4,6 +4,7 @@
                     repo: https://github.com/litmuschaos/litmus.git
                     dest: litmus
                     force: true
+
 - name: "[Info]: creating  Prometheus Namespace as monitoring "
   community.kubernetes.k8s:
                    name: monitoring
@@ -20,6 +21,7 @@
   file:
                  path: litmus/monitoring/utils/prometheus/prometheus-configuration/prometheus.yaml
                  state: absent
+
 - name: "[Info]:  prometheus-configuration"
   command: kubectl apply -f litmus/monitoring/utils/prometheus/prometheus-configuration -n monitoring
 
@@ -34,6 +36,7 @@
   register: prometheus_status
 - debug:
         var: prometheus_status.resources[0].status
+
 - name: "[Info]: Wait till prometheus-k8s created "
   community.kubernetes.k8s_info:
     kind: StatefulSet
@@ -46,7 +49,6 @@
 - debug:
         var: prometheus_k8s.resources[0].status
 
-        
 - name: "[Info]: Getting all the  pods"
   command: kubectl get pods -n monitoring
   register: list_pods
@@ -59,8 +61,6 @@
 - debug:
                   var: list_svc.stdout_lines
           
-
-
 - name: "[Install]: Installing Grafana "
   command: kubectl apply -f litmus/monitoring/utils/grafana -n monitoring
 
@@ -71,7 +71,3 @@
   register: list_svc
 - debug:
                   var: list_svc.stdout_lines
-          
-- debug:
-                  msg: "Monitoring Part Completed"
-
