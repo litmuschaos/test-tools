@@ -22,7 +22,7 @@
      var: kudoresult.status_code  
 
 - name: "[Info]: Moving the kubectl-kudo"
-  command: mv   kubectl-kudo  /usr/local/bin/kubectl-kudo
+  command: mv kubectl-kudo  /usr/local/bin/kubectl-kudo
       
 - name: "[Info]: Initialising the kubectl kudo"
   command: "kubectl kudo init"
@@ -43,7 +43,7 @@
 - debug:
      var: kafka_output.stdout_lines
 
-- name: "[Wait]: Wait till the  obect of zookeeper is not crerated"
+- name: "[Wait]: Wait till the  object of zookeeper is not crerated"
   community.kubernetes.k8s_info:
      api_version: apps/v1
      kind: StatefulSet
@@ -51,7 +51,7 @@
      name: zookeeper-instance-zookeeper
      namespace: '{{ KAFKA_NS }}'
      wait_sleep: 2
-     wait_timeout: 100
+     wait_timeout: 180
   register: Zoowaitlog
 - debug:
      var: Zoowaitlog.resources[0].status.currentReplicas
@@ -65,9 +65,6 @@
   register: kafkawaitlog
   until:  kafkawaitlog.resources[0].status.currentReplicas == kafkawaitlog.resources[0].spec.replicas
   retries: 10
-  delay: 15
+  delay: 18
 - debug:
      var: kafkawaitlog.resources[0].status.currentReplicas
-
-
-

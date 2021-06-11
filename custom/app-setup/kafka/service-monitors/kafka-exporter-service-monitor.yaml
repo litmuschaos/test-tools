@@ -7,7 +7,6 @@ metadata:
     k8s-app: kafka-exporter
   namespace: NAMESPACE
 spec:
- 
   jobLabel: name
   vars:
   selector:

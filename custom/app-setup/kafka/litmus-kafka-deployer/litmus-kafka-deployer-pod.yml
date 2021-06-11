@@ -8,7 +8,7 @@ spec:
   serviceAccountName: litmus-kafka-sa
   containers:
   - name: litmus-kafka-deployer-container
-    image: aady12/demotest:latest
+    image: litmuschaos/kafka-deployer:latest
     imagePullPolicy: Always
     envFrom:
         - secretRef:

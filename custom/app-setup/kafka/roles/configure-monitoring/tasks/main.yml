@@ -3,6 +3,7 @@
   git:
      repo: https://github.com/litmuschaos/litmus.git
      dest: litmus
+     version: 2.0.0-Beta7
      force: true
 
 - name: "[Info]: creating  Prometheus Namespace as monitoring "
@@ -14,8 +15,6 @@
         
 - name: "[Install]: Installing prometheus-operator"
   command: kubectl apply -f litmus/monitoring/utils/prometheus/prometheus-operator -n monitoring
-- pause:
-     seconds: 5
 
 - name: "[CleanUp]: Removing Unused file"
   file:
@@ -48,7 +47,7 @@
      wait_timeout: 180
   register: prometheus_k8s_
 - debug:
-     var: prometheus_k8s_.resources[0].status
+     var: prometheus_k8s_.resources
 
 - name: "[Info]: Getting all the  pods"
   command: kubectl get pods -n monitoring

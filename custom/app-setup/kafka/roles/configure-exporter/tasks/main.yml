@@ -1,4 +1,11 @@
 ---
+- name: "[Info]:  Creating  litmus  namespace"
+  community.kubernetes.k8s:
+    name: litmus
+    api_version: v1
+    kind: Namespace
+    state: present
+
 - name: "[Install]: Installing chaos-exporter-service-monitor"
   command: kubectl apply -f service-monitors/chaos-exporter-service-monitor.yaml
  
@@ -8,18 +15,22 @@
     regexp: 'NAMESPACE'
     replace: '{{ KAFKA_NS }}'
     backup: yes
+
 - name: "[Install]: Installing  kafka exporter service monitor"
   command: "kubectl apply -f service-monitors/kafka-exporter-service-monitor.yaml "
+  
+- name: "[Install]: Installing chaos-exporter"
+  command: "kubectl apply -f chaos-exporter -n litmus"
 
-- pause:
-     seconds: 5
-
+- name: "[Install]: Installing kafka-exporter"
+  command: "helm upgrade --install  -f kafka-exporter/values.yaml kafka-exporter --namespace=kafka ./kafka-exporter"
+     
 - name: "[Info]: Labeling servicemonitor"
   shell:
      cmd: "kubectl label servicemonitor.monitoring.coreos.com kafka -n {{  KAFKA_NS }}  app=kafka-exporter --overwrite"
   register: monitor_log
 - debug:
-                  var: monitor_log
+     var: monitor_log
 
 - name: "[Install]: Installing  kafka exporter service monitor"
   command: "kubectl apply -f service-monitors/kafka-exporter-service-monitor.yaml "
@@ -57,8 +68,3 @@
   register: monitoring_svc
 - debug:
      var: monitoring_svc.stdout_lines
-
-
-
-
- 
