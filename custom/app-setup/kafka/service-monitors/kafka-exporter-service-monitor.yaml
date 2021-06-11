@@ -5,15 +5,17 @@ metadata:
   labels:
     name: kafka
     k8s-app: kafka-exporter
-  namespace: kafka
+  namespace: NAMESPACE
 spec:
+ 
   jobLabel: name
+  vars:
   selector:
     matchLabels:
       app.kubernetes.io/name: kafka-exporter
   namespaceSelector:
     matchNames:
-    - kafka
+    - NAMESPACE
   endpoints:
   - port: metrics
     interval: 1s

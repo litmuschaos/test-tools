@@ -27,4 +27,6 @@ spec:
         ## It defines the kubectl-Kudo version
         - name: KUDO_VERSION
           value: 0.12.0
- 
+        ## Name of namespace where kafka will be installed
+        - name: KAFKA_NS 
+          value: "kafka" 

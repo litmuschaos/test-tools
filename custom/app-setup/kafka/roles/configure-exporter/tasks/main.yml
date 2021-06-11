@@ -1,52 +1,62 @@
 ---
 - name: "[Install]: Installing chaos-exporter-service-monitor"
   command: kubectl apply -f service-monitors/chaos-exporter-service-monitor.yaml
-
+ 
+- name: "[Info]: Assigning the namespace to kafka-exporter-service-monitor"
+  replace:
+    path: service-monitors/kafka-exporter-service-monitor.yaml
+    regexp: 'NAMESPACE'
+    replace: '{{ KAFKA_NS }}'
+    backup: yes
 - name: "[Install]: Installing  kafka exporter service monitor"
-  command: kubectl apply -f service-monitors/kafka-exporter-service-monitor.yaml
-            
+  command: "kubectl apply -f service-monitors/kafka-exporter-service-monitor.yaml "
+
 - pause:
-                  seconds: 5
+     seconds: 5
 
 - name: "[Info]: Labeling servicemonitor"
   shell:
-                    cmd: kubectl label servicemonitor.monitoring.coreos.com kafka -n kafka  app=kafka-exporter --overwrite
+     cmd: "kubectl label servicemonitor.monitoring.coreos.com kafka -n {{  KAFKA_NS }}  app=kafka-exporter --overwrite"
   register: monitor_log
 - debug:
                   var: monitor_log
-          
+
+- name: "[Install]: Installing  kafka exporter service monitor"
+  command: "kubectl apply -f service-monitors/kafka-exporter-service-monitor.yaml "
+
+
 - name: "[Install]: Installing prometheus for exporter"
   command: kubectl apply -f prometheus/prometheus.yaml
  
 - name: "[CleanUp]: Removing litmus directory"
   file:
-                path: litmus
-                state: absent
-                force: true
+     path: litmus
+     state: absent
+     force: true
 
 - name: "[Info]:  Pods in Kafka namespace"
-  command: kubectl get pods -n kafka
+  command: "kubectl get pods -n $KAFKA_NS"
   register: kafka_pods
 - debug:
-                var: kafka_pods.stdout_lines
+     var: kafka_pods.stdout_lines
 
 - name: "[Info]: Pods in monitoring  namespace"
   command: kubectl get pods -n  monitoring
   register: monitoring_pods
 - debug:
-                var: monitoring_pods.stdout_lines
+     var: monitoring_pods.stdout_lines
 
 - name: "[Info]: Pods in litmus namespace"
   command: kubectl get pods -n litmus
   register: litmus_pods
 - debug:
-                var: litmus_pods.stdout_lines
+     var: litmus_pods.stdout_lines
 
 - name: "[Info]: Services in Monitoring"
   command: kubectl get svc -n monitoring
   register: monitoring_svc
 - debug:
-                var: monitoring_svc.stdout_lines
+     var: monitoring_svc.stdout_lines
 
 
 
