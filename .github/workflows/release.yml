@@ -21,23 +21,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: prepare binaries for release artifact
-        run: |
-          mkdir -p binaries
-          declare -a ARCH=("amd64" "arm64")
-          for val in ${ARCH[@]}; do
-            mv custom/nsutil/nsutil-linux-${val} binaries/nsutil-linux-${val}
-            mv custom/promql-cli/promql-linux-${val} binaries/promql-linux-${val}
-            mv custom/pause/pause-linux-${val} binaries/pause-linux-${val}
-          done
-          mv custom/dns_interceptor/dns_interceptor binaries/dns_interceptor
+
+      - name: Build go binary for pause
+        run : ./../../build/go-multiarch-build.sh "go build -o ./../../build/_output/pause-linux"
+        working-directory: custom/pause
+
+      - name: Build go binary for nsutil
+        run : ./../../build/go-multiarch-build.sh "go build -o ./../../build/_output/nsutil-linux"
+        working-directory: custom/nsutil
+
+      - name: Build go binary for promql-cli
+        run : |
+          cp custom/promql-cli/promql-linux-amd64 build/_output/
+          cp custom/promql-cli/promql-linux-arm64 build/_output/
+          
+      - name: Build go binary for dns_interceptor
+        run : go build -o ./../../build/_output/dns_interceptor
+        working-directory: custom/dns_interceptor
       
       - name: create release along with artifact
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "binaries/*"
+          artifacts: "build/_output/*"
           body: "${{ github.event.inputs.release_notes }}"
           token: ${{ secrets.GITHUB_TOKEN }}
           name: "${{ github.event.inputs.release_title }}"
           tag: ${{ github.event.inputs.release_tag }}
-
