@@ -2,9 +2,18 @@
 FROM golang:1.14 AS builder
 
 LABEL maintainer="LitmusChaos"
- 
+
+ARG TARGETOS=linux
+ARG TARGETARCH=amd64
+
 ADD . /app-deployer
 WORKDIR /app-deployer
+
+ENV GOOS=${TARGETOS} \
+    GOARCH=${TARGETARCH}
+
+RUN go env
+
 RUN CGO_ENABLED=0 go build -o /output/deployer -v
 
 #Deploy Stage

@@ -1,0 +1,459 @@
+---
+name: build-pipeline
+on:
+  pull_request:
+    branches:
+      - master
+
+defaults:
+  run:
+    shell: bash        
+
+jobs:
+  shell-checker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: checking syntax of shell script
+        run: bash -c 'shopt -s globstar nullglob; shellcheck **/*.{sh,ksh,bash}' || true
+
+
+  changes:
+    runs-on: ubuntu-latest
+    # Set job outputs to values from filter step
+    # this is done to run the selective jobs based on the code change
+    outputs:
+      forkbomb: ${{ steps.filter.outputs.forkbomb }}
+      fio: ${{ steps.filter.outputs.fio }}
+      mysql-client: ${{ steps.filter.outputs.mysql-client }}
+      sysbench-client: ${{ steps.filter.outputs.sysbench-client }}
+      tpcc-client: ${{ steps.filter.outputs.tpcc-client }}
+      stress-ng: ${{ steps.filter.outputs.stress-ng }}
+      mongo-client: ${{ steps.filter.outputs.mongo-client }}
+      postgres-client: ${{ steps.filter.outputs.postgres-client }}
+      custom-client: ${{ steps.filter.outputs.custom-client }}
+      logger: ${{ steps.filter.outputs.logger }}
+      dd-client: ${{ steps.filter.outputs.dd-client }}
+      memleak: ${{ steps.filter.outputs.memleak }}
+      elasticsearch-stress: ${{ steps.filter.outputs.elasticsearch-stress }}
+      kafka-client: ${{ steps.filter.outputs.kafka-client }}
+      memory-stress: ${{ steps.filter.outputs.memory-stress }}
+      nfs-client: ${{ steps.filter.outputs.nfs-client }}
+      cassandra-client: ${{ steps.filter.outputs.cassandra-client }}
+      litmus-app-deployer: ${{ steps.filter.outputs.litmus-app-deployer }}
+      litmus-qps-cmd: ${{ steps.filter.outputs.litmus-qps-cmd }}
+      pod-delete: ${{ steps.filter.outputs.pod-delete }}
+      pod-delete-helper: ${{ steps.filter.outputs.pod-delete-helper }}
+      container-killer: ${{ steps.filter.outputs.container-killer }}
+      container-kill-helper: ${{ steps.filter.outputs.pod-delete }}
+      litmus-git-app-checker: ${{ steps.filter.outputs.litmus-git-app-checker }}
+      litmus-k8s: ${{ steps.filter.outputs.litmus-k8s }}
+      litmus-checker: ${{ steps.filter.outputs.litmus-checker }}
+      litmus-argocli: ${{ steps.filter.outputs.litmus-argocli }}   
+      workflow-controller: ${{ steps.filter.outputs.workflow-controller }}   
+      argoexec: ${{ steps.filter.outputs.argoexec }}                                                
+      mongo: ${{ steps.filter.outputs.mongo }}   
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}    
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            forkbomb:
+              - 'resource_stress/forkbomb/**'
+            fio:
+              - 'io_tools/fio/**'
+            mysql-client:
+              - 'app_clients/mysql-client/**'
+            sysbench-client:
+              - 'io_tools/sysbench/**'
+            tpcc-client:
+              - 'io_tools/tpcc/**'
+            stress-ng:
+              - 'resource_stress/stress-ng/**'
+            mongo-client:
+              - 'app_clients/mongo-client/**'
+            postgres-client:
+              - 'app_clients/postgres-client/**'     
+            custom-client:
+              - 'custom/custom-client/**'
+            litmus-checker:
+              - 'custom/litmus-checker/**'
+            logger:
+              - 'log_utils/logger/**'
+            dd-client:
+              - 'io_tools/dd/**'
+            memleak:
+              - 'resource_stress/memleak/**'
+            elasticsearch-stress:
+              - 'app_clients/elasticsearch-stress/**'
+            kafka-client:
+              - 'app_clients/kafka-client/**'
+            nfs-client:
+              - 'app_clients/nfs-client/**'
+            cassandra-client:
+              - 'app_clients/cassandra-client/**' 
+            litmus-app-deployer:
+              - 'custom/workflow-helper/app-deployer/**'
+            litmus-qps-cmd:
+              - 'custom/workflow-helper/app-qps-test/**'
+            pod-delete:
+              - 'experiments/pod-delete/**'
+            pod-delete-helper:
+              - 'experiments/generic/pod-delete/**'
+            container-killer:
+              - 'containerd/crictl/**'
+            container-kill-helper:
+              - 'experiments/generic/container-kill/**'
+            litmus-git-app-checker:
+              - 'custom/workflow-helper/app-checker/**'
+            litmus-k8s:
+              - 'custom/k8s/**'
+            litmus-argocli:
+              - 'custom/argo-server/**'   
+            workflow-controller:
+              - 'custom/argo-workflow-controller/**' 
+            argoexec:
+              - 'custom/argo-workflow-executor/**'  
+            mongo:
+              - 'custom/mongo/**'   
+
+  litmus-app-deployer:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.litmus-app-deployer == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building litmus-app-deployer image
+        run: make litmus-app-deployer
+
+  litmus-qps-cmd:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.litmus-qps-cmd == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building litmus-qps-cmd image
+        run: make litmus-qps-cmd
+
+  litmus-checker:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.litmus-checker == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building litmus-checker image
+        run: make litmus-checker
+
+  litmus-git-app-checker:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.litmus-git-app-checker == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building litmus-git-app-checker image
+        run: make litmus-git-app-checker
+
+  litmus-k8s:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.litmus-k8s == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building litmus-k8s image
+        run: make litmus-k8s
+
+  kafka-client:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.kafka-client == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building kafka-client image
+        run: make kafka-client
+
+  cassandra-client:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.cassandra-client == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building cassandra-client image
+        run: make cassandra-client
+
+  litmus-argocli:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.litmus-argocli == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Building litmus-argocli image
+        run: make litmus-argocli
+
+  litmus-argo-workflow-controller:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.workflow-controller == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+                    
+      - name: Building workflow-controller image
+        run: make litmus-argo-workflow-controller
+
+  litmus-argo-workflow-executor:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.argoexec == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Building argoexec image
+        run: make litmus-argo-workflow-executor
+
+  mongo:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.mongo == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Building mongo image
+        run: make litmus-mongo
+
+  mysql-client:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.mysql-client == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building mysql-client image
+        run: make mysql-client
+
+  sysbench-client:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.sysbench-client == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building sysbench-client image
+        run: make sysbench
+
+  tpcc-client:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.tpcc-client == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building tpcc-client image
+        run: make tpcc
+
+  stress-ng:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.stress-ng == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building stress-ng image
+        run: make stress-ng
+
+  mongo-client:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.mongo-client == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building mongo-client image
+        run: make mongo-client
+
+  postgres-client:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.postgres-client == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building postgres-client image
+        run: make postgres-client
+
+  custom-client:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.custom-client == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building custom-client image
+        run: make custom-client
+
+  logger:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.logger == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building logger image
+        run: make logger
+
+  dd-client:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.dd-client == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building dd-client image
+        run: make dd
+
+  memleak:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.memleak == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building memleak image
+        run: make memleak
+
+  elasticsearch-stress:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.elasticsearch-stress == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building elasticsearch-stress image
+        run: make elasticsearch-stress
+
+  memory-stress:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.memory-stress == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building memory-stress image
+        run: make memory-stress
+
+  nfs-client:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.nfs-client == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building nfs-client image
+        run: make nfs-client
+
+  pod-delete:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.pod-delete == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building pod-delete image
+        run: make pod-delete
+
+  pod-delete-helper:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.pod-delete-helper == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building pod-delete-helper image
+        run: make pod-delete-go
+
+  container-killer:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.container-killer == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building container-killer image
+        run: make container-killer
+
+  container-kill-helper:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.container-kill-helper == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building container-kill-helper image
+        run: make container-kill-go
+
+  forkbomb:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.forkbomb == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building forkbomb image
+        run: make forkbomb
+
+  fio:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.fio == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building fio image
+        run: make fio
