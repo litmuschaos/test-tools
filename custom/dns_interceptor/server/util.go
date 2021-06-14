@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	log "github.com/sirupsen/logrus"
+	"net"
 	"os"
 	"strings"
 )
@@ -25,6 +26,8 @@ func getInterceptorSettings() (*InterceptorSettings, error) {
 			return nil, errors.New("failed to parse target hostname list : " + err.Error())
 		}
 	}
+
+	log.WithField("targets", interceptorSettings.TargetHostNames).Info("Chaos Error Targets")
 
 	if spoofMap == "" {
 		interceptorSettings.SpoofMap = nil
@@ -94,4 +97,9 @@ func updateResolvConf(resolvConfPath string, originalData *string) (string, erro
 		return "", err
 	}
 	return originalLines, nil
+}
+
+func checkValidUpstream(server string) bool {
+	serverIp := net.ParseIP(server)
+	return !serverIp.IsLoopback() && !net.IPv4zero.Equal(serverIp) && !net.IPv6zero.Equal(serverIp)
 }

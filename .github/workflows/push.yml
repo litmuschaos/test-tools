@@ -135,7 +135,7 @@ jobs:
         with:
           version: latest
 
-      - name: Building litmus-app-deployer image
+      - name: Build and Push litmus-app-deployer image
         run: |
           make docker.buildx
           make _push_litmus_app_deployer
@@ -153,7 +153,7 @@ jobs:
         with:
           version: latest
 
-      - name: Building litmus-qps-cmd image
+      - name: Build and Push litmus-qps-cmd image
         run: |
           make docker.buildx
           make _push_litmus_qps_cmd
@@ -171,7 +171,7 @@ jobs:
         with:
           version: latest
 
-      - name: Building litmus-checker image
+      - name: Build and Push litmus-checker image
         run: |
           make docker.buildx
           make _push_litmus_checker
@@ -182,7 +182,7 @@ jobs:
     if: needs.changes.outputs.litmus-git-app-checker == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building litmus-git-app-checker image
+      - name: Build and Push litmus-git-app-checker image
         run: make litmus-git-app-checker
 
   litmus-k8s:
@@ -191,7 +191,7 @@ jobs:
     if: needs.changes.outputs.litmus-k8s == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building litmus-k8s image
+      - name: Build and Push litmus-k8s image
         run: make litmus-k8s
 
   kafka-client:
@@ -200,7 +200,7 @@ jobs:
     if: needs.changes.outputs.kafka-client == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building kafka-client image
+      - name: Build and Push kafka-client image
         run: make kafka-client
 
   cassandra-client:
@@ -209,7 +209,7 @@ jobs:
     if: needs.changes.outputs.cassandra-client == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building cassandra-client image
+      - name: Build and Push cassandra-client image
         run: make cassandra-client
 
   litmus-argocli:
@@ -218,16 +218,13 @@ jobs:
     if: needs.changes.outputs.litmus-argocli == 'true'
     steps:
       - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
         with:
           version: latest
 
-      - name: Building litmus-argocli image
+      - name: Build and Push litmus-argocli image
         run: |
           make docker.buildx
           make _push_litmus_argocli
@@ -238,16 +235,13 @@ jobs:
     if: needs.changes.outputs.workflow-controller == 'true'
     steps:
       - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
         with:
           version: latest
                     
-      - name: Building workflow-controller image
+      - name: Build and Push workflow-controller image
         run: |
           make docker.buildx
           make _push_litmus_argo_workflow_controller
@@ -258,16 +252,13 @@ jobs:
     if: needs.changes.outputs.argoexec == 'true'
     steps:
       - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
         with:
           version: latest
 
-      - name: Building argoexec image
+      - name: Build and Push argoexec image
         run: |
           make docker.buildx
           make _push_litmus_argo_workflow_executor
@@ -278,16 +269,13 @@ jobs:
     if: needs.changes.outputs.mongo == 'true'
     steps:
       - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
         with:
           version: latest
 
-      - name: Building mongo image
+      - name: Build and Push mongo image
         run: |
           make docker.buildx
           make _push_litmus_mongo
@@ -298,7 +286,7 @@ jobs:
     if: needs.changes.outputs.mysql-client == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building mysql-client image
+      - name: Build and Push mysql-client image
         run: make mysql-client
 
   sysbench-client:
@@ -307,7 +295,7 @@ jobs:
     if: needs.changes.outputs.sysbench-client == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building sysbench-client image
+      - name: Build and Push sysbench-client image
         run: make sysbench
 
   tpcc-client:
@@ -316,7 +304,7 @@ jobs:
     if: needs.changes.outputs.tpcc-client == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building tpcc-client image
+      - name: Build and Push tpcc-client image
         run: make tpcc
 
   stress-ng:
@@ -325,7 +313,7 @@ jobs:
     if: needs.changes.outputs.stress-ng == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building stress-ng image
+      - name: Build and Push stress-ng image
         run: make stress-ng
 
   mongo-client:
@@ -334,7 +322,7 @@ jobs:
     if: needs.changes.outputs.mongo-client == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building mongo-client image
+      - name: Build and Push mongo-client image
         run: make mongo-client
 
   postgres-client:
@@ -343,7 +331,7 @@ jobs:
     if: needs.changes.outputs.postgres-client == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building postgres-client image
+      - name: Build and Push postgres-client image
         run: make postgres-client
 
   custom-client:
@@ -352,7 +340,7 @@ jobs:
     if: needs.changes.outputs.custom-client == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building custom-client image
+      - name: Build and Push custom-client image
         run: make custom-client
 
   logger:
@@ -361,7 +349,7 @@ jobs:
     if: needs.changes.outputs.logger == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building logger image
+      - name: Build and Push logger image
         run: make logger
 
   dd-client:
@@ -370,7 +358,7 @@ jobs:
     if: needs.changes.outputs.dd-client == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building dd-client image
+      - name: Build and Push dd-client image
         run: make dd
 
   memleak:
@@ -379,7 +367,7 @@ jobs:
     if: needs.changes.outputs.memleak == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building memleak image
+      - name: Build and Push memleak image
         run: make memleak
 
   elasticsearch-stress:
@@ -388,7 +376,7 @@ jobs:
     if: needs.changes.outputs.elasticsearch-stress == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building elasticsearch-stress image
+      - name: Build and Push elasticsearch-stress image
         run: make elasticsearch-stress
 
   memory-stress:
@@ -397,7 +385,7 @@ jobs:
     if: needs.changes.outputs.memory-stress == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building memory-stress image
+      - name: Build and Push memory-stress image
         run: make memory-stress
 
   nfs-client:
@@ -406,7 +394,7 @@ jobs:
     if: needs.changes.outputs.nfs-client == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building nfs-client image
+      - name: Build and Push nfs-client image
         run: make nfs-client
 
   pod-delete:
@@ -415,7 +403,7 @@ jobs:
     if: needs.changes.outputs.pod-delete == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building pod-delete image
+      - name: Build and Push pod-delete image
         run: make pod-delete
 
   pod-delete-helper:
@@ -424,7 +412,7 @@ jobs:
     if: needs.changes.outputs.pod-delete-helper == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building pod-delete-helper image
+      - name: Build and Push pod-delete-helper image
         run: make pod-delete-go
 
   container-killer:
@@ -433,7 +421,7 @@ jobs:
     if: needs.changes.outputs.container-killer == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building container-killer image
+      - name: Build and Push container-killer image
         run: make container-killer
 
   container-kill-helper:
@@ -442,7 +430,7 @@ jobs:
     if: needs.changes.outputs.container-kill-helper == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building container-kill-helper image
+      - name: Build and Push container-kill-helper image
         run: make container-kill-go
 
   forkbomb:
@@ -451,7 +439,7 @@ jobs:
     if: needs.changes.outputs.forkbomb == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building forkbomb image
+      - name: Build and Push forkbomb image
         run: make forkbomb
 
   fio:
@@ -460,5 +448,5 @@ jobs:
     if: needs.changes.outputs.fio == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Building fio image
+      - name: Build and Push fio image
         run: make fio

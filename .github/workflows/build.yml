@@ -209,7 +209,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-
       - name: Building litmus-argocli image
         run: make litmus-argocli
 
@@ -233,7 +232,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-
       - name: Building argoexec image
         run: make litmus-argo-workflow-executor
 

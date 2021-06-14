@@ -6,6 +6,7 @@ const (
 	Error            ChaosType = "error"
 	Spoof            ChaosType = "spoof"
 	RandomResolution ChaosType = "random"
+	DefaultDNSPort             = "53"
 )
 
 type MatchType string
