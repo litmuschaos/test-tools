@@ -3,4 +3,4 @@
  KUDO_VERSION : "0.12.0"
  OS : "linux"
  ARCH : "x86_64"
- KAFKA_NS: "{{ lookup('env','KAFKA_NS') }}"
+ KAFKA_NAMESPACE: "{{ lookup('env','KAFKA_NAMESPACE') }}"

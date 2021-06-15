@@ -1,7 +1,7 @@
 ---
-- name: "[Info]: Creating  {{ KAFKA_NS }} Namespace"
+- name: "[Info]: Creating  {{ KAFKA_NAMESPACE }} Namespace"
   community.kubernetes.k8s:
-     name: '{{ KAFKA_NS }}'
+     name: '{{ KAFKA_NAMESPACE }}'
      api_version: v1
      kind: Namespace
      state: present
@@ -28,7 +28,7 @@
   command: "kubectl kudo init"
 
 - name: "[Install]: Installing zookeeper"
-  command: "kubectl kudo install zookeeper --instance=zookeeper-instance -n {{ KAFKA_NS }}"
+  command: "kubectl kudo install zookeeper --instance=zookeeper-instance -n {{ KAFKA_NAMESPACE }}"
   register: zookeeper_output
   changed_when: false
   failed_when: "zookeeper_output.rc!=0 and zookeeper_output.stdout_lines[0].find('already installed') == -1"
@@ -36,7 +36,7 @@
      var: zookeeper_output.stdout_lines[0]
 
 - name: "[Install]: Installing kafka"
-  command: "kubectl kudo install kafka --instance=kafka -p ADD_SERVICE_MONITOR=true -n {{ KAFKA_NS }}"
+  command: "kubectl kudo install kafka --instance=kafka -p ADD_SERVICE_MONITOR=true -n {{ KAFKA_NAMESPACE }}"
   register: kafka_output
   changed_when: false
   failed_when:  "kafka_output.rc != 0 and kafka_output.stdout_lines[0].find('already installed') == -1"
@@ -49,7 +49,7 @@
      kind: StatefulSet
      wait: yes
      name: zookeeper-instance-zookeeper
-     namespace: '{{ KAFKA_NS }}'
+     namespace: '{{ KAFKA_NAMESPACE }}'
      wait_sleep: 2
      wait_timeout: 180
   register: Zoowaitlog
@@ -61,7 +61,7 @@
      kind: StatefulSet
      name: kafka-kafka
      wait: yes
-     namespace: '{{ KAFKA_NS }}'
+     namespace: '{{ KAFKA_NAMESPACE }}'
   register: kafkawaitlog
   until:  kafkawaitlog.resources[0].status.currentReplicas == kafkawaitlog.resources[0].spec.replicas
   retries: 10

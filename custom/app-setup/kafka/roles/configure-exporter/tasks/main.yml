@@ -13,7 +13,7 @@
   replace:
     path: service-monitors/kafka-exporter-service-monitor.yaml
     regexp: 'NAMESPACE'
-    replace: '{{ KAFKA_NS }}'
+    replace: '{{ KAFKA_NAMESPACE }}'
     backup: yes
 
 - name: "[Install]: Installing  kafka exporter service monitor"
@@ -23,22 +23,28 @@
   command: "kubectl apply -f chaos-exporter -n litmus"
 
 - name: "[Install]: Installing kafka-exporter"
-  command: "helm upgrade --install  -f kafka-exporter/values.yaml kafka-exporter --namespace=kafka ./kafka-exporter"
+  command: "helm upgrade --install  -f kafka-exporter/values.yaml kafka-exporter --namespace={{ KAFKA_NAMESPACE }} ./kafka-exporter"
      
 - name: "[Info]: Labeling servicemonitor"
   shell:
-     cmd: "kubectl label servicemonitor.monitoring.coreos.com kafka -n {{  KAFKA_NS }}  app=kafka-exporter --overwrite"
+     cmd: "kubectl label servicemonitor.monitoring.coreos.com kafka-monitor -n {{  KAFKA_NAMESPACE }}  k8s-app=kafka-exporter --overwrite"
   register: monitor_log
 - debug:
      var: monitor_log
 
-- name: "[Install]: Installing  kafka exporter service monitor"
-  command: "kubectl apply -f service-monitors/kafka-exporter-service-monitor.yaml "
-
-
 - name: "[Install]: Installing prometheus for exporter"
-  command: kubectl apply -f prometheus/prometheus.yaml
- 
+  command: "kubectl apply -f prometheus/prometheus.yaml -n {{ MONITORING_NAMESPACE }}"
+
+- name: "[Info]: Wait till prometheus-k8s created "
+  community.kubernetes.k8s_info:
+     api_version: apps/v1
+     kind: StatefulSet
+     wait: yes
+     name: prometheus-k8s
+     namespace: '{{ MONITORING_NAMESPACE }}'
+     wait_sleep: 10
+     wait_timeout: 180 
+  
 - name: "[CleanUp]: Removing litmus directory"
   file:
      path: litmus
@@ -46,13 +52,13 @@
      force: true
 
 - name: "[Info]:  Pods in Kafka namespace"
-  command: "kubectl get pods -n $KAFKA_NS"
+  command: "kubectl get pods -n $KAFKA_NAMESPACE"
   register: kafka_pods
 - debug:
      var: kafka_pods.stdout_lines
 
 - name: "[Info]: Pods in monitoring  namespace"
-  command: kubectl get pods -n  monitoring
+  command: "kubectl get pods -n  $MONITORING_NAMESPACE"
   register: monitoring_pods
 - debug:
      var: monitoring_pods.stdout_lines
@@ -64,7 +70,7 @@
      var: litmus_pods.stdout_lines
 
 - name: "[Info]: Services in Monitoring"
-  command: kubectl get svc -n monitoring
+  command: "kubectl get svc -n $MONITORING_NAMESPACE"
   register: monitoring_svc
 - debug:
      var: monitoring_svc.stdout_lines

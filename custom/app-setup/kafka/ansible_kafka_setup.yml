@@ -2,7 +2,9 @@
   hosts: localhost
   vars:
      ansible_python_interpreter: /usr/bin/python3
-     KAFKA_NS: "{{ lookup('env','KAFKA_NS') }}"
+     KAFKA_NAMESPACE: "{{ lookup('env','KAFKA_NAMESPACE') }}"
+     MONITORING_NAMESPACE: "{{ lookup('env','MONITORING_NAMESPACE') }}"
+     LITMUS_GIT_TAG: "{{ lookup('env','LITMUS_GIT_TAG') }}"
 
   tasks:
      - name: "[Info]: Configure kafka-sts application"

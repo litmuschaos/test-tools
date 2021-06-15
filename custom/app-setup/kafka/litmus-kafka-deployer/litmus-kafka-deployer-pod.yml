@@ -27,6 +27,15 @@ spec:
         ## It defines the kubectl-Kudo version
         - name: KUDO_VERSION
           value: 0.12.0
+        
         ## Name of namespace where kafka will be installed
-        - name: KAFKA_NS 
+        - name: KAFKA_NAMESPACE 
           value: "kafka" 
+
+        ## Name of namespace where prometheus and grafana will be installed  
+        - name: MONITORING_NAMESPACE
+          value: "monitoring"
+
+        ## Tag of LITMUS Repository  
+        - name: LITMUS_GIT_TAG
+          value: 2.0.0-Beta7  

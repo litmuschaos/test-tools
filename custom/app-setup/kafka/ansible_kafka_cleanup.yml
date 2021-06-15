@@ -2,21 +2,22 @@
   hosts: localhost
   vars:
      ansible_python_interpreter: /usr/bin/python3
-     KAFKA_NS: "{{ lookup('env','KAFKA_NS') }}"
+     KAFKA_NAMESPACE: "{{ lookup('env','KAFKA_NAMESPACE') }}"
+     MONITORING_NAMESPACE: "{{ lookup('env','MONITORING_NAMESPACE') }}"
   tasks:
      - name: "[CleanUp]: Removing  the deployments of prometheus"
        community.kubernetes.k8s:
           state: absent
           name: prometheus-operator
           kind: Deployment
-          namespace: monitoring
+          namespace: '{{ MONITORING_NAMESPACE }}'
 
      - name: "[CleanUp]: Removing Grafana deployment"
        community.kubernetes.k8s:
           state: absent
           name: grafana
           kind: Deployment
-          namespace: monitoring
+          namespace: '{{ MONITORING_NAMESPACE }}'
 
      - name: "[CleanUp]: Removing prometheus-k8s Statefulsets"
        community.kubernetes.k8s:
@@ -24,16 +25,16 @@
           state: absent
           name: prometheus-k8s
           kind: StatefulSet
-          namespace: monitoring
+          namespace: '{{ MONITORING_NAMESPACE }}'
  
-     - name: "[CleanUp]: Removing monitoring namespace"
+     - name: "[CleanUp]: Removing '{{ MONITORING_NAMESPACE }}' namespace"
        community.kubernetes.k8s:
           state: absent
-          name: monitoring
+          name: '{{ MONITORING_NAMESPACE }}'
           kind: namespace
                      
      - name: "[CleanUp]: Removing prometheus-k8s Statefulsets"
        community.kubernetes.k8s:
           state: absent
-          name: '{{ KAFKA_NS }}'
+          name: '{{ KAFKA_NAMESPACE }}'
           kind: namespace
