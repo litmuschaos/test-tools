@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	logs "log"
 	"os/exec"
 	"strings"
 	"time"
@@ -36,17 +37,17 @@ func main() {
 	//GetData is initializing required variables for app-deployer
 	appVars, err := GetData()
 	if err != nil {
-		panic(err.Error())
+		logs.Fatalf("err: %v", err)
 	}
 
 	config, err := getKubeConfig()
 	if err != nil {
-		panic(err.Error())
+		logs.Fatalf("err: %v", err)
 	}
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		panic(err.Error())
+		logs.Fatalf("err: %v", err)
 	}
 
 	log.Info("[Start]: Starting App Deployer...")
@@ -56,19 +57,16 @@ func main() {
 	switch appVars.operation {
 	case "apply", "create":
 		if err := CreateApplication(appVars, 2, clientset); err != nil {
-			log.Errorf("err: %v", err)
-			return
+			logs.Fatalf("err: %v", err)
 		}
 		log.Infof("[Status]: %s applications has been successfully created", appVars.app)
 	case "delete":
 		if err := DeleteApplication(appVars, 2, clientset); err != nil {
-			log.Errorf("err: %v", err)
-			return
+			logs.Fatalf("err: %v", err)
 		}
 		log.Infof("[Status]: %s applications has been successfully deleted", appVars.app)
 	default:
-		log.Infof("Operation '%s' not supported in app-deployer", appVars.operation)
-		return
+		logs.Fatalf("Operation '%s' not supported in app-deployer", appVars.operation)
 	}
 }
 

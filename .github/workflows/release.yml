@@ -1,0 +1,49 @@
+---
+name: release
+
+on:
+  workflow_dispatch:
+    inputs:   
+      release_tag:
+        description: 'release tag'
+        required: true
+      release_title:
+        description: 'release title'
+        required: false
+      release_notes:
+        description: 'release notes'     
+        required: false
+        default: ''         
+
+jobs:
+  create_release:
+    name: create_release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build go binary for pause
+        run : ./../../build/go-multiarch-build.sh "go build -o ./../../build/_output/pause-linux"
+        working-directory: custom/pause
+
+      - name: Build go binary for nsutil
+        run : ./../../build/go-multiarch-build.sh "go build -o ./../../build/_output/nsutil-linux"
+        working-directory: custom/nsutil
+
+      - name: Build go binary for promql-cli
+        run : |
+          cp custom/promql-cli/promql-linux-amd64 build/_output/
+          cp custom/promql-cli/promql-linux-arm64 build/_output/
+          
+      - name: Build go binary for dns_interceptor
+        run : go build -o ./../../build/_output/dns_interceptor
+        working-directory: custom/dns_interceptor
+      
+      - name: create release along with artifact
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "build/_output/*"
+          body: "${{ github.event.inputs.release_notes }}"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: "${{ github.event.inputs.release_title }}"
+          tag: ${{ github.event.inputs.release_tag }}

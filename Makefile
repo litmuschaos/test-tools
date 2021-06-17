@@ -140,7 +140,7 @@ _build_litmus_checker:
 
 _push_litmus_checker:
 	@echo "INFO: Publish container litmuschaos/litmus-checker"
-	cd custom/litmus-checker/buildscripts && ./push
+	cd custom/litmus-checker && ./buildscripts/push
 
 litmus-checker: deps _build_litmus_checker _push_litmus_checker
 
@@ -261,7 +261,7 @@ _build_litmus_app_deployer:
 
 _push_litmus_app_deployer:
 	@echo "INFO: Publish container litmuschaos/litmus-app-deployer"
-	cd custom/workflow-helper/app-deployer/buildscripts && ./push
+	cd custom/workflow-helper/app-deployer && ./buildscripts/push
 
 litmus-app-deployer: deps _build_litmus_app_deployer _push_litmus_app_deployer
 
@@ -271,7 +271,7 @@ _build_litmus_qps_cmd:
 
 _push_litmus_qps_cmd:
 	@echo "INFO: Publish container litmuschaos/litmus-qps-cmd"
-	cd custom/workflow-helper/app-qps-test/buildscripts && ./push
+	cd custom/workflow-helper/app-qps-test && ./buildscripts/push
 
 litmus-qps-cmd: deps _build_litmus_qps_cmd _push_litmus_qps_cmd
 
@@ -302,7 +302,7 @@ _build_litmus_argocli:
 
 _push_litmus_argocli:
 	@echo "INFO: Publish container litmuschaos/argocli"
-	cd custom/argo-server/buildscripts && ./push
+	cd custom/argo-server && ./buildscripts/push
 
 litmus-argocli: deps _build_litmus_argocli _push_litmus_argocli
 
@@ -312,7 +312,7 @@ _build_litmus_argo_workflow_controller:
 
 _push_litmus_argo_workflow_controller:
 	@echo "INFO: Publish container litmuschaos/workflow-controller"
-	cd custom/argo-workflow-controller/buildscripts && ./push
+	cd custom/argo-workflow-controller && ./buildscripts/push
 
 litmus-argo-workflow-controller: deps _build_litmus_argo_workflow_controller _push_litmus_argo_workflow_controller
 
@@ -322,7 +322,7 @@ _build_litmus_argo_workflow_executor:
 
 _push_litmus_argo_workflow_executor:
 	@echo "INFO: Publish container litmuschaos/argoexec"
-	cd custom/argo-workflow-executor/buildscripts && ./push
+	cd custom/argo-workflow-executor && ./buildscripts/push
 
 litmus-argo-workflow-executor: deps _build_litmus_argo_workflow_executor _push_litmus_argo_workflow_executor
 
@@ -332,7 +332,7 @@ _build_litmus_mongo:
 
 _push_litmus_mongo:
 	@echo "INFO: Publish container litmuschaos/mongo"
-	cd custom/mongo/buildscripts && ./push
+	cd custom/mongo && ./buildscripts/push
 
 litmus-mongo: deps _build_litmus_mongo _push_litmus_mongo
 
@@ -354,3 +354,15 @@ experiment-go-binary:
 	@echo "--> Build experiment go binary" 
 	@echo "------------------"
 	@sh build/generate_go_binary
+
+.PHONY: docker.buildx
+docker.buildx:
+	@echo "------------------------------"
+	@echo "--> Setting up Builder        " 
+	@echo "------------------------------"
+	@if ! docker buildx ls | grep -q multibuilder; then\
+		docker buildx create --name multibuilder;\
+		docker buildx inspect multibuilder --bootstrap;\
+		docker buildx use multibuilder;\
+		docker run --rm --privileged multiarch/qemu-user-static --reset -p yes;\
+	fi

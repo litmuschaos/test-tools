@@ -11,7 +11,7 @@ import (
 // DNSInterceptor instance helps create a dns server that intercepts dns requests and injects chaos
 type DNSInterceptor struct {
 	client         dns.Client
-	config         *dns.ClientConfig
+	upstreamServer string
 	settings       *InterceptorSettings
 	server         *dns.Server
 	originalConfig string
@@ -19,12 +19,23 @@ type DNSInterceptor struct {
 }
 
 // NewDNSInterceptor creates a new instance of the DNSInterceptor and updates the resolv.conf to point to the interceptor
-func NewDNSInterceptor(resolvConfPath string) (*DNSInterceptor, error) {
+func NewDNSInterceptor(resolvConfPath, upstreamServer string) (*DNSInterceptor, error) {
 	conf, err := dns.ClientConfigFromFile(resolvConfPath)
 	if err != nil {
 		return nil, errors.New("failed to get resolv.conf : " + err.Error())
 	}
-
+	if upstreamServer == "" {
+		for _, srv := range conf.Servers {
+			if checkValidUpstream(srv) {
+				upstreamServer = srv
+				break
+			}
+		}
+		if upstreamServer == "" {
+			log.Fatal("Failed to get a valid upstream server address, add a custom UPSTREAM_SERVER")
+		}
+	}
+	log.WithField("server", upstreamServer+":"+DefaultDNSPort).Info("Upstream DNS Server")
 	settings, err := getInterceptorSettings()
 	if err != nil {
 		return nil, err
@@ -39,7 +50,7 @@ func NewDNSInterceptor(resolvConfPath string) (*DNSInterceptor, error) {
 		client: dns.Client{
 			ReadTimeout: 5 * time.Second,
 		},
-		config:         conf,
+		upstreamServer: upstreamServer,
 		settings:       settings,
 		originalConfig: original,
 		configPath:     resolvConfPath,
@@ -47,9 +58,9 @@ func NewDNSInterceptor(resolvConfPath string) (*DNSInterceptor, error) {
 }
 
 // Serve starts the interceptor server
-func (d *DNSInterceptor) Serve(pattern string) {
+func (d *DNSInterceptor) Serve(pattern, port string) {
 	dns.HandleFunc(pattern, d.dnsHandler)
-	d.server = &dns.Server{Addr: ":53", Net: "udp"}
+	d.server = &dns.Server{Addr: ":" + port, Net: "udp"}
 	go func() {
 		if err := d.server.ListenAndServe(); err != nil {
 			d.Shutdown()
@@ -94,9 +105,9 @@ func (d *DNSInterceptor) dnsHandler(writer dns.ResponseWriter, msg *dns.Msg) {
 						target += "."
 					}
 					msg.Question[0].Name = target
-					r, _, err := d.client.Exchange(msg, d.config.Servers[0]+":"+d.config.Port)
+					r, _, err := d.client.Exchange(msg, d.upstreamServer+":"+DefaultDNSPort)
 					if err != nil {
-						log.WithError(err).WithField("server", d.config.Servers[0]+":"+d.config.Port).Error("Error while forwarding query to dns server")
+						log.WithError(err).WithField("server", d.upstreamServer+":"+DefaultDNSPort).Error("Error while forwarding query to dns server")
 						writer.WriteMsg(msg)
 						return
 					}
@@ -117,9 +128,9 @@ func (d *DNSInterceptor) dnsHandler(writer dns.ResponseWriter, msg *dns.Msg) {
 		}
 		log.WithField("query", question.Name).Info("Query received")
 	}
-	r, _, err := d.client.Exchange(msg, d.config.Servers[0]+":"+d.config.Port)
+	r, _, err := d.client.Exchange(msg, d.upstreamServer+":"+DefaultDNSPort)
 	if err != nil {
-		log.WithError(err).WithField("server", d.config.Servers[0]+":"+d.config.Port).Error("Error while forwarding query to dns server")
+		log.WithError(err).WithField("server", d.upstreamServer+":"+DefaultDNSPort).Error("Error while forwarding query to dns server")
 		writer.WriteMsg(msg)
 		return
 	}
