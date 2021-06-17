@@ -23,7 +23,10 @@
 
 - name: "[Info]: Moving the kubectl-kudo"
   command: mv kubectl-kudo  /usr/local/bin/kubectl-kudo
-      
+ 
+- name: "[Info]: Creating serviceaccount"
+  command: "kubectl apply -f https://raw.githubusercontent.com/litmuschaos/litmus/{{ LITMUS_GIT_TAG }}/monitoring/utils/prometheus/prometheus-operator/crd-servicemonitor.yaml"
+
 - name: "[Info]: Initialising the kubectl kudo"
   command: "kubectl kudo init"
 
@@ -64,7 +67,7 @@
      namespace: '{{ KAFKA_NAMESPACE }}'
   register: kafkawaitlog
   until:  kafkawaitlog.resources[0].status.currentReplicas == kafkawaitlog.resources[0].spec.replicas
-  retries: 10
-  delay: 18
+  retries: 150
+  delay: 2
 - debug:
      var: kafkawaitlog.resources[0].status.currentReplicas
