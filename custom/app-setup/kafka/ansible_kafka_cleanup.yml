@@ -33,7 +33,7 @@
           name: '{{ MONITORING_NAMESPACE }}'
           kind: namespace
                      
-     - name: "[CleanUp]: Removing prometheus-k8s Statefulsets"
+     - name: "[CleanUp]: Removing '{{ KAFKA_NAMESPACE }}'"
        community.kubernetes.k8s:
           state: absent
           name: '{{ KAFKA_NAMESPACE }}'
