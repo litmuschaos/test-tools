@@ -1,0 +1,33 @@
+- name: "[Install]: Configuring Kafka along with exporter and monitoring]"
+  hosts: localhost
+  vars:
+     ansible_python_interpreter: /usr/bin/python3
+     KAFKA_NAMESPACE: "{{ lookup('env','KAFKA_NAMESPACE') }}"
+     MONITORING_NAMESPACE: "{{ lookup('env','MONITORING_NAMESPACE') }}"
+     LITMUS_GIT_TAG: "{{ lookup('env','LITMUS_GIT_TAG') }}"
+
+  tasks:
+     - name: "[Info]: Configure kafka-sts application"
+       import_role:
+          name:  roles/configure-kafka
+       register: configure_kafka
+
+     - debug:
+          msg: "kafka has been configured"
+          
+     - name: "[Info]: Configure Monitoring for Kafka"
+       import_role:
+          name:   roles/configure-monitoring
+       register: configure_monitor
+          
+     - debug:
+          msg: "Monitoring part  has been configured"
+ 
+     - name: "[Info]: Configuring Exporter"
+       import_role:
+          name: roles/configure-exporter
+       register: export_var
+
+     - debug: 
+          msg: "Configuration Completed!!"
+             

@@ -1,0 +1,87 @@
+---
+- name: "[Info]: Cloning the git repository of litmus "
+  git:
+     repo: https://github.com/litmuschaos/litmus.git
+     dest: litmus
+     version: '{{ LITMUS_GIT_TAG }}'
+     force: true
+
+- name: "[Info]: creating  monitoring  Namespace as '{{ MONITORING_NAMESPACE }}'"
+  community.kubernetes.k8s:
+     name: '{{ MONITORING_NAMESPACE }}'
+     api_version: v1
+     kind: Namespace
+     state: present
+
+- name: "[CleanUp]: Removing Unnecessary file"
+  file:
+     path: litmus/monitoring/utils/prometheus/prometheus-configuration/prometheus.yaml
+     state: absent
+
+- name: "[CleanUp]: Removing Unnecessary file"
+  file:
+     path: litmus/monitoring/utils/prometheus/prometheus-operator/namepace.yaml
+     state: absent       
+
+- name: "[Info]: Renaming the monitoring namespace "
+  replace:
+     path: '{{ item }}'
+     regexp: 'namespace:\smonitoring'
+     replace: "namespace: {{ MONITORING_NAMESPACE }}"
+     backup: yes
+  with_fileglob:
+     - "litmus/monitoring/utils/prometheus/prometheus-operator/*"
+     - "litmus/monitoring/utils/prometheus/prometheus-configuration/*"
+     - "litmus/monitoring/utils/grafana/*"
+     - "prometheus/prometheus.yaml"
+     - "kafka-exporter/values.yaml"
+
+- name: "[Info]: Renaming the  namespace"
+  replace:
+     path: '{{ item }}'
+     regexp: 'namespace=["].*["]'
+     replace: 'namespace="{{ MONITORING_NAMESPACE }}"'
+     backup: yes
+  with_fileglob:
+     - "litmus/monitoring/utils/prometheus/prometheus-configuration/*"
+     
+- name: "[Install]: Installing prometheus-operator"
+  command: "kubectl apply -f litmus/monitoring/utils/prometheus/prometheus-operator -n {{ MONITORING_NAMESPACE }}"
+
+- name: "[Info]:  prometheus-configuration"
+  command: "kubectl apply -f litmus/monitoring/utils/prometheus/prometheus-configuration -n {{ MONITORING_NAMESPACE }}"
+
+- name: "[Info]: Wait till prometheus operatior is created"
+  community.kubernetes.k8s_info:
+     kind: Deployment
+     wait: yes
+     name: prometheus-operator 
+     namespace: '{{ MONITORING_NAMESPACE }}'
+     wait_sleep: 10
+     wait_timeout: 360 
+  register: prometheus_status
+- debug:
+     var: prometheus_status.resources[0].status
+
+- name: "[Info]: Getting all the  pods"
+  command: "kubectl get pods -n $MONITORING_NAMESPACE"
+  register: list_pods
+- debug:
+     var: list_pods
+
+- name: "[Info]: Getting all the  services"
+  command: "kubectl get svc -n $MONITORING_NAMESPACE"
+  register: list_svc
+- debug:
+     var: list_svc.stdout_lines
+          
+- name: "[Install]: Installing Grafana "
+  command: "kubectl apply -f litmus/monitoring/utils/grafana -n {{ MONITORING_NAMESPACE }}"
+
+- pause:
+     seconds: 2
+- name: "[Info]: getting all the services"  
+  command: "kubectl get svc -n $MONITORING_NAMESPACE"
+  register: list_svc
+- debug:
+     var: list_svc.stdout_lines

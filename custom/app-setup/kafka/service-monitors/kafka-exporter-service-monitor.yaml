@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kafka
+  labels:
+    name: kafka
+    k8s-app: kafka-exporter
+  namespace: NAMESPACE
+spec:
+  jobLabel: name
+  vars:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kafka-exporter
+  namespaceSelector:
+    matchNames:
+    - NAMESPACE
+  endpoints:
+  - port: metrics
+    interval: 1s

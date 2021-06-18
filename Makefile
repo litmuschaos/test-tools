@@ -336,6 +336,16 @@ _push_litmus_mongo:
 
 litmus-mongo: deps _build_litmus_mongo _push_litmus_mongo
 
+_build_litmus_kafka_deployer:
+	@echo "INFO: Building container image for litmuschaos/kafka-deployer"
+	cd custom/app-setup/kafka && docker build -t litmuschaos/kafka-deployer .
+
+_push_litmus_kafka_deployer:
+	@echo "INFO: Publish container litmuschaos/kafka-deployer"
+	cd custom/app-setup/kafka/buildscripts && ./push
+
+litmus-kafka-deployer: deps _build_litmus_kafka_deployer _push_litmus_kafka_deployer
+
 PHONY: go-build
 go-build: experiment-go-binary
 

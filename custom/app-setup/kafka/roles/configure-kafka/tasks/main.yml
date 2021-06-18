@@ -1,0 +1,73 @@
+---
+- name: "[Info]: Creating  {{ KAFKA_NAMESPACE }} Namespace"
+  community.kubernetes.k8s:
+     name: '{{ KAFKA_NAMESPACE }}'
+     api_version: v1
+     kind: Namespace
+     state: present
+    
+- name: "[Info]: Creating an empty file"
+  file:
+     path: kubectl-kudo
+     state: touch
+
+- name: "[Info]: Downloading kubectl-kudo"
+  get_url:
+     url: https://github.com/kudobuilder/kudo/releases/download/v{{ KUDO_VERSION }}/kubectl-kudo_{{ KUDO_VERSION }}_{{ OS }}_{{ ARCH }}
+     dest: kubectl-kudo
+     force: yes
+     mode: '755'
+  register: kudoresult
+- debug:
+     var: kudoresult.status_code  
+
+- name: "[Info]: Moving the kubectl-kudo"
+  command: mv kubectl-kudo  /usr/local/bin/kubectl-kudo
+ 
+- name: "[Info]: Creating serviceaccount"
+  command: "kubectl apply -f https://raw.githubusercontent.com/litmuschaos/litmus/{{ LITMUS_GIT_TAG }}/monitoring/utils/prometheus/prometheus-operator/crd-servicemonitor.yaml"
+
+- name: "[Info]: Initialising the kubectl kudo"
+  command: "kubectl kudo init"
+
+- name: "[Install]: Installing zookeeper"
+  command: "kubectl kudo install zookeeper --instance=zookeeper-instance -n {{ KAFKA_NAMESPACE }}"
+  register: zookeeper_output
+  changed_when: false
+  failed_when: "zookeeper_output.rc!=0 and zookeeper_output.stdout_lines[0].find('already installed') == -1"
+- debug:
+     var: zookeeper_output.stdout_lines[0]
+
+- name: "[Install]: Installing kafka"
+  command: "kubectl kudo install kafka --instance=kafka -p ADD_SERVICE_MONITOR=true -n {{ KAFKA_NAMESPACE }}"
+  register: kafka_output
+  changed_when: false
+  failed_when:  "kafka_output.rc != 0 and kafka_output.stdout_lines[0].find('already installed') == -1"
+- debug:
+     var: kafka_output.stdout_lines
+
+- name: "[Wait]: Wait till the  object of zookeeper is not created"
+  community.kubernetes.k8s_info:
+     api_version: apps/v1
+     kind: StatefulSet
+     wait: yes
+     name: zookeeper-instance-zookeeper
+     namespace: '{{ KAFKA_NAMESPACE }}'
+     wait_sleep: 2
+     wait_timeout: 180
+  register: Zoowaitlog
+- debug:
+     var: Zoowaitlog.resources[0].status.currentReplicas
+
+- name: "[Wait]: Wait till object of kafka is not created"
+  community.kubernetes.k8s_info:
+     kind: StatefulSet
+     name: kafka-kafka
+     wait: yes
+     namespace: '{{ KAFKA_NAMESPACE }}'
+  register: kafkawaitlog
+  until:  kafkawaitlog.resources[0].status.currentReplicas == kafkawaitlog.resources[0].spec.replicas
+  retries: 150
+  delay: 2
+- debug:
+     var: kafkawaitlog.resources[0].status.currentReplicas
