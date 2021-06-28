@@ -1,2 +1,2 @@
-FROM argoproj/workflow-controller:v2.9.3
+FROM argoproj/workflow-controller:v2.11.0
 ARG TARGETPLATFORM
