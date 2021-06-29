@@ -281,7 +281,7 @@ _build_litmus_api_checker:
 
 _push_litmus_api_checker:
 	@echo "INFO: Publish container litmuschaos/litmus-git-app-checker"
-	cd custom/workflow-helper/app-checker/buildscripts && ./push
+	cd custom/workflow-helper/app-checker && ./buildscripts/push
 
 litmus-git-app-checker: deps _build_litmus_api_checker _push_litmus_api_checker
 
@@ -291,7 +291,7 @@ _build_litmus_k8s:
 
 _push_litmus_k8s:
 	@echo "INFO: Publish container litmuschaos/k8s"
-	cd custom/k8s/buildscripts && ./push
+	cd custom/k8s && ./buildscripts/push
 
 litmus-k8s: deps _build_litmus_k8s _push_litmus_k8s
 

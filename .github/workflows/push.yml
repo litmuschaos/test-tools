@@ -11,7 +11,7 @@ defaults:
 
 env:
   DNAME: ${{ secrets.DNAME }}
-  DPASS: ${{ secrets.DPASS }}    
+  DPASS: ${{ secrets.DPASS }}
 
 jobs:
   shell-checker:
@@ -26,7 +26,7 @@ jobs:
     # Set job outputs to values from filter step
     # this is done to run the selective jobs based on the code change
     outputs:
-      kafka-deployer: ${{ steps.filter.outputs.kafka-deployer }}     
+      kafka-deployer: ${{ steps.filter.outputs.kafka-deployer }}
       forkbomb: ${{ steps.filter.outputs.forkbomb }}
       fio: ${{ steps.filter.outputs.fio }}
       mysql-client: ${{ steps.filter.outputs.mysql-client }}
@@ -53,13 +53,13 @@ jobs:
       litmus-git-app-checker: ${{ steps.filter.outputs.litmus-git-app-checker }}
       litmus-k8s: ${{ steps.filter.outputs.litmus-k8s }}
       litmus-checker: ${{ steps.filter.outputs.litmus-checker }}
-      litmus-argocli: ${{ steps.filter.outputs.litmus-argocli }}   
-      workflow-controller: ${{ steps.filter.outputs.workflow-controller }}   
-      argoexec: ${{ steps.filter.outputs.argoexec }}                                                
-      mongo: ${{ steps.filter.outputs.mongo }}   
+      litmus-argocli: ${{ steps.filter.outputs.litmus-argocli }}
+      workflow-controller: ${{ steps.filter.outputs.workflow-controller }}
+      argoexec: ${{ steps.filter.outputs.argoexec }}
+      mongo: ${{ steps.filter.outputs.mongo }}
 
     steps:
-      - uses: actions/checkout@v2    
+      - uses: actions/checkout@v2
       - uses: dorny/paths-filter@v2
         id: filter
         with:
@@ -123,7 +123,7 @@ jobs:
             mongo:
               - 'custom/mongo/**'
             kafka-deployer:
-              - 'custom/app-setup/kafka/**'   
+              - 'custom/app-setup/kafka/**'
 
   litmus-app-deployer:
     runs-on: ubuntu-latest
@@ -185,8 +185,17 @@ jobs:
     if: needs.changes.outputs.litmus-git-app-checker == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Build and Push litmus-git-app-checker image
-        run: make litmus-git-app-checker
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          version: latest
+
+      - name: Build and Push litmus-checker image
+        run: |
+          make docker.buildx
+          make _push_litmus_api_checker
 
   litmus-k8s:
     runs-on: ubuntu-latest
@@ -194,8 +203,17 @@ jobs:
     if: needs.changes.outputs.litmus-k8s == 'true'
     steps:
       - uses: actions/checkout@v2
-      - name: Build and Push litmus-k8s image
-        run: make litmus-k8s
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          version: latest
+
+      - name: Build and Push litmus-checker image
+        run: |
+          make docker.buildx
+          make _push_litmus_k8s
 
   kafka-client:
     runs-on: ubuntu-latest
@@ -243,7 +261,7 @@ jobs:
         uses: docker/setup-buildx-action@v1
         with:
           version: latest
-                    
+
       - name: Build and Push workflow-controller image
         run: |
           make docker.buildx

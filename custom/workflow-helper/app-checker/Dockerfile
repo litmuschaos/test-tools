@@ -1,5 +1,7 @@
 FROM python:3
 
+ARG TARGETPLATFORM
+
 LABEL maintainer="LitmusChaos"
 
 ADD main.py /
