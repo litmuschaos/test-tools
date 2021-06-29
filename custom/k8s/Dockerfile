@@ -1,5 +1,5 @@
 FROM alpine:3.12
-ARG TARGETPLATFORM
+ARG TARGETARCH
 
 LABEL maintainer="LitmusChaos"
 
@@ -10,7 +10,5 @@ RUN apk --no-cache add curl &&\
     rm -rf /var/cache/apk/*
 
 #Installing kubectl
-ENV KUBECTL_VERSION="v1.19.0"
-RUN curl -L https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl && \
-    chmod +x /usr/local/bin/kubectl
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${TARGETARCH}/kubectl" && mkdir -p ~/.local/bin/kubectl && mv ./kubectl ~/.local/bin/kubectl
 
