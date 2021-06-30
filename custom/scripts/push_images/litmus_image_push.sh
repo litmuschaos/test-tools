@@ -139,17 +139,17 @@ cat <<EOF
 
 Usage:       ${0} ARGS (list|pull|push)
 
-list:        "./${0} list" will list all the images used by the litmus portal.     
+list:        "${0} list" will list all the images used by the litmus portal.     
 
 
-pull:        "./${0} pull" will pull the litmus images with the given image tag. 
+pull:        "${0} pull" will pull the litmus images with the given image tag. 
               The value of tag can be provided by exporting following ENVs:
               - LITMUS_PORTAL_TAG: Tag for the portal component like 'litmusportal-frontend' etc
               - LITMUS_BACKEND_TAG: Tag for backend component chaos-operator, chaos-runner, go-runner etc
               - LITMUS_IMAGE_REGISTRY: Name of litmuschaos image registry. Default is docker.io
               The default images tags are the latest tags released.
 
-push:         "./${0} push" will push the images to the given target image registry with the give repo-name
+push:         "${0} push" will push the images to the given target image registry with the give repo-name
               The value of target images can be set by exporting following ENVs:
               - TARGET_IMAGE_REGISTRY: Give the target registry name. Default is set to "docker.io"
               - TARGET_REPONAME: Give the target image repo-name. This is mandatory to provide.               

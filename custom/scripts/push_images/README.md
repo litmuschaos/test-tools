@@ -1,14 +1,53 @@
 ## Table of content
-- [Supported Tunables](https://github.com/litmuschaos/test-tools/custom/scripts/push_images#supported-tunables)
-- [Check the available commands](https://github.com/litmuschaos/test-tools/custom/scripts/push_images#check-the-available-commands)
-- [List Down all the Images](https://github.com/litmuschaos/test-tools/custom/scripts/push_images#list-down-all-the-images)
-- [Pull the LitmusChaos Images into your machine](https://github.com/litmuschaos/test-tools/custom/scripts/push_images#pull-the-litmuschaos-images-into-your-machine)
-- [Push the LitmusChaos Images to your image registry](https://github.com/litmuschaos/test-tools/custom/scripts/push_images#push-the-litmuschaos-images-to-your-image-registry)
+- [Supported Tunables](https://github.com/litmuschaos/test-tools/blob/master/custom/scripts/push_images/README.md#supported-tunables)
+- [Check the available commands](https://github.com/litmuschaos/test-tools/blob/master/custom/scripts/push_images/README.md#check-the-available-commands)
+- [List Down all the Images](https://github.com/litmuschaos/test-tools/blob/master/custom/scripts/push_images/README.md#list-down-all-the-images)
+- [Pull the LitmusChaos Images into your machine](https://github.com/litmuschaos/test-tools/blob/master/custom/scripts/push_images/README.md#pull-the-litmuschaos-images-into-your-machine)
+- [Push the LitmusChaos Images to your image registry](https://github.com/litmuschaos/test-tools/blob/master/custom/scripts/push_images/README.md#push-the-litmuschaos-images-to-your-image-registry)
+
 
 ## LitmusChaos Images
 
-- Pish docker images contains all the images that are used to execute a litmuschaos generic experiment using litmus portal. For more information please check [LitmusChaos Docs](https://litmusdocs-beta.netlify.app/docs/introduction).
+- Push docker images contains all the images that are used to execute a litmuschaos generic experiment using litmus portal. For more information please check [LitmusChaos Docs](https://litmusdocs-beta.netlify.app/docs/introduction).
 
+
+**LitmusChaos images in the script**
+
+ <table>
+    <tr>
+      <th> Portal Images </th>
+      <th> Backend and monitoring Images  </th>
+      <th> Workflow and other Images </th>
+  </tr>
+  <tr>
+    <td> 
+      <ul>
+         <li>litmuschaos/litmusportal-frontend</li>
+         <li>litmuschaos/litmusportal-server</li>
+         <li>litmuschaos/litmusportal-event-tracker</li>
+         <li>litmuschaos/litmusportal-auth-server</li>
+         <li>litmuschaos/litmusportal-subscriber</li>
+      </ul>
+    </td>
+    <td>
+      <ul>
+         <li>litmuschaos/chaos-operator</li>
+         <li>litmuschaos/chaos-runner</li>
+         <li>litmuschaos/go-runner</li>
+         <li>litmuschaos/chaos-exporter</li>
+      </ul>    
+    </td> 
+    <td>
+      <ul>
+         <li>litmuschaos/k8s:latest</li>
+         <li>litmuschaos/litmus-checker:latest</li>
+         <li>litmuschaos/workflow-controller:v2.11.0</li>
+         <li>litmuschaos/argoexec:v2.11.0</li>
+         <li>litmuschaos/mongo:4.2.8</li>         
+      </ul>      
+    </td>
+  </tr>
+ </table>
 
 ## Get LitmusChaos Images In Your Repository
 
@@ -16,9 +55,9 @@
 
 ```bash
 wget https://raw.githubusercontent.com/litmuschaos/test-tools/master/custom/scripts/push_images/litmus_image_push.sh
+
 chmod +x litmus_image_push.sh
 ```
-
 #### Supported Tunables
 
  <table>
@@ -67,17 +106,17 @@ $ ./litmus_image_push.sh -h
 
 Usage:       ./litmus_image_push.sh ARGS (list|pull|tag|push)
 
-list:        "././litmus_image_push.sh list" will list all the images used by the litmus portal.     
+list:        "./litmus_image_push.sh list" will list all the images used by the litmus portal.     
 
 
-pull:        "././litmus_image_push.sh pull" will pull the litmus images with the given image tag. 
+pull:        "./litmus_image_push.sh pull" will pull the litmus images with the given image tag. 
               The value of tag can be provided by exporting following ENVs:
               - LITMUS_PORTAL_TAG: Tag for the portal component like 'litmusportal-frontend' etc
               - LITMUS_BACKEND_TAG: Tag for backend component chaos-operator, chaos-runner, go-runner etc
               - IMAGE_REGISTRY: Name of litmuschaos image registry. Default is docker.io
               The default images tags are the latest tags released.
 
-push:         "././litmus_image_push.sh push" will push the images to the given target image registry with the give repo-name
+push:         "./litmus_image_push.sh push" will push the images to the given target image registry with the give repo-name
               The value of target images can be set by exporting following ENVs:
               - TARGET_IMAGE_REGISTRY: Give the target registry name. Default is set to "docker.io"
               - TARGET_REPONAME: Give the target image repo-name. This is mandatory to provide.               
