@@ -3,7 +3,7 @@ ARG TARGETARCH
 
 LABEL maintainer="LitmusChaos"
 
-#Installing 
+#Installing minimal packages
 RUN apk update && \
     apk upgrade --update-cache --available 
 RUN apk --no-cache add curl &&\

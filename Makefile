@@ -275,15 +275,15 @@ _push_litmus_qps_cmd:
 
 litmus-qps-cmd: deps _build_litmus_qps_cmd _push_litmus_qps_cmd
 
-_build_litmus_api_checker:
+_build_litmus_git_app_checker:
 	@echo "INFO: Building container image for performing litmus-git-app-checker check"
 	cd custom/workflow-helper/app-checker && docker build -t litmuschaos/litmus-git-app-checker .
 
-_push_litmus_api_checker:
+_push_litmus_git_app_checker:
 	@echo "INFO: Publish container litmuschaos/litmus-git-app-checker"
 	cd custom/workflow-helper/app-checker && ./buildscripts/push
 
-litmus-git-app-checker: deps _build_litmus_api_checker _push_litmus_api_checker
+litmus-git-app-checker: deps _build_litmus_git_app_checker _push_litmus_git_app_checker
 
 _build_litmus_k8s:
 	@echo "INFO: Building container image for litmus-k8s"
