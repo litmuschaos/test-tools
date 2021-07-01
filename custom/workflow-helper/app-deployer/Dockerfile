@@ -18,6 +18,7 @@ RUN CGO_ENABLED=0 go build -o /output/deployer -v
 
 #Deploy Stage
 FROM alpine:latest
+ARG TARGETARCH
 
 RUN apk add curl
 
