@@ -80,6 +80,10 @@
 
 - pause:
      seconds: 2
+
+- name: "[Info]: Updateting grafana dashboard config"
+  command: "kubectl apply -f grafana -n {{ MONITORING_NAMESPACE }}"
+
 - name: "[Info]: getting all the services"  
   command: "kubectl get svc -n $MONITORING_NAMESPACE"
   register: list_svc

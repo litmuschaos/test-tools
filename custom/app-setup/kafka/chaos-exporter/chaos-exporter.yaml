@@ -3,18 +3,18 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: chaos-monitor
-  name: chaos-monitor
+    app: chaos-exporter
+  name: chaos-exporter
   namespace: litmus
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: chaos-monitor
+      app: chaos-exporter
   template:
     metadata:
       labels:
-        app: chaos-monitor
+        app: chaos-exporter
     spec:
       containers:
       - image: litmuschaos/chaos-exporter:ci
@@ -23,14 +23,14 @@ spec:
         env:
         - name: WATCH_NAMESPACE
           value: ''
-      serviceAccountName: litmus-cluster-scope
+      serviceAccountName: litmus
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: chaos-monitor
-  name: chaos-monitor
+    app: chaos-exporter
+  name: chaos-exporter
   namespace: litmus
 spec:
   ports:
@@ -39,6 +39,6 @@ spec:
     protocol: TCP
     targetPort: 8080
   selector:
-    app: chaos-monitor
+    app: chaos-exporter
   type: NodePort
   
