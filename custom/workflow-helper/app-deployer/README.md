@@ -30,7 +30,7 @@ At first, the user is asked to give the namespace, typeName, operation, app, sco
     <td> -timeout </td>
     <td> Time after which it will fail the app-deployer if application is not ready </td>
     <td> -timeout="400" </td>
-    <td> timeout can be any </td>
+    <td> any integer </td>
   </tr>
   <tr>
     <td> -operation</td>
