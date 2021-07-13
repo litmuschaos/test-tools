@@ -1,5 +1,5 @@
 # Setup EKS And Configure Kafka
-A terraform script to create a managed kubernetes cluster on AWS EKS with the spot Instance.This script also gives you an option to setup kafka along with prometheus and kafka-provisioned grafana and also litmus portal.
+A terraform script to create a managed kubernetes cluster on AWS EKS with the spot Instance. This script also gives you an option to setup kafka along with prometheus and kafka-provisioned grafana and also litmus portal.
 ## Prerequisites
 Make sure You have installed all of the following prerequisites on your system:
 * Kubectl - [Download & Install kubectl](https://kubernetes.io/docs/tasks/tools/) 
@@ -7,33 +7,38 @@ Make sure You have installed all of the following prerequisites on your system:
 * Terraform - [Download & Install terraform](https://www.terraform.io/downloads.html)
 
 ## Step 1: 
-  Clone the repo
+  Clone the Repository
   ```
-  git clone https://github.com/Adarshkumar14/kafka-eks-infra-setup.git
+  git clone https://github.com/litmuschaos/test-tools.git
+  cd test-tools/custom/scripts/eks
   ```
 ## Step 2:
 ### Variables
 You can change the value of variable in the variable.tf
- <table>
-    <tr>
-      <th> Name </th>
-      <th> Description</th>
-      <th> Example </th>
-    </tr>
-    <tr>
-      <td> <code>vpc_name</code> </td>
-      <td> The name of VPC</td>
-        <td><code>eks-vpc</code> </td>
-    </tr>
-    <tr>
-      <td><code>vpc_cidr</code></td>
-      <td> Subnet CIDR</td>
-      <td><code>10.0.0.0/16</code></td>
-    </tr>
-    <tr>
-      <td><code>private_subnets_cidr</code></td>
-      <td>Private Subnet CIDR</td>
-      <td><code>[ "10.0.1.0/24" , "10.0.2.0/24", "10.0.3.0/24",]</code></td>
+<table>
+  <tr>
+    <th> Name </th>
+    <th> Description</th>
+    <th> Default </th>
+  </tr>
+  <tr>
+    <td><code>aws_region</code></td>
+    <td> AWS Region Name </td>
+    <td><code>ap-south-1</code></td>
+  <tr>
+    <td> <code>vpc_name</code> </td>
+    <td> The name of VPC</td>
+    <td><code>eks-vpc</code> </td>
+  </tr>
+  <tr>
+    <td><code>vpc_cidr</code></td>
+    <td> Subnet CIDR</td>
+    <td><code>10.0.0.0/16</code></td>
+  </tr>
+  <tr>
+    <td><code>private_subnets_cidr</code></td>
+    <td>Private Subnet CIDR</td>
+    <td><code>[ "10.0.1.0/24" , "10.0.2.0/24", "10.0.3.0/24",]</code></td>
   </tr>
   <tr>
     <td><code>public_subnets_cidr</code></td>
@@ -48,7 +53,7 @@ You can change the value of variable in the variable.tf
   <tr>
     <td><code>cluster_name</code></td>
     <td>The name of your EKS Cluster</td>
-    <td><code>eks-adarsh</code></td>
+    <td><code>eks-litmus</code></td>
   </tr>
   <tr>
     <td><code>k8s_version</code></td>
@@ -76,17 +81,30 @@ You can change the value of variable in the variable.tf
     <td><code>0.10</code></td>
   </tr>
   <tr>
+    <td><code>volume_size</code></td>
+    <td> Volume Size Of Worker Nodes</td>
+    <td><code>100</code></td>
+  </tr>
+  <tr>
+    <td><code>node_ami_id</code></td>
+    <td> AMI Id of Worker Node </td>
+    <td><code>ami-0bcc785359fda47de</code></td>
+  <tr>  
     <td><code>configure_kafka</code></td>
     <td>To configure kafka enter true else false </td>
     <td> <code>true</code> or <code>false</code> </td>
   </tr>
-  </table>
+  <tr>
+    <td><code>k8s_secret_name</code></td>
+    <td>File Name of K8s-Secrets</td>
+    <td><code>mysecret.yml</code></td>
+  </tr>
+</table>
   
 ##  Step 3:
    Provide the provider in providers.tf
    ```
    provider "aws" {
-    region = "ap-south-1"
     profile = "default"
 }
 ```
@@ -95,25 +113,44 @@ You can change the value of variable in the variable.tf
    ```
     terraform init
   ```
-## Step 5:
-  **Note:** If you are also configuring  kafka , then also you need to give the aws credentials in the secrets.For better understanding [refer this](https://github.com/litmuschaos/test-tools/tree/master/custom/app-setup/kafka).
+## Step 5: (Optional)
+
+**Note:** If you are also configuring  kafka, Then also you need to create k8s-secret In the current Directory and provide your aws credentials like this:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aws-secret
+data:
+  AWS_ACCESS_KEY_ID: "your base64-encoded access key"   
+  AWS_SECRET_ACCESS_KEY: "your base64-encoded secret key"
+  AWS_DEFAULT_REGION: "your base64-encoded region"
+  EKS_CLUSTER_NAME: "your base64-encoded cluster name"    
+```
+And provide the file name of secrets in <code>variable.tf</code>.
+
+For better understanding [refer this](https://github.com/litmuschaos/test-tools/tree/master/custom/app-setup/kafka).
   
- After Terraform has been successfully initialized, run <code>terraform apply</code>,It will ask for the setup of kafka ,enter <code>true</code> to setup else enter <code>false</code>.
+## Step 6:
+
+After Terraform has been successfully initialized, run <code>terraform apply</code>, It will ask for the setup of kafka, enter <code>true</code> to setup else enter <code>false</code>.
  
 ```
 terraform apply
 ```
-It takes approximately 15 minutes to complete.\
- **Note**: If you have not configure the kafka , then to interact with your cluster .You have to run the following command in your terminal:
-  ```
-  aws eks --region aws_region_name update-kubeconfig --name eks_cluster_name
- ```
-  Now Your eks-cluster is ready and configured.
+It takes approximately 15 minutes to complete.
+
+**Note**: If you have not configure the kafka, Then to interact with your cluster, You have to run the following command in your terminal:
+```
+  aws eks --region <aws_region_name> update-kubeconfig --name <eks_cluster_name>
+```
+Now Your eks-cluster is ready and configured.
   
 ## CleanUp
   To delete the eks-cluster, run the following command:
   ```
    terraform destroy
- ```
-It will delete all the resources that are created by Terraform.
+  ```
+  It will delete all the resources that are created by Terraform.
 

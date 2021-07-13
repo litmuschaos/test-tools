@@ -12,35 +12,30 @@ module "vpc" {
         Environment    = "kafka"
     }
 }
- data "aws_eks_cluster" "cluster" {
+data "aws_eks_cluster" "cluster" {
   name = module.eks.cluster_id
 }
-
 data "aws_eks_cluster_auth" "cluster" {
   name = module.eks.cluster_id
 }
-
 module "eks" {
   source               = "terraform-aws-modules/eks/aws"
   cluster_name         = var.cluster_name
-    cluster_version    = var.k8s_version
-    vpc_id             = module.vpc.vpc_id
-    subnets            = module.vpc.public_subnets
-    //enable_irsa      = true
-  worker_groups = [
-    
+  cluster_version      = var.k8s_version
+  vpc_id               = module.vpc.vpc_id
+  subnets              = module.vpc.public_subnets
+  worker_groups        = [
     {
       name                          = "worker-group"
       instance_type                 = var.node_instance_type
-      //disk_size                   = var.bot_disk_size
-      //ami_id                      = "ami-0c1a7f89451184c8b"
+      root_volume_size              = var.volume_size
+      ami_id                        = var.node_ami_id
       asg_desired_capacity          = var.desired_nodes
       asg_max_size                  = var.max_nodes
       kubelet_extra_args            = "--node-labels=node.kubernetes.io/lifecycle=spot"
       suspended_processes           = ["AZRebalance"]
       spot_price                    = var.spot_price
-
-      tags = [
+      tags                          = [
         {
           "key"                     = "k8s.io/cluster-autoscaler/enabled"
           "propagate_at_launch"     = "false"
@@ -54,10 +49,8 @@ module "eks" {
       ]
     },
   ]
-
-  workers_additional_policies = ["arn:aws:iam::aws:policy/AutoScalingFullAccess"]
+  workers_additional_policies       = ["arn:aws:iam::aws:policy/AutoScalingFullAccess"]
 }
-
 resource "null_resource" "kafka_deployment" {
    depends_on = [module.eks]
    count      = var.configure_kafka ? 1 : 0
@@ -66,19 +59,18 @@ resource "null_resource" "kafka_deployment" {
    }
    provisioner "local-exec" {
    command    = "kubectl apply -f https://raw.githubusercontent.com/litmuschaos/litmus/master/litmus-portal/cluster-k8s-manifest.yml"
-}
-   provisioner "local-exec" {
-     command  = "kubectl apply -f litmus-kafka-deployer/mysecret.yml"
    }
    provisioner "local-exec" {
-     command  = "kubectl apply -f litmus-kafka-deployer/rbac.yml"
+     command  = "kubectl apply -f ${var.k8s_secret_name}"
    }
    provisioner "local-exec" {
-     command  = "kubectl create -f litmus-kafka-deployer/litmus-kafka-deployer-pod.yml"
+     command  = "kubectl apply -f https://raw.githubusercontent.com/litmuschaos/test-tools/master/custom/app-setup/kafka/litmus-kafka-deployer/rbac.yml"
+   }
+   provisioner "local-exec" {
+     command  = "kubectl create -f litmus-kafka-deployer-pod.yml"
    }
    provisioner "local-exec" {
      command  = "while [[ $(kubectl get pods litmus-kafka-deployer -o jsonpath='{.status.containerStatuses[0].state..reason}') != 'Completed' ]]; do echo 'waiting for pod to come in Complete state'; done"
-
    }
 }
 resource "null_resource" "Cleanup" {

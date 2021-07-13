@@ -8,12 +8,12 @@ variable "vpc_cidr" {
     default = "10.0.0.0/16"
 }
 variable "private_subnets_cidr" {
-    type = list
+    type    = list
     default = [ "10.0.1.0/24" , "10.0.2.0/24", "10.0.3.0/24",]
 }
 
 variable "public_subnets_cidr" {
-    type = list
+    type    = list
     default = [ "10.0.101.0/24" , "10.0.102.0/24", "10.0.103.0/24",]
 }
 
@@ -22,7 +22,7 @@ variable "azs" {
 }
 
 variable "cluster_name" {
-    default =  "eks-adarsh"
+    default =  "eks-litmus"
 }
 
 variable "k8s_version" {
@@ -30,21 +30,31 @@ variable "k8s_version" {
  }
  variable "node_instance_type"{
 
-     default = "t3.xlarge"
+    default = "t3.xlarge"
  }
  variable "desired_nodes"{
-     type = number
-     default = 3
+    type    = number
+    default = 3
  }
  variable "max_nodes"{
-     type = number
-     default = 3
+    type    = number
+    default = 3
  }
  variable "spot_price"{
-     default= "0.10"
+    default = "0.10"
  }
-
+ variable "volume_size"{
+    type    = number
+    default = 100
+ }
+ variable "node_ami_id"{
+    default = "ami-0bcc785359fda47de"
+ }
 variable "configure_kafka"{
-  type = bool
-  description= "Enter true to setup kafka else enter false"
+    type    = bool
+    description = "Enter true to setup kafka else enter false"
+}
+variable "k8s_secret_name"{
+    default = "mysecret.yml"
+    description = "File name of the k8s-secret"
 }
