@@ -15,8 +15,8 @@ spec:
         - secretRef:
               name: aws-secret
     env:
-        ##  It defines the mode of the experiment
-        ##Supported values: setup, cleanup
+        ## It defines the mode of the experiment
+        ## Supported values: setup, cleanup
         - name: MODE
           value: "setup"
           
