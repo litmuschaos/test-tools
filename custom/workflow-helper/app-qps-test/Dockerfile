@@ -3,7 +3,7 @@ FROM golang:alpine
 LABEL maintainer="LitmusChaos"
 
 ARG TARGETOS=linux
-ARG TARGETARCH=amd64
+ARG TARGETARCH
 
 WORKDIR /app
 

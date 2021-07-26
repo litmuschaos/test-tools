@@ -4,7 +4,7 @@ FROM golang:1.14 AS builder
 LABEL maintainer="LitmusChaos"
 
 ARG TARGETOS=linux
-ARG TARGETARCH=amd64
+ARG TARGETARCH
 
 ADD . /chaos-checker
 WORKDIR /chaos-checker
