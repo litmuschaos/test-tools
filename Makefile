@@ -295,6 +295,15 @@ _push_litmus_k8s:
 
 litmus-k8s: deps _build_litmus_k8s _push_litmus_k8s
 
+_build_litmus_curl:
+	@echo "INFO: Building container image for litmus-curl"
+	cd custom/curl && docker build -t litmuschaos/curl .
+
+_push_litmus_curl:
+	@echo "INFO: Publish container litmuschaos/curl"
+	cd custom/curl && ./buildscripts/push
+
+litmus-curl: deps _build_litmus_curl _push_litmus_curl
 
 _build_litmus_argocli:
 	@echo "INFO: Building container image for litmuschaos/argocli"

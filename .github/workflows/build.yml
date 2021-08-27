@@ -52,6 +52,7 @@ jobs:
       container-kill-helper: ${{ steps.filter.outputs.pod-delete }}
       litmus-git-app-checker: ${{ steps.filter.outputs.litmus-git-app-checker }}
       litmus-k8s: ${{ steps.filter.outputs.litmus-k8s }}
+      litmus-curl: ${{ steps.filter.outputs.litmus-curl }}
       litmus-checker: ${{ steps.filter.outputs.litmus-checker }}
       litmus-argocli: ${{ steps.filter.outputs.litmus-argocli }}   
       workflow-controller: ${{ steps.filter.outputs.workflow-controller }}   
@@ -116,6 +117,8 @@ jobs:
               - 'custom/workflow-helper/app-checker/**'
             litmus-k8s:
               - 'custom/k8s/**'
+            litmus-curl:
+              - 'custom/curl/**'
             litmus-argocli:
               - 'custom/argo-server/**'   
             workflow-controller:
@@ -181,6 +184,17 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Building litmus-k8s image
         run: make litmus-k8s
+
+  litmus-curl:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.litmus-curl == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building litmus-curl image
+        run: make litmus-curl
 
   kafka-client:
     runs-on: ubuntu-latest
