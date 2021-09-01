@@ -1,10 +1,4 @@
-FROM alpine:3.12
+FROM curlimages/curl:7.78.0
 ARG TARGETARCH
+ARG TARGETPLATFORM
 
-LABEL maintainer="LitmusChaos"
-
-#Installing minimal packages
-RUN apk update && \
-    apk upgrade --update-cache --available 
-RUN apk --no-cache add curl &&\
-    rm -rf /var/cache/apk/*
