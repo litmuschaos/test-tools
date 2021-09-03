@@ -6,6 +6,7 @@ metadata:
     app: litmus-kafka-deployer
 spec:
   serviceAccountName: litmus-kafka-sa
+  restartPolicy: Never
   containers:
   - name: litmus-kafka-deployer-container
     image: litmuschaos/kafka-deployer:latest
@@ -14,8 +15,8 @@ spec:
         - secretRef:
               name: aws-secret
     env:
-        ##  It defines the mode of the experiment
-        ##Supported values: setup, cleanup
+        ## It defines the mode of the experiment
+        ## Supported values: setup, cleanup
         - name: MODE
           value: "setup"
           

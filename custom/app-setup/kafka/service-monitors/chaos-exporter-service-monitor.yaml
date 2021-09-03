@@ -4,7 +4,7 @@ metadata:
   name: chaos-exporter
   labels:
     name: chaos-exporter
-    k8s-app: chaos-exporter
+    app: chaos-exporter
   namespace: litmus
 spec:
   jobLabel: name
