@@ -1,4 +1,4 @@
-FROM centos:7.5.1804
+FROM centos:centos8
 
 ARG JMETER_VERSION="5.2.1"
 
