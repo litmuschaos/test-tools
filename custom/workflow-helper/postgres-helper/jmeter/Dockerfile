@@ -1,4 +1,4 @@
-FROM centos:7.5.1804 AS build-stage0
+FROM centos:7.5.1804
 
 ARG JMETER_VERSION="5.2.1"
 
