@@ -355,6 +355,26 @@ _push_litmus_kafka_deployer:
 
 litmus-kafka-deployer: deps _build_litmus_kafka_deployer _push_litmus_kafka_deployer
 
+_build_litmus_experiment_hardened_alpine:
+	@echo "INFO: Building container image for litmuschaos/experiment-alpine:latest"
+	cd custom/hardened-alpine/experiment/ && docker build -t litmuschaos/experiment-alpine:latest . --build-arg TARGETARCH=amd64
+
+_push_litmus_experiment_hardened_alpine:
+	@echo "INFO: Publish container litmuschaos/experiment-alpine"
+	cd custom/hardened-alpine/experiment/ && ./buildscripts/push
+
+litmus-experiment-hardened-alpine: deps _build_litmus_experiment_hardened_alpine _push_litmus_experiment_hardened_alpine
+
+_build_litmus_infra_hardened_alpine:
+	@echo "INFO: Building container image for litmuschaos/infra-alpine:latest"
+	cd custom/hardened-alpine/infra/ && docker build -t litmuschaos/infra-alpine:latest .
+
+_push_litmus_infra_hardened_alpine:
+	@echo "INFO: Publish container litmuschaos/infra-alpine"
+	cd custom/hardened-alpine/infra/ && ./buildscripts/push
+
+litmus-infra-hardened-alpine: deps _build_litmus_infra_hardened_alpine _push_litmus_infra_hardened_alpine
+
 PHONY: go-build
 go-build: experiment-go-binary
 
