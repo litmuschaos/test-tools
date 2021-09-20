@@ -287,7 +287,7 @@ litmus-git-app-checker: deps _build_litmus_git_app_checker _push_litmus_git_app_
 
 _build_litmus_pg_jmeter:
 	@echo "INFO: Building container image for performing litmus-pg-jmeter check"
-	cd custom/workflow-helper/postgres-helper/jmeter && docker build -t litmuschaos/litmus-pg-jmeter.
+	cd custom/workflow-helper/postgres-helper/jmeter && docker build -t litmuschaos/litmus-pg-jmeter .
 
 _push_litmus_pg_jmeter:
 	@echo "INFO: Publish container litmuschaos/litmus-pg-jmeter"
