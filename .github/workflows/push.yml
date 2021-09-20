@@ -493,4 +493,4 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Building litmus-pg-jmeter image
-        run: make litmus-pg-jmeter
+        run: make _push_litmus_pg_jmeter
