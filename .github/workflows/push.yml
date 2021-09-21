@@ -205,7 +205,9 @@ jobs:
           version: latest
 
       - name: Building litmus-infra-hardened-alpine image
-        run: make _push_litmus_infra_hardened_alpine
+        run: |
+          make docker.buildx
+          make _push_litmus_infra_hardened_alpine
 
   litmus-experiment-hardened-alpine:
     runs-on: ubuntu-latest
@@ -221,7 +223,9 @@ jobs:
           version: latest
 
       - name: Building litmus-experiment-hardened-alpine image
-        run: make _push_litmus_experiment_hardened_alpine
+        run: |
+          make docker.buildx
+          make _push_litmus_experiment_hardened_alpine
 
   litmus-git-app-checker:
     runs-on: ubuntu-latest
