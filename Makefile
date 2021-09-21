@@ -305,6 +305,15 @@ _push_litmus_k8s:
 
 litmus-k8s: deps _build_litmus_k8s _push_litmus_k8s
 
+_build_litmus_curl:
+	@echo "INFO: Building container image for litmus-curl"
+	cd custom/curl && docker build -t litmuschaos/curl .
+
+_push_litmus_curl:
+	@echo "INFO: Publish container litmuschaos/curl"
+	cd custom/curl && ./buildscripts/push
+
+litmus-curl: deps _build_litmus_curl _push_litmus_curl
 
 _build_litmus_argocli:
 	@echo "INFO: Building container image for litmuschaos/argocli"
@@ -355,6 +364,26 @@ _push_litmus_kafka_deployer:
 	cd custom/app-setup/kafka/buildscripts && ./push
 
 litmus-kafka-deployer: deps _build_litmus_kafka_deployer _push_litmus_kafka_deployer
+
+_build_litmus_experiment_hardened_alpine:
+	@echo "INFO: Building container image for litmuschaos/experiment-alpine:latest"
+	cd custom/hardened-alpine/experiment/ && docker build -t litmuschaos/experiment-alpine:latest . --build-arg TARGETARCH=amd64
+
+_push_litmus_experiment_hardened_alpine:
+	@echo "INFO: Publish container litmuschaos/experiment-alpine"
+	cd custom/hardened-alpine/experiment/ && ./buildscripts/push
+
+litmus-experiment-hardened-alpine: deps _build_litmus_experiment_hardened_alpine _push_litmus_experiment_hardened_alpine
+
+_build_litmus_infra_hardened_alpine:
+	@echo "INFO: Building container image for litmuschaos/infra-alpine:latest"
+	cd custom/hardened-alpine/infra/ && docker build -t litmuschaos/infra-alpine:latest .
+
+_push_litmus_infra_hardened_alpine:
+	@echo "INFO: Publish container litmuschaos/infra-alpine"
+	cd custom/hardened-alpine/infra/ && ./buildscripts/push
+
+litmus-infra-hardened-alpine: deps _build_litmus_infra_hardened_alpine _push_litmus_infra_hardened_alpine
 
 PHONY: go-build
 go-build: experiment-go-binary

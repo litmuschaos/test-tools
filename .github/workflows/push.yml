@@ -52,12 +52,15 @@ jobs:
       container-kill-helper: ${{ steps.filter.outputs.pod-delete }}
       litmus-git-app-checker: ${{ steps.filter.outputs.litmus-git-app-checker }}
       litmus-k8s: ${{ steps.filter.outputs.litmus-k8s }}
+      litmus-curl: ${{ steps.filter.outputs.litmus-curl }}
       litmus-checker: ${{ steps.filter.outputs.litmus-checker }}
       litmus-argocli: ${{ steps.filter.outputs.litmus-argocli }}
       workflow-controller: ${{ steps.filter.outputs.workflow-controller }}
       argoexec: ${{ steps.filter.outputs.argoexec }}
       mongo: ${{ steps.filter.outputs.mongo }}
       litmus-pg-jmeter: ${{ steps.filter.outputs.litmus-pg-jmeter }}
+      litmus-experiment-hardened-alpine: ${{ steps.filter.outputs.litmus-experiment-hardened-alpine }}
+      litmus-infra-hardened-alpine: ${{ steps.filter.outputs.litmus-infra-hardened-alpine }}
 
     steps:
       - uses: actions/checkout@v2
@@ -85,6 +88,10 @@ jobs:
               - 'custom/custom-client/**'
             litmus-checker:
               - 'custom/litmus-checker/**'
+            litmus-experiment-hardened-alpine:
+              - 'custom/hardened-alpine/experiment/**'
+            litmus-infra-hardened-alpine:
+              - 'custom/hardened-alpine/infra/**'              
             logger:
               - 'log_utils/logger/**'
             dd-client:
@@ -115,6 +122,8 @@ jobs:
               - 'custom/workflow-helper/app-checker/**'
             litmus-k8s:
               - 'custom/k8s/**'
+            litmus-curl:
+              - 'custom/curl/**'
             litmus-argocli:
               - 'custom/argo-server/**'   
             workflow-controller:
@@ -182,6 +191,38 @@ jobs:
           make docker.buildx
           make _push_litmus_checker
 
+  litmus-infra-hardened-alpine:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.litmus-infra-hardened-alpine == 'true'
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          version: latest
+
+      - name: Building litmus-infra-hardened-alpine image
+        run: make _push_litmus_infra_hardened_alpine
+
+  litmus-experiment-hardened-alpine:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.litmus-experiment-hardened-alpine == 'true'
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          version: latest
+
+      - name: Building litmus-experiment-hardened-alpine image
+        run: make _push_litmus_experiment_hardened_alpine
+
   litmus-git-app-checker:
     runs-on: ubuntu-latest
     needs: changes
@@ -217,6 +258,24 @@ jobs:
         run: |
           make docker.buildx
           make _push_litmus_k8s
+
+  litmus-curl:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.litmus-curl == 'true'
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          version: latest
+
+      - name: Build and Push litmus-curl image
+        run: |
+          make docker.buildx
+          make _push_litmus_curl
 
   kafka-client:
     runs-on: ubuntu-latest
@@ -493,4 +552,6 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Building litmus-pg-jmeter image
-        run: make _push_litmus_pg_jmeter
+        run: |
+          make docker.buildx
+          make _push_litmus_pg_jmeter
