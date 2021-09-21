@@ -58,6 +58,8 @@ jobs:
       workflow-controller: ${{ steps.filter.outputs.workflow-controller }}   
       argoexec: ${{ steps.filter.outputs.argoexec }}                                                
       mongo: ${{ steps.filter.outputs.mongo }}   
+      litmus-experiment-hardened-alpine: ${{ steps.filter.outputs.litmus-experiment-hardened-alpine }}
+      litmus-infra-hardened-alpine: ${{ steps.filter.outputs.litmus-infra-hardened-alpine }}
 
     steps:
       - uses: actions/checkout@v2
@@ -87,6 +89,10 @@ jobs:
               - 'custom/custom-client/**'
             litmus-checker:
               - 'custom/litmus-checker/**'
+            litmus-experiment-hardened-alpine:
+              - 'custom/hardened-alpine/experiment/**'
+            litmus-infra-hardened-alpine:
+              - 'custom/hardened-alpine/infra/**'
             logger:
               - 'log_utils/logger/**'
             dd-client:
@@ -162,6 +168,28 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Building litmus-checker image
         run: make litmus-checker
+
+  litmus-infra-hardened-alpine:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.litmus-infra-hardened-alpine == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building litmus-infra-hardened-alpine image
+        run: make litmus-infra-hardened-alpine
+
+  litmus-experiment-hardened-alpine:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.litmus-experiment-hardened-alpine == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building litmus-experiment-hardened-alpine image
+        run: make litmus-experiment-hardened-alpine
 
   litmus-git-app-checker:
     runs-on: ubuntu-latest
