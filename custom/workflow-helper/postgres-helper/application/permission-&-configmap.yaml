@@ -1,0 +1,316 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-operator
+data:
+  api_port: "8080"
+  aws_region: eu-central-1
+  cluster_domain: cluster.local
+  cluster_history_entries: "1000"
+  cluster_labels: application:spilo
+  cluster_name_label: cluster-name
+  connection_pooler_image: "registry.opensource.zalan.do/acid/pgbouncer:master-18"
+  db_hosted_zone: db.example.com
+  debug_logging: "true"
+  enable_sidecars: "true"
+  docker_image: registry.opensource.zalan.do/acid/spilo-13:2.1-p1
+  enable_ebs_gp3_migration: "false"
+  enable_master_load_balancer: "false"
+  enable_pgversion_env_var: "true"
+  enable_replica_load_balancer: "false"
+  enable_spilo_wal_path_compat: "true"
+  enable_team_member_deprecation: "false"
+  enable_teams_api: "false"
+  external_traffic_policy: "Cluster"
+  logical_backup_docker_image: "registry.opensource.zalan.do/acid/logical-backup:v1.6.3"
+  logical_backup_job_prefix: "logical-backup-"
+  logical_backup_provider: "s3"
+  logical_backup_s3_bucket: "my-bucket-url"
+  logical_backup_s3_sse: "AES256"
+  logical_backup_schedule: "30 00 * * *"
+  major_version_upgrade_mode: "manual"
+  master_dns_name_format: "{cluster}.{team}.{hostedzone}"
+  pdb_name_format: "postgres-{cluster}-pdb"
+  pod_deletion_wait_timeout: 10m
+  pod_label_wait_timeout: 10m
+  pod_management_policy: "ordered_ready"
+  pod_role_label: spilo-role
+  pod_service_account_name: "postgres-pod"
+  pod_terminate_grace_period: 5m
+  ready_wait_interval: 3s
+  ready_wait_timeout: 30s
+  repair_period: 5m
+  replica_dns_name_format: "{cluster}-repl.{team}.{hostedzone}"
+  replication_username: standby
+  resource_check_interval: 3s
+  resource_check_timeout: 10m
+  resync_period: 30m
+  ring_log_lines: "100"
+  role_deletion_suffix: "_deleted"
+  secret_name_template: "{username}.{cluster}.credentials"
+  spilo_allow_privilege_escalation: "true"
+  spilo_privileged: "false"
+  storage_resize_mode: "pvc"
+  super_username: postgres
+  watched_namespace: "*"  
+  workers: "8"
+---
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: postgres-operator
+  namespace: postgres
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: postgres-operator
+rules:
+# all verbs allowed for custom operator resources
+- apiGroups:
+  - acid.zalan.do
+  resources:
+  - postgresqls
+  - postgresqls/status
+  - operatorconfigurations
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+# operator only reads PostgresTeams
+- apiGroups:
+  - acid.zalan.do
+  resources:
+  - postgresteams
+  verbs:
+  - get
+  - list
+  - watch
+# to create or get/update CRDs when starting up
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - create
+  - get
+  - patch
+  - update
+# to read configuration from ConfigMaps
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+# to send events to the CRs
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+# to manage endpoints which are also used by Patroni
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+# to CRUD secrets for database access
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+  - delete
+  - get
+  - update
+# to check nodes for node readiness label
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
+# to read or delete existing PVCs. Creation via StatefulSet
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims
+  verbs:
+  - delete
+  - get
+  - list
+  - patch
+  - update
+ # to read existing PVs. Creation should be done via dynamic provisioning
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumes
+  verbs:
+  - get
+  - list
+  - update  # only for resizing AWS volumes
+# to watch Spilo pods and do rolling updates. Creation via StatefulSet
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+# to resize the filesystem in Spilo pods when increasing volume size
+- apiGroups:
+  - ""
+  resources:
+  - pods/exec
+  verbs:
+  - create
+# to CRUD services to point to Postgres cluster instances
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - create
+  - delete
+  - get
+  - patch
+  - update
+# to CRUD the StatefulSet which controls the Postgres cluster instances
+- apiGroups:
+  - apps
+  resources:
+  - statefulsets
+  - deployments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+# to CRUD cron jobs for logical backups
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+# to get namespaces operator resources can run in
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+# to define PDBs. Update happens via delete/create
+- apiGroups:
+  - policy
+  resources:
+  - poddisruptionbudgets
+  verbs:
+  - create
+  - delete
+  - get
+# to create ServiceAccounts in each namespace the operator watches
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
+  verbs:
+  - get
+  - create
+# to create role bindings to the postgres-pod service account
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - rolebindings
+  verbs:
+  - get
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: postgres-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: postgres-operator
+subjects:
+- kind: ServiceAccount
+  name: postgres-operator
+  namespace: postgres
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: postgres-pod
+rules:
+# Patroni needs to watch and manage endpoints
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+# Patroni needs to watch pods
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+# to let Patroni create a headless service
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - create
+---
