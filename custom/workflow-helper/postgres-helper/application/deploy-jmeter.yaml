@@ -1,0 +1,37 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-jmeter-load
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: postgres
+        image: "litmuschaos/litmus-pg-jmeter:latest"
+        imagePullPolicy: Always
+        env:      
+        - name: "DATA_SOURCE_URI"
+          value: "jdbc:postgresql://postgres-application.postgres.svc:5432/postgres?autoReconnect=true"
+        - name: "USERNAME"
+          valueFrom: 
+            secretKeyRef: 
+              key: username
+              name: zalando.postgres-application.credentials
+        - name: "PASSWORD"
+          valueFrom: 
+            secretKeyRef: 
+              key: password
+              name: zalando.postgres-application.credentials
+       
+ 
