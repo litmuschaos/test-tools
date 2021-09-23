@@ -365,6 +365,16 @@ _push_litmus_kafka_deployer:
 
 litmus-kafka-deployer: deps _build_litmus_kafka_deployer _push_litmus_kafka_deployer
 
+_build_litmus_pg_load:
+	@echo "INFO: Building container image for litmuschaos/litmus-pg-load"
+	cd custom/workflow-helper/postgres-helper/load-test && docker build -t litmuschaos/litmus-pg-load .
+
+_push_litmus_pg_load:
+	@echo "INFO: Publish container litmuschaos/litmus-pg-load"
+	cd custom/workflow-helper/postgres-helper/load-test/buildscripts && ./push
+
+litmus-pg-load: deps _build_litmus_pg_load _push_litmus_pg_load
+
 _build_litmus_experiment_hardened_alpine:
 	@echo "INFO: Building container image for litmuschaos/experiment-alpine:latest"
 	cd custom/hardened-alpine/experiment/ && docker build -t litmuschaos/experiment-alpine:latest . --build-arg TARGETARCH=amd64
