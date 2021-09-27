@@ -1,0 +1,76 @@
+apiVersion: "acid.zalan.do/v1"
+kind: postgresql
+metadata:
+  name: postgres-application
+  namespace: postgres
+spec:
+  teamId: "postgres"
+  volume:
+    size: 3Gi
+  numberOfInstances: 2
+  users:
+    zalando:  # database owner
+    - superuser
+    - createdb
+    - inherit
+    - login
+    - createrole
+    - replication
+    - bypassrls
+    foo_user: 
+    - superuser
+    - createdb
+    - inherit
+    - login
+    - createrole
+    - replication
+    - bypassrls # role for application foo
+  databases:
+    foo: zalando  # dbname: owner
+  preparedDatabases:
+    bar: {}
+  postgresql:
+    version: "13"
+  sidecars:
+    - name: "exporter"
+      image: "wrouesnel/postgres_exporter"
+      ports:
+        - name: exporter
+          containerPort: 9187
+          protocol: TCP
+      resources:
+        limits:
+          cpu: 500m
+          memory: 256M
+        requests:
+          cpu: 100m
+          memory: 200M
+      env:
+        - name: "DATA_SOURCE_URI"
+          value: "localhost/postgres?sslmode=disable"
+        - name: "DATA_SOURCE_USER"
+          valueFrom: 
+            secretKeyRef: 
+              key: username
+              name: zalando.postgres-application.credentials
+        - name: "DATA_SOURCE_PASS"
+          valueFrom: 
+            secretKeyRef: 
+              key: password
+              name: zalando.postgres-application.credentials
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-exporter
+  labels:
+    app: pg-exporter
+spec:
+  type: NodePort
+  ports:
+    - name: exporter
+      port: 9187
+      targetPort: 9187
+  selector:
+    application: spilo
+    team: postgres
