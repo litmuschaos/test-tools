@@ -556,8 +556,6 @@ jobs:
     if: needs.changes.outputs.litmus-pg-load == 'true'
     steps:
       - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
       - name: Building litmus-pg-load image
         run: |
           make docker.buildx

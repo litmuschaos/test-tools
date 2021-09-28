@@ -371,7 +371,7 @@ _build_litmus_pg_load:
 
 _push_litmus_pg_load:
 	@echo "INFO: Publish container litmuschaos/litmus-pg-load"
-	cd custom/workflow-helper/postgres-helper/load-test/buildscripts && ./push
+	cd custom/workflow-helper/postgres-helper/load-test && ./buildscripts/push
 
 litmus-pg-load: deps _build_litmus_pg_load _push_litmus_pg_load
 
