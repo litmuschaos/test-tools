@@ -33,13 +33,13 @@ type QPSVars struct {
 	route         string
 	urlList       []string
 	query         string
+	application   string
 }
 
 func main() {
 	log.Info("[Status]: Starting QPS provider...")
 
 	qpsVars := initialiseVars()
-	log.Info("[Status]: intialised")
 	go runDataLoop(qpsVars)
 
 	// Create a handler that will read-lock the mutext and
@@ -63,10 +63,11 @@ func initialiseVars() (vars *QPSVars) {
 		totalReqCount: "0",
 		namespace:     os.Getenv("APP_NAMESPACE"),
 		appLabel:      os.Getenv("APP_LABEL"),
-		timeInterval:  0,
+		timeInterval:  20,
 		route:         os.Getenv("ROUTE"),
 		query:         os.Getenv("QUERY"),
 		urlList:       []string{},
+		application:   os.Getenv("APPLICATION_NAME"),
 	}
 	return &qpsVars
 }
@@ -86,6 +87,8 @@ func runDataLoop(vars *QPSVars) {
 	}
 
 	queue := list.New()
+	sumQuery := 0
+	skipFirst := true
 	vars.timeInterval, _ = strconv.Atoi(os.Getenv("TIME")) //The time period in second to calculate mean value of QPS.
 	flag.Parse()
 
@@ -96,33 +99,51 @@ func runDataLoop(vars *QPSVars) {
 	for {
 		vars.urlList, err = getURL(vars, clientset)
 		if err != nil {
-			log.Errorf("Unable to find the pods in namespace, err: %v", err)
-			continue
+			log.Errorf("Unable to find pods in namespace, err: %v", err)
+			time.Sleep(1 * time.Second)
+			vars.totalReqCount = "0"
 		}
 		req, err := GetRequests(vars.urlList, vars.route, vars)
 		if err != nil {
 			vars.qpsValue = strconv.Itoa(0)
 			time.Sleep(1 * time.Second)
-			continue
 		}
 
+		if skipFirst {
+			sumQuery = 0
+			skipFirst = false
+			vars.totalQueries, _ = strconv.Atoi(req)
+			vars.totalReqCount = "0"
+			continue
+		}
 		second := int(time.Now().Sub(start).Seconds())
 		reqs, _ := strconv.Atoi(req)
 		vars.totalReqCount = "0"
-		vars.totalQueries = reqs
 
 		if second <= vars.timeInterval {
-			queue.PushBack(reqs)
-			vars.qpsValue = strconv.Itoa(int(math.Abs(float64(100 * (reqs / queue.Len())))))
+			if reqs-vars.totalQueries > 0 {
+				queue.PushBack(reqs - vars.totalQueries)
+				sumQuery += reqs - vars.totalQueries
+				vars.qpsValue = strconv.Itoa(int(math.Abs(float64(100 * int((sumQuery)) / vars.timeInterval))))
+			} else {
+				queue.PushBack(0)
+				vars.qpsValue = strconv.Itoa(int(math.Abs(float64(100 * int((sumQuery)) / vars.timeInterval))))
+			}
 		} else {
 			front := queue.Front()
+			sumQuery -= front.Value.(int)
 			queue.Remove(front)
-			queue.PushBack(reqs)
-			vars.totalQueries -= front.Value.(int)
-			vars.qpsValue = strconv.Itoa(int(math.Abs(float64(100 * (vars.totalQueries / vars.timeInterval)))))
+			if reqs-vars.totalQueries > 0 {
+				queue.PushBack(reqs - vars.totalQueries)
+				sumQuery += reqs - vars.totalQueries
+			} else {
+				queue.PushBack(0)
+			}
+			vars.qpsValue = strconv.Itoa(int(math.Abs(float64(100 * (sumQuery / vars.timeInterval)))))
 		}
-		log.Infof("[Status]: Current total requests : ", req)
-		log.Infof("[Status]: Current QPS value is   : ", vars.qpsValue)
+		vars.totalQueries = reqs
+		log.Infof("[Status]: Current Total Requests : ", req)
+		log.Infof("[Status]: Current Query Rate : ", vars.qpsValue)
 		time.Sleep(1 * time.Second)
 	}
 }
@@ -130,12 +151,30 @@ func runDataLoop(vars *QPSVars) {
 // getURL will list the IPs for all the pods exporting metrics
 func getURL(vars *QPSVars, clientset *kubernetes.Clientset) ([]string, error) {
 	vars.urlList = []string{}
+	log.Info("[Status]: 1")
 	podSpec, err := clientset.CoreV1().Pods(vars.namespace).List(metav1.ListOptions{LabelSelector: vars.appLabel})
-	if err != nil {
-		return []string{}, errors.Errorf("Unable to find the pods in namespace, err: %v", err)
+	if err != nil && len(podSpec.Items) == 0 {
+		return []string{}, err
 	}
-	for _, pod := range podSpec.Items {
-		vars.urlList = append(vars.urlList, strings.Replace(pod.Status.PodIP, ".", "-", -1))
+
+	switch strings.ToLower(vars.application) {
+	case "postgres":
+		for _, pod := range podSpec.Items {
+			if strings.Contains(string(pod.ObjectMeta.Annotations["status"]), "master") {
+				vars.urlList = append(vars.urlList, strings.Replace(pod.Status.PodIP, ".", "-", -1))
+				break
+			}
+		}
+		if len(vars.urlList) == 0 {
+			fmt.Println("length of urls :", len(vars.urlList))
+			return []string{}, errors.Errorf("Unable to find the pods with master role in namespace")
+		}
+	case "sock-shop":
+		for _, pod := range podSpec.Items {
+			vars.urlList = append(vars.urlList, strings.Replace(pod.Status.PodIP, ".", "-", -1))
+		}
+	default:
+		return []string{}, errors.Errorf("Application '%v' not supported in app-qps-test", vars.application)
 	}
 	return vars.urlList, nil
 }
