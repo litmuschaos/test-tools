@@ -887,21 +887,21 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: query-test
+  name: qps-test
   labels:
     app: sock-shop
-    name: query-test
+    name: qps-test
 spec:
   replicas: 1
   selector:
     matchLabels:
-      name: query-test
+      name: qps-test
       app: sock-shop
   template:
     metadata:
       labels:
         app: sock-shop
-        name: query-test
+        name: qps-test
     spec:
       containers:
       - name: sock-shop
@@ -921,9 +921,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: query-test
+  name: qps-test
   labels:
-    name: query-test
+    name: qps-test
   namespace: sock-shop
 spec:
   type: NodePort
@@ -932,7 +932,7 @@ spec:
     port: 80
     targetPort: 8080
   selector:
-    name: query-test
+    name: qps-test
 ---
 apiVersion: apps/v1
 kind: Deployment
