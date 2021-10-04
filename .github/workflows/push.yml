@@ -58,6 +58,7 @@ jobs:
       workflow-controller: ${{ steps.filter.outputs.workflow-controller }}
       argoexec: ${{ steps.filter.outputs.argoexec }}
       mongo: ${{ steps.filter.outputs.mongo }}
+      litmus-pg-load: ${{ steps.filter.outputs.litmus-pg-load }} 
       litmus-pg-jmeter: ${{ steps.filter.outputs.litmus-pg-jmeter }}
       litmus-experiment-hardened-alpine: ${{ steps.filter.outputs.litmus-experiment-hardened-alpine }}
       litmus-infra-hardened-alpine: ${{ steps.filter.outputs.litmus-infra-hardened-alpine }}
@@ -134,6 +135,8 @@ jobs:
               - 'custom/mongo/**'
             kafka-deployer:
               - 'custom/app-setup/kafka/**'
+            litmus-pg-load:
+              - 'custom/workflow-helper/postgres-helper/load-test/**'
             litmus-pg-jmeter:
               - 'custom/workflow-helper/postgres-helper/jmeter/**'
 
@@ -546,6 +549,17 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build and Push fio image
         run: make fio
+
+  litmus-pg-load:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.litmus-pg-load == 'true'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Building litmus-pg-load image
+        run: |
+          make docker.buildx
+          make _push_litmus_pg_load
   
   litmus-pg-jmeter:
     runs-on: ubuntu-latest

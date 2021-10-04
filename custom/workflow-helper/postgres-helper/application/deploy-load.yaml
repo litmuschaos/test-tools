@@ -1,0 +1,31 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-load
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      serviceAccountName: postgres-operator # require permission is get resource "secrets" in the namespace lirmus 
+      containers:
+      - name: postgres
+        image: litmuschaos/litmus-pg-load:latest
+        args:
+          - -c
+          - python3 -u loadGen.py
+        command:
+          - /bin/bash 
+        env:
+        - name: NAMESPACE
+          value: "litmus"
+        - name: SECRET_NAME
+          value: "postgres-application.credentials"

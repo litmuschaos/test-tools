@@ -891,42 +891,43 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: qps-test
+  name: query-test
   labels:
     app: sock-shop
-    name: qps-test
-  namespace: sock-shop
+    name: query-test
 spec:
   replicas: 1
   selector:
     matchLabels:
-      name: qps-test
+      name: query-test
       app: sock-shop
   template:
     metadata:
       labels:
         app: sock-shop
-        name: qps-test
+        name: query-test
     spec:
       containers:
       - name: sock-shop
         image: litmuschaos/litmus-qps-cmd:latest
         env:
-        - name: URL
-          value: 'http://front-end.sock-shop.svc.cluster.local:80/metrics'
-        - name: TIME
-          value: '20'
-        - name: ROUTE
-          value: '/'
+          - name: ROUTE
+            value: http://front-end.sock-shop.svc.cluster.local:80/metrics
+          - name: TIME
+            value: '20'
+          - name: QUERY
+            value: "request_duration_seconds_count{service=\"front-end\",method=\"get\",route=\"/\",status_code=\"200\"}" #"pg_stat_database_tup_inserted{datid=\"13385\",datname=\"sock-shop\",server=\"localhost:5432\"}"
+          - name: APPLICATION_NAME
+            value: "sock-shop" 
         ports:
           - containerPort: 8080
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: qps-test
+  name: query-test
   labels:
-    name: qps-test
+    name: query-test
   namespace: sock-shop
 spec:
   type: NodePort
@@ -935,7 +936,7 @@ spec:
     port: 80
     targetPort: 8080
   selector:
-    name: qps-test
+    name: query-test
 ---
 apiVersion: apps/v1
 kind: Deployment

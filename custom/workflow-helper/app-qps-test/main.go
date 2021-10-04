@@ -63,7 +63,7 @@ func initialiseVars() (vars *QPSVars) {
 		totalReqCount: "0",
 		namespace:     os.Getenv("APP_NAMESPACE"),
 		appLabel:      os.Getenv("APP_LABEL"),
-		timeInterval:  20,
+		timeInterval:  0,
 		route:         os.Getenv("ROUTE"),
 		query:         os.Getenv("QUERY"),
 		urlList:       []string{},
@@ -151,28 +151,24 @@ func runDataLoop(vars *QPSVars) {
 // getURL will list the IPs for all the pods exporting metrics
 func getURL(vars *QPSVars, clientset *kubernetes.Clientset) ([]string, error) {
 	vars.urlList = []string{}
-	log.Info("[Status]: 1")
-	podSpec, err := clientset.CoreV1().Pods(vars.namespace).List(metav1.ListOptions{LabelSelector: vars.appLabel})
-	if err != nil && len(podSpec.Items) == 0 {
-		return []string{}, err
-	}
 
 	switch strings.ToLower(vars.application) {
 	case "postgres":
+		podSpec, err := clientset.CoreV1().Pods(vars.namespace).List(metav1.ListOptions{LabelSelector: vars.appLabel})
+		if err != nil && len(podSpec.Items) == 0 {
+			return []string{}, err
+		}
 		for _, pod := range podSpec.Items {
 			if strings.Contains(string(pod.ObjectMeta.Annotations["status"]), "master") {
-				vars.urlList = append(vars.urlList, strings.Replace(pod.Status.PodIP, ".", "-", -1))
+				vars.urlList = append(vars.urlList, string(`http://`+strings.Replace(pod.Status.PodIP, ".", "-", -1)+`.`+vars.route))
 				break
 			}
 		}
 		if len(vars.urlList) == 0 {
-			fmt.Println("length of urls :", len(vars.urlList))
 			return []string{}, errors.Errorf("Unable to find the pods with master role in namespace")
 		}
 	case "sock-shop":
-		for _, pod := range podSpec.Items {
-			vars.urlList = append(vars.urlList, strings.Replace(pod.Status.PodIP, ".", "-", -1))
-		}
+		vars.urlList = append(vars.urlList, string(vars.route))
 	default:
 		return []string{}, errors.Errorf("Application '%v' not supported in app-qps-test", vars.application)
 	}
@@ -183,12 +179,11 @@ func getURL(vars *QPSVars, clientset *kubernetes.Clientset) ([]string, error) {
 func GetRequests(urlList []string, route string, vars *QPSVars) (string, error) {
 
 	for index := range urlList {
-		response, err := http.Get(string("http://" + urlList[index] + "." + vars.route))
+		response, err := http.Get(urlList[index])
 		if err != nil {
 			return "", err
 		}
 		defer response.Body.Close()
-
 		metric, err := ioutil.ReadAll(response.Body)
 		if err != nil {
 			return "", err
@@ -196,6 +191,7 @@ func GetRequests(urlList []string, route string, vars *QPSVars) (string, error) 
 
 		metrics := string(metric)
 		metricsSplited := strings.Split(metrics, "\n")
+
 		for i := 0; i < len(metricsSplited); i++ {
 			if strings.Contains(string(metricsSplited[i]), vars.query) {
 				metricsValue := strings.Split(metricsSplited[i], " ")
