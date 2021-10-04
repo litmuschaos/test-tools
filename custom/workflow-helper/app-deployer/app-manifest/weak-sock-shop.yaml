@@ -912,7 +912,7 @@ spec:
           - name: TIME
             value: '20'
           - name: QUERY
-            value: "request_duration_seconds_count{service=\"front-end\",method=\"get\",route=\"/\",status_code=\"200\"}" #"pg_stat_database_tup_inserted{datid=\"13385\",datname=\"sock-shop\",server=\"localhost:5432\"}"
+            value: "request_duration_seconds_count{service=\"front-end\",method=\"get\",route=\"/\",status_code=\"200\"}"
           - name: APPLICATION_NAME
             value: "sock-shop" 
         ports:
