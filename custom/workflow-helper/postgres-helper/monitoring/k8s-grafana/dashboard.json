@@ -215,7 +215,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "pg_postmaster_start_time_seconds{release=\"$release\", instance=\"$instance\"} * 1000",
+          "expr": "pg_postmaster_start_time_seconds{release=\"$release\", instance=\"$instance\"} * 100",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "",
@@ -608,7 +608,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "avg(rate(process_cpu_seconds_total{release=\"$release\", instance=\"$instance\"}[5m]) * 1000)",
+          "expr": "avg(rate(process_cpu_seconds_total{release=\"$release\", instance=\"$instance\"}[5m]) * 100)",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "CPU Time",
