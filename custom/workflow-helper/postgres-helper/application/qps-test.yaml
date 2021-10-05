@@ -21,7 +21,7 @@ spec:
       serviceAccountName: postgres-operator
       containers:
       - name: postgres
-        image: kaleoum/app-qps-test:q1
+        image: litmuschaos/litmus-qps-cmd:latest
         env:
           - name: ROUTE
             value: 'postgres.pod.cluster.local:9187/metrics'
