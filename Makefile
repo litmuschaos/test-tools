@@ -377,7 +377,7 @@ litmus-pg-load: deps _build_litmus_pg_load _push_litmus_pg_load
 
 _build_litmus_experiment_hardened_alpine:
 	@echo "INFO: Building container image for litmuschaos/experiment-alpine:latest"
-	cd custom/hardened-alpine/experiment/ && docker build -t litmuschaos/experiment-alpine:latest . --build-arg TARGETARCH=amd64
+	cd custom/hardened-alpine/experiment/ && docker build -t litmuschaos/experiment-alpine:latest . --build-arg TARGETARCH=amd64 --build-arg LITMUS_VERSION=1.13.8
 
 _push_litmus_experiment_hardened_alpine:
 	@echo "INFO: Publish container litmuschaos/experiment-alpine"

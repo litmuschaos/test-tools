@@ -20,6 +20,9 @@ ENV DATA_DIR "$APP_DIR/data"
 # Where configuration should be stored
 ENV CONF_DIR "$APP_DIR/conf"
 
+# Change default shell from ash to bash
+RUN sed -i -e "s/bin\/ash/bin\/bash/" /etc/passwd   
+
 # Update base system
 # hadolint ignore=DL3018
 RUN apk add --no-cache ca-certificates
@@ -99,6 +102,6 @@ RUN rm -f /etc/fstab
 # Remove any symlinks that we broke during previous steps
 RUN find /bin /etc /lib /sbin /usr -xdev -type l -exec test ! -e {} \; -delete
 
-# default directory is /app
+# default directory is /litmus
 WORKDIR $APP_DIR
 USER ${APP_USER}

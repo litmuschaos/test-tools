@@ -89,8 +89,8 @@ RUN adduser -s /bin/true -u 1000 -D -h $APP_DIR $APP_USER \
   && mkdir "$DATA_DIR" "$CONF_DIR" \
   && chown -R "$APP_USER" "$APP_DIR" "$CONF_DIR" \
   && chmod 700 "$APP_DIR" "$DATA_DIR" "$CONF_DIR" \
-  && echo "$APP_USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/app \
-  && chmod 0440 /etc/sudoers.d/app
+  && echo "$APP_USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/litmus \
+  && chmod 0440 /etc/sudoers.d/litmus
 
 # Remove existing crontabs, if any.
 RUN rm -fr /var/spool/cron \
@@ -161,6 +161,6 @@ RUN rm -f /etc/fstab
 # Remove any symlinks that we broke during previous steps
 RUN find /bin /etc /lib /sbin /usr -xdev -type l -exec test ! -e {} \; -delete
 
-# default directory is /app
+# default directory is /litmus
 WORKDIR $APP_DIR
 USER ${APP_USER}

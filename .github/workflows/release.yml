@@ -71,7 +71,7 @@ jobs:
           username: ${{ secrets.DNAME }}
           password: ${{ secrets.DPASS }}
 
-      - name: Build and push
+      - name: Build and push experiment-alpine
         uses: docker/build-push-action@v2
         with:
           push: true
@@ -80,7 +80,7 @@ jobs:
           build-args: LITMUS_VERSION=${{ github.event.inputs.release_tag }}
           tags: litmuschaos/experiment-alpine:${{ github.event.inputs.release_tag }},litmuschaos/experiment-alpine:latest
 
-      - name: Build and push
+      - name: Build and push infra-alpine
         uses: docker/build-push-action@v2
         with:
           push: true
