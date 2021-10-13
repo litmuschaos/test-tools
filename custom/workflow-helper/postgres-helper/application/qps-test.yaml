@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qps-test
+  labels:
+    app: postgres
+    name: qps-test
+  namespace: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: qps-test
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+        name: qps-test
+    spec:
+      serviceAccountName: postgres-operator
+      containers:
+      - name: postgres
+        image: litmuschaos/litmus-qps-cmd:latest
+        env:
+          - name: ROUTE
+            value: 'postgres.pod.cluster.local:9187/metrics'
+          - name: APP_NAMESPACE
+            value: 'postgres'
+          - name: APP_LABEL
+            value: 'application=spilo'
+          - name: TIME
+            value: '90'
+          - name: QUERY
+            value: "pg_stat_database_tup_inserted{datid=\"13385\",datname=\"postgres\",server=\"localhost:5432\"}"
+          - name: APPLICATION_NAME
+            value: "postgres" 
+        ports:
+          - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qps-test
+  labels:
+    name: qps-test
+  namespace: postgres
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  selector:
+    name: qps-test

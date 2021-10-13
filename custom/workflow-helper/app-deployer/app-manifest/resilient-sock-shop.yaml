@@ -895,7 +895,6 @@ metadata:
   labels:
     app: sock-shop
     name: qps-test
-  namespace: sock-shop
 spec:
   replicas: 1
   selector:
@@ -912,12 +911,14 @@ spec:
       - name: sock-shop
         image: litmuschaos/litmus-qps-cmd:latest
         env:
-        - name: URL
-          value: 'http://front-end.sock-shop.svc.cluster.local:80/metrics'
-        - name: TIME
-          value: '20'
-        - name: ROUTE
-          value: '/'
+          - name: ROUTE
+            value: http://front-end.sock-shop.svc.cluster.local:80/metrics
+          - name: TIME
+            value: '20'
+          - name: QUERY
+            value: "request_duration_seconds_count{service=\"front-end\",method=\"get\",route=\"/\",status_code=\"200\"}"
+          - name: APPLICATION_NAME
+            value: "sock-shop" 
         ports:
           - containerPort: 8080
 ---
