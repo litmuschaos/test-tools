@@ -15,6 +15,7 @@ RUN echo "https://alpine.global.ssl.fastly.net/alpine/v$(cut -d . -f 1,2 < /etc/
 ENV GLIBC_REPO=https://github.com/sgerrand/alpine-pkg-glibc
 ENV GLIBC_VERSION=2.30-r0
 ARG TARGETARCH
+ARG LITMUS_VERSION
 
 RUN rm -rf /var/lib/apt/lists/*
 
@@ -57,16 +58,16 @@ ENV PUMBA_VERSION="0.7.7"
 RUN curl -L https://github.com/alexei-led/pumba/releases/download/${PUMBA_VERSION}/pumba_linux_${TARGETARCH} --output /usr/local/bin/pumba && chmod +x /usr/local/bin/pumba
 
 #Installing promql cli binaries
-RUN curl -L https://github.com/litmuschaos/test-tools/releases/download/1.13.6/promql-linux-${TARGETARCH} --output /usr/local/bin/promql && chmod +x /usr/local/bin/promql
+RUN curl -L https://github.com/litmuschaos/test-tools/releases/download/${LITMUS_VERSION}/promql-linux-${TARGETARCH} --output /usr/local/bin/promql && chmod +x /usr/local/bin/promql
 
 #Installing nsutil cli binaries
-RUN curl -L https://github.com/litmuschaos/test-tools/releases/download/1.13.6/nsutil-linux-${TARGETARCH} --output /usr/local/bin/nsutil && chmod +x /usr/local/bin/nsutil
+RUN curl -L https://github.com/litmuschaos/test-tools/releases/download/${LITMUS_VERSION}/nsutil-linux-${TARGETARCH} --output /usr/local/bin/nsutil && chmod +x /usr/local/bin/nsutil
 
 #Installing pause cli binaries
-RUN curl -L https://github.com/litmuschaos/test-tools/releases/download/1.13.6/pause-linux-${TARGETARCH} --output /usr/local/bin/pause && chmod +x /usr/local/bin/pause
+RUN curl -L https://github.com/litmuschaos/test-tools/releases/download/${LITMUS_VERSION}/pause-linux-${TARGETARCH} --output /usr/local/bin/pause && chmod +x /usr/local/bin/pause
 
 #Installing dns_interceptor cli binaries
-RUN curl -L https://github.com/litmuschaos/test-tools/releases/download/1.13.6/dns_interceptor --output /usr/local/bin/dns_interceptor && chmod +x /usr/local/bin/dns_interceptor
+RUN curl -L https://github.com/litmuschaos/test-tools/releases/download/${LITMUS_VERSION}/dns_interceptor --output /usr/local/bin/dns_interceptor && chmod +x /usr/local/bin/dns_interceptor
 
 COPY --from=docker:19.03 /usr/local/bin/docker /usr/local/bin/
 
@@ -88,8 +89,8 @@ RUN adduser -s /bin/true -u 1000 -D -h $APP_DIR $APP_USER \
   && mkdir "$DATA_DIR" "$CONF_DIR" \
   && chown -R "$APP_USER" "$APP_DIR" "$CONF_DIR" \
   && chmod 700 "$APP_DIR" "$DATA_DIR" "$CONF_DIR" \
-  && echo "$APP_USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/app \
-  && chmod 0440 /etc/sudoers.d/app
+  && echo "$APP_USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/litmus \
+  && chmod 0440 /etc/sudoers.d/litmus
 
 # Remove existing crontabs, if any.
 RUN rm -fr /var/spool/cron \
@@ -160,6 +161,6 @@ RUN rm -f /etc/fstab
 # Remove any symlinks that we broke during previous steps
 RUN find /bin /etc /lib /sbin /usr -xdev -type l -exec test ! -e {} \; -delete
 
-# default directory is /app
+# default directory is /litmus
 WORKDIR $APP_DIR
 USER ${APP_USER}
