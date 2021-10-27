@@ -20,6 +20,12 @@ ENV DATA_DIR "$APP_DIR/data"
 # Where configuration should be stored
 ENV CONF_DIR "$APP_DIR/conf"
 
+# Install generally useful things
+RUN apk --update add \
+        curl \
+	sudo \
+        bash
+
 # Change default shell from ash to bash
 RUN sed -i -e "s/bin\/ash/bin\/bash/" /etc/passwd   
 
