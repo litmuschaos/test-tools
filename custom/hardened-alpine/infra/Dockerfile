@@ -23,7 +23,7 @@ ENV CONF_DIR "$APP_DIR/conf"
 # Install generally useful things
 RUN apk --update add \
         curl \
-	      sudo \
+	sudo \
         bash
 
 # Change default shell from ash to bash
