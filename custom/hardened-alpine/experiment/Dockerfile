@@ -54,7 +54,7 @@ RUN curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.16
     tar zxvf crictl-v1.16.0-linux-${TARGETARCH}.tar.gz -C /usr/local/bin
     
 #Installing pumba binaries
-ENV PUMBA_VERSION="0.7.7"
+ENV PUMBA_VERSION="0.8.0"
 RUN curl -L https://github.com/alexei-led/pumba/releases/download/${PUMBA_VERSION}/pumba_linux_${TARGETARCH} --output /usr/local/bin/pumba && chmod +x /usr/local/bin/pumba
 
 #Installing promql cli binaries
