@@ -588,4 +588,4 @@ jobs:
       - name: Building mongo-utils image
         run: |
           make docker.buildx
-          make mongo-utils
+          make _push_litmus_mongo_utils 
