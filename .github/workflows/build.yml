@@ -553,5 +553,4 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Building mongo-utils image
         run: |
-          make docker.buildx
           make litmus-mongo-utils
