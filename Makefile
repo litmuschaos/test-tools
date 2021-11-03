@@ -395,6 +395,16 @@ _push_litmus_infra_hardened_alpine:
 
 litmus-infra-hardened-alpine: deps _build_litmus_infra_hardened_alpine _push_litmus_infra_hardened_alpine
 
+_build_litmus_mongo_utils:
+	@echo "INFO: Building container image for litmuschaos/mongo-utils"
+	cd custom/mongo-utils && docker build -t litmuschaos/mongo-utils .
+
+_push_litmus_mongo_utils:
+	@echo "INFO: Publish container litmuschaos/mongo-utils"
+	cd custom/mongo-utils && ./buildscripts/push
+
+litmus-mongo-utils: deps _build_litmus_mongo_utils _push_litmus_mongo_utils
+
 PHONY: go-build
 go-build: experiment-go-binary
 
