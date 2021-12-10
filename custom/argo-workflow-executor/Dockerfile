@@ -1,2 +1,2 @@
-FROM argoproj/argoexec:v2.11.0
+FROM argoproj/argoexec:v3.2.3
 ARG TARGETPLATFORM
