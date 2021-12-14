@@ -37,7 +37,10 @@ RUN apk add --no-cache ca-certificates
 RUN adduser -s /bin/true -u 1000 -D -h $APP_DIR $APP_USER \
   && mkdir "$DATA_DIR" "$CONF_DIR" \
   && chown -R "$APP_USER" "$APP_DIR" "$CONF_DIR" \
-  && chmod 700 "$APP_DIR" "$DATA_DIR" "$CONF_DIR"
+  && chmod 700 "$APP_DIR" "$DATA_DIR" "$CONF_DIR" \
+# change to 0(root) group because openshift will run container with arbitrary uid as a member of root group
+  && chgrp -R 0 "$APP_DIR" "$DATA_DIR" "$CONF_DIR" \
+  && chmod -R g=u "$APP_DIR" "$DATA_DIR" "$CONF_DIR"
 
 # Remove existing crontabs, if any.
 RUN rm -fr /var/spool/cron \
