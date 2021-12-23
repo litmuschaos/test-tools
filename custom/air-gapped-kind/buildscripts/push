@@ -1,0 +1,21 @@
+#!/bin/bash
+set -e
+
+# While making any change in below variables, Please edit the enrtypoint-wrapper.sh as well
+KIND_NODE_IMAGE="kindest/node:v1.21.1"
+REGISTRY_IMAGE="registry:2"
+
+if [ ! -z "${DNAME}" ] && [ ! -z "${DPASS}" ];
+then
+  docker login -u "${DNAME}" -p "${DPASS}";
+  
+  # Pulling Node & Registry images
+  mkdir assets
+  docker pull kindest/node:v1.21.1 && docker save ${KIND_NODE_IMAGE} -o assets/node.tar
+  docker pull registry:2 && docker save ${REGISTRY_IMAGE} -o assets/registry.tar
+
+  #Push to docker hub repository with latest tag
+  docker buildx build -f Dockerfile --progress plane --push --no-cache --platform linux/amd64,linux/arm64 --tag litmuschaos/air-gapped-kind:latest .
+else
+  echo "No docker credentials provided. Skip uploading litmuschaos/air-gapped-kind:latest to docker hub";
+fi;
