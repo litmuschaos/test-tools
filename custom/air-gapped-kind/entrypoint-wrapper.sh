@@ -16,7 +16,7 @@ while ! docker info; do
 done
 
 # Import pre-installed images
-for file in ./assets/*.tar; do
+for file in ./assets/*.tar.gz; do
   docker load -q <$file
 done
 
