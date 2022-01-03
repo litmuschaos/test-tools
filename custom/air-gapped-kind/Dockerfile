@@ -118,8 +118,6 @@ RUN apk update && \
     tar -xvf /tmp/helm.tar.gz && \
     mv ./linux-amd64/helm /usr/bin/helm
 
-RUN 
-
 COPY ./assets/ ./assets/
 COPY kind-config.yml ./kind-config.yml
 COPY entrypoint-wrapper.sh ./entrypoint-wrapper.sh
