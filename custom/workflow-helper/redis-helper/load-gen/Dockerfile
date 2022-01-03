@@ -1,6 +1,9 @@
 FROM python:3
 
 LABEL maintainer="LitmusChaos"
+
+ARG TARGETPLATFORM
+
 ADD redisLoad.py .
 ADD redis-cmd.py .
 ADD locustfile.py .

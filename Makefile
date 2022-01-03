@@ -413,7 +413,7 @@ _push_litmus_redis_load:
 	@echo "INFO: Publish container litmuschaos/litmus-kgh-loadGen"
 	cd custom/workflow-helper/redis-helper/load-gen && ./buildscripts/push
 
-litmus-kgh-loadGen: deps _build_litmus_redis_load _push_litmus_redis_load
+litmus-redis-load: deps _build_litmus_redis_load _push_litmus_redis_load
 
 PHONY: go-build
 go-build: experiment-go-binary

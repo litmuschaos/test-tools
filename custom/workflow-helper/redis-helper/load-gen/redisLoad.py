@@ -18,6 +18,8 @@ class DBDetails(object):
         
         client.bulk_stop()
         print("Added ", randomstr)
+
+# main method
 def Main():
     print("[Info]: Redis Load-generation has been started!!")
     print("[Info]: Redis dbname: {}, host: {}, port: {}".format(0, host, 6379))

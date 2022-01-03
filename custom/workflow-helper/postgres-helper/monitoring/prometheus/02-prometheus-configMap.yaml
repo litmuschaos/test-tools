@@ -16,6 +16,9 @@ data:
       - job_name: 'chaos-exporter'
         static_configs:
           - targets: ['chaos-exporter.litmus.svc.cluster.local:8080']
+      - job_name: 'redis-metrics'
+        static_configs:
+          - targets: ['redis-svc.redis.svc.cluster.local:9121']
       - job_name: kubernetes-pods
         kubernetes_sd_configs:
           - role: pod

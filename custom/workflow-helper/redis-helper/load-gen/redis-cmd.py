@@ -14,7 +14,8 @@ class DBDetails(object):
         client.bulk_start()
         client.set(randomstr, randomstr, 10000)
         client.bulk_stop()
-       
+
+# main method  
 def Main():
     try:
         db = DBDetails()
