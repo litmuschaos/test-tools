@@ -1,0 +1,35 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-load-1
+  labels:
+    app: redis-load-1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-load-1
+  template:
+    metadata:
+      labels:
+        app: redis-load-1
+    spec:
+      containers:
+      - name: redis
+        image: litmuschaos/litmus-redis-load:latest
+        args:
+          - -c
+          - python3 -u redisLoad.py
+        command:
+          - /bin/bash 
+        env:
+          - name: REDIS_PORT
+            value: "6379"
+          - name: REDIS_HOST
+            value: "redis.redis.svc"
+          - name: REDIS_PW
+            value: ""
+         
+      
+

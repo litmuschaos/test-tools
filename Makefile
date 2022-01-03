@@ -405,6 +405,16 @@ _push_litmus_mongo_utils:
 
 litmus-mongo-utils: deps _build_litmus_mongo_utils _push_litmus_mongo_utils
 
+_build_litmus_redis_load:
+	@echo "INFO: Building container image for litmuschaos/litmus-redis-load"
+	cd custom/workflow-helper/redis-helper/load-gen && docker build -t litmuschaos/litmus-redis-load:latest .
+
+_push_litmus_redis_load:
+	@echo "INFO: Publish container litmuschaos/litmus-kgh-loadGen"
+	cd custom/workflow-helper/redis-helper/load-gen && ./buildscripts/push
+
+litmus-kgh-loadGen: deps _build_litmus_redis_load _push_litmus_redis_load
+
 PHONY: go-build
 go-build: experiment-go-binary
 
