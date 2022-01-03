@@ -567,4 +567,5 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Building litmus-redis-load image
-        run: make litmus-redis-load
+        run: |
+          make litmus-redis-load
