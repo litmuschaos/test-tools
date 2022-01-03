@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-KIND_NODE_IMAGE=$1
-REGISTRY_IMAGE=$2
+KIND_NODE_IMAGE="kindest/node:v1.21.1"
+REGISTRY_IMAGE="registry:2"
 
 echo -e "[Info]: -----------------------Setting up KIND cluster-----------------------"
 

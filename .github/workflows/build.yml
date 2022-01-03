@@ -561,7 +561,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: changes
     if: needs.changes.outputs.air-gapped-kind == 'true'
-    # Note: While updating these envs, make sure update the same in dockerfile
+    # Note: While updating these envs, make sure update the same in entrypoint-wrapper.sh
     env:
       KIND_NODE_IMAGE: "kindest/node:v1.21.1"
       REGISTRY_IMAGE: "registry:2"
