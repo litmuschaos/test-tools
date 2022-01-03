@@ -46,9 +46,9 @@ RUN set -eux; \
   dockerd --version; \
   docker --version
 
-COPY build/air-gapped/modprobe.sh /usr/local/bin/modprobe
+COPY modprobe.sh /usr/local/bin/modprobe
 RUN chmod +x /usr/local/bin/modprobe
-COPY build/air-gapped/docker-entrypoint.sh /usr/local/bin/
+COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # https://github.com/docker-library/docker/pull/166
@@ -98,7 +98,7 @@ RUN set -eux; \
   wget -O /usr/local/bin/dind "https://raw.githubusercontent.com/docker/docker/${DIND_COMMIT}/hack/dind"; \
   chmod +x /usr/local/bin/dind
 
-COPY build/air-gapped/dockerd-entrypoint.sh /usr/local/bin/
+COPY dockerd-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/dockerd-entrypoint.sh
 
 VOLUME /var/lib/docker
@@ -121,8 +121,8 @@ RUN apk update && \
 RUN 
 
 COPY ./assets/ ./assets/
-COPY build/air-gapped/kind-config.yml ./kind-config.yml
-COPY build/air-gapped/entrypoint-wrapper.sh ./entrypoint-wrapper.sh
+COPY kind-config.yml ./kind-config.yml
+COPY entrypoint-wrapper.sh ./entrypoint-wrapper.sh
 
 RUN chmod +x ./entrypoint-wrapper.sh
 
