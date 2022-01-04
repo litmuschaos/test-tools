@@ -3,12 +3,12 @@
 Generating load against Redis using locust io. 
 
 Locust helps in defining website user behavior with code and swarms your system with millions of simultaneous users.
-Logs of the metrics contain requests per second, total requests, failed requests, average, min, max, and failed per seconds.
+Logs of the metrics contain requests per second, total requests, failed requests, average, min, max, and failed per second.
 
 ### To run load generator: 
  - Deploying load application and generator [Manifest](./manifest)
-    - Redis application as a single replica, `deployment.yaml`
-    - Redis application as a two replica, `statefulset.yaml`
+    - Redis application with single replica, `deployment.yaml`
+    - Redis application with two replicas, `statefulset.yaml`
     - Redis load generate using locust, `redisLoadDeployment.yaml`
     - Redis load generate using script, `redisLoadLocustDeployment.yaml`
  - Load gen code is inside [Script](./load-gen)

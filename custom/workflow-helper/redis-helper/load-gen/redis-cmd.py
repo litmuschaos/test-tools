@@ -4,7 +4,7 @@ import time, string, random, os
 # DBDetails is performing io operations on redis db
 class DBDetails(object):
     def __init__(self):
-        self.client       = Client(host=os.getenv("REDIS_HOST", "redis.redis.svc"))
+        self.client = Client(host=os.getenv("REDIS_HOST", "redis.redis.svc"))
         
     # createTable is inserting table in postgres database
     def createTable(self, client):

@@ -6,7 +6,7 @@ host = os.getenv("REDIS_HOST", "redis.redis.svc")
 # DBDetails is performing io operations on redis db
 class DBDetails(object):
     def __init__(self):
-        self.client       = Client(host=host)
+        self.client = Client(host=host)
         
     # createTable is inserting table in postgres database
     def createTable(self, client):

@@ -1,5 +1,5 @@
 ## Workflow-Helper
-Workflow-Helper is helping pre-defined workflows to install applications, delete applications, corresponding checks, API requests, QPS tracker, Load-Tester, postgres helper and redis helper.
+Workflow-Helper is helping pre-defined workflows to install applications, delete applications, corresponding checks, API requests, QPS tracker, Load-Tester postgres helper and redis helper.
 
 For more details:
 [app-checker](https://github.com/litmuschaos/test-tools/tree/master/custom/workflow-helper/app-checker), 

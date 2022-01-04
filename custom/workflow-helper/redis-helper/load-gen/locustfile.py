@@ -15,7 +15,7 @@ redis_port = os.getenv("REDIS_PORT", "6379")
 redis_pw = os.getenv("REDIS_PW", "")
 
 # Locust helps in defining website user behavior with code and swarms your system with millions of simultaneous users.
-# Logs of the metrics contain requests per second, total requests, failed requests, average, min, max, and failed per seconds.
+# Logs of the metrics contain requests per second, total requests, failed requests, average, min, max, and failed per second.
 class RedisClient(object):
     def __init__(self, host=redis_host, port=redis_port, password=redis_pw):
         self.rc = redis.StrictRedis(host=host, port=port, password=password)
