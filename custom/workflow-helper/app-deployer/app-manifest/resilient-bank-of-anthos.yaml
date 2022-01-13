@@ -62,7 +62,7 @@ spec:
       serviceAccountName: default
       containers:
       - name: accounts-db
-        image: gcr.io/bank-of-anthos/accounts-db:v0.5.0
+        image: gcr.io/bank-of-anthos-ci/accounts-db:v0.5.3
         envFrom:
           - configMapRef:
               name: environment-config
@@ -139,7 +139,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: balancereader
-        image: gcr.io/bank-of-anthos/balancereader:v0.5.0
+        image: gcr.io/bank-of-anthos-ci/balancereader:v0.5.3
         volumeMounts:
         - name: publickey
           mountPath: "/root/.ssh"
@@ -220,7 +220,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: contacts
-        image: gcr.io/bank-of-anthos/contacts:v0.5.0
+        image: gcr.io/bank-of-anthos-ci/contacts:v0.5.3
         volumeMounts:
         - name: publickey
           mountPath: "/root/.ssh"
@@ -296,7 +296,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: front
-        image: gcr.io/bank-of-anthos/frontend:v0.5.0
+        image: gcr.io/bank-of-anthos-ci/frontend:v0.5.3
         volumeMounts:
         - name: publickey
           mountPath: "/root/.ssh"
@@ -391,7 +391,7 @@ spec:
       serviceAccountName: default
       containers:
         - name: postgres
-          image: gcr.io/bank-of-anthos/ledger-db:v0.5.0
+          image: gcr.io/bank-of-anthos-ci/ledger-db:v0.5.3
           ports:
             - containerPort: 5432
           envFrom:
@@ -466,7 +466,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: ledgerwriter
-        image: gcr.io/bank-of-anthos/ledgerwriter:v0.5.0
+        image: gcr.io/bank-of-anthos-ci/ledgerwriter:v0.5.3
         volumeMounts:
         - name: publickey
           mountPath: "/root/.ssh"
@@ -548,7 +548,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: loadgenerator
-        image: gcr.io/bank-of-anthos/loadgenerator:v0.5.0
+        image: gcr.io/bank-of-anthos-ci/loadgenerator:v0.5.3
         env:
         - name: FRONTEND_ADDR
           value: "frontend:80"
@@ -584,7 +584,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: transactionhistory
-        image: gcr.io/bank-of-anthos/transactionhistory:v0.5.0
+        image: gcr.io/bank-of-anthos-ci/transactionhistory:v0.5.3
         volumeMounts:
         - name: publickey
           mountPath: "/root/.ssh"
@@ -669,7 +669,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: userservice
-        image: gcr.io/bank-of-anthos/userservice:v0.5.0
+        image: gcr.io/bank-of-anthos-ci/userservice:v0.5.3
         volumeMounts:
         - name: keys
           mountPath: "/root/.ssh"
