@@ -88,7 +88,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: litmuschaos/infra-alpine:${{ github.event.inputs.release_tag }},litmuschaos/infra-alpine:latest
 
-
       - name: Build and push k8s
         uses: docker/build-push-action@v2
         with:
@@ -120,16 +119,16 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          file: custom/litmus-app-deployer/Dockerfile
-          context: custom/litmus-app-deployer
+          file: custom/workflow-helper/app-deployer/Dockerfile
+          context: custom/workflow-helper/app-deployer
           platforms: linux/amd64,linux/arm64
           tags: litmuschaos/litmus-app-deployer:${{ github.event.inputs.release_tag }},litmuschaos/litmus-app-deployer:latest
 
-      - name: Build and push litmus-git-app-deployer
+      - name: Build and push litmus-git-app-checker
         uses: docker/build-push-action@v2
         with:
           push: true
-          file: custom/litmus-git-app-checker/Dockerfile
-          context: custom/litmus-git-app-checker
+          file: custom/workflow-helper/app-checker/Dockerfile
+          context: custom/workflow-helper/app-checker
           platforms: linux/amd64,linux/arm64
           tags: litmuschaos/litmus-git-app-checker:${{ github.event.inputs.release_tag }},litmuschaos/litmus-git-app-checker:latest
