@@ -1,6 +1,6 @@
 # This Dockerfile contains the hardened alpine image that can be used in litmus components.
 # It is also made non-root with default litmus directory.
-FROM alpine:3.14.2
+FROM alpine:3.15.0
 
 LABEL maintainer="LitmusChaos"
 
