@@ -1,7 +1,7 @@
 # This Dockerfile contains the hardened alpine image with all the
 # litmus experiment dependencies installed.
 # It is also made non-root, sudo-enabled with default litmus directory.
-FROM alpine:3.14.2
+FROM alpine:3.15.0
 
 LABEL maintainer="LitmusChaos"
 
