@@ -22,7 +22,7 @@ RUN rm -rf /var/lib/apt/lists/*
 # Install generally useful things
 RUN apk --update add \
         sudo \
-	      htop\
+        htop\
         bash\
         make\
         git \
@@ -31,7 +31,9 @@ RUN apk --update add \
         stress-ng\
         openssh-client\
 #        libc6-compat \
-        sshpass
+        sshpass \
+        py3-pip
+        
 
 RUN set -ex && \
      apk --update add libstdc++ curl ca-certificates && \
@@ -83,6 +85,10 @@ ENV CONF_DIR "$APP_DIR/conf"
 # Update base system
 # hadolint ignore=DL3018
 RUN apk add --no-cache ca-certificates
+
+#Installing ChaosToolkit
+RUN pip install --no-cache-dir setuptools chaostoolkit \
+ && pip install -U chaostoolkit-cloud-foundry
 
 # Add custom user and setup home directory
 RUN adduser -s /bin/true -u 1000 -D -h $APP_DIR $APP_USER \
