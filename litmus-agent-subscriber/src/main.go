@@ -1,6 +1,7 @@
 package main
 
 import (
+  "fmt"
 	"context"
 	"encoding/json"
 	"flag"
@@ -15,7 +16,8 @@ import (
 	types "github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	corev1r "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
+	"errors"
+
 	metav1r "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -31,22 +33,56 @@ var (
 
 	AGENT_NAME        string
 	AGENT_DESCRIPTION string
-
+  AGENT_MODE        string
+  AGENT_NODE_SELECTOR string
+  
 	NAMESPACE            string
 	APP_VERSION          string
 	SERVICE_ACCOUNT_NAME string
-	CONFIG_MAP_NAME      string
+	AGENT_CONFIGMAP_NAME string
 	RELEASE_NAME         string
 	ACTION               string
 
 	CLUSTER_ID	     string
+	CLUSTER_TYPE     string
+	PLATFORM_NAME    string
+	AGENT_SA_EXISTS        bool
+	AGENT_NS_EXISTS        bool
+	
+	WORKFLOW_CONTROLER_CONFIGMAP_NAME string
+	CONTAINER_RUNTIME_EXECUTOR string
+	
+	
 )
 
-type agentData struct {
+type AgentConnectionData struct {
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Data AgentConnect `json:"data"`
+}
+
+type Errors struct {
+	Message string   `json:"message"`
+	Path    []string `json:"path"`
+}
+
+type AgentConnect struct {
+	UserAgentReg UserAgentReg `json:"userClusterReg"`
+}
+
+type UserAgentReg struct {
 	ClusterID   string `json:"cluster_id"`
 	ClusterName string `json:"cluster_name"`
-	AccessKey   string `json:"access_key"`
-        IsClusterConfirmed bool `json:"is_cluster_confirmed"`
+	Token       string `json:"token"`
+}
+	
+type agentData struct {
+  ClusterID   string `json:"cluster_id"`
+  ClusterName string `json:"cluster_name"`
+  AccessKey   string `json:"access_key"`
+  IsClusterConfirmed bool `json:"is_cluster_confirmed"`
 }
 
 type agentResponse struct {
@@ -67,13 +103,25 @@ func init() {
 
 	AGENT_NAME = os.Getenv("AGENT_NAME")
 	AGENT_DESCRIPTION = os.Getenv("AGENT_DESCRIPTION")
-
+	AGENT_MODE = os.Getenv("AGENT_MODE")
+  AGENT_CONFIGMAP_NAME = os.Getenv("AGENT_CONFIGMAP_NAME")
+  AGENT_NODE_SELECTOR = os.Getenv("AGENT_NODE_SELECTOR")
+  CLUSTER_TYPE = os.Getenv("CLUSTER_TYPE")
+  
 	NAMESPACE = os.Getenv("NAMESPACE")
 	RELEASE_NAME = os.Getenv("RELEASE_NAME")
 	APP_VERSION = os.Getenv("APP_VERSION")
-	CONFIG_MAP_NAME = os.Getenv("CONFIG_MAP_NAME")
+
 	SERVICE_ACCOUNT_NAME = os.Getenv("SERVICE_ACCOUNT_NAME")
 
+  PLATFORM_NAME = os.Getenv("PLATFORM_NAME")
+  AGENT_SA_EXISTS, _ = strconv.ParseBool(os.Getenv("SA_EXISTS"))
+  AGENT_NS_EXISTS, _ = strconv.ParseBool(os.Getenv("NS_EXISTS"))
+  
+  WORKFLOW_CONTROLER_CONFIGMAP_NAME = os.Getenv("WORKFLOW_CONTROLER_CONFIGMAP_NAME")
+  CONTAINER_RUNTIME_EXECUTOR = os.Getenv("CONTAINER_RUNTIME_EXECUTOR")
+
+	
 	CLUSTER_ID = os.Getenv("CLUSTER_ID")
 
 }
@@ -83,7 +131,7 @@ func GetAgentList(c types.Credentials, project_id string) agentResponse {
 
 	query := `{"query":"query{\n  getCluster(project_id: \"` + LITMUS_PROJECT_ID + `\" ){\n  cluster_id cluster_name access_key is_cluster_confirmed \n  }\n}"}`
 	params := apis.SendRequestParams{Endpoint: LITMUS_BACKEND_URL + "/query", Token: c.Token}
-	resp, err := apis.SendRequest(params, []byte(query))
+	resp, err := apis.SendRequest(params, []byte(query), "POST")
 	if err != nil {
 		utils.Red.Println("Error in getting agent list: ", err)
 		os.Exit(1)
@@ -171,46 +219,84 @@ func createConfigMap(configmapName string, configMapData map[string]string) {
 	_ = cm
 }
 
+// ConnectAgent connects the agent with the given details
+func ConnectAgent(agent types.Agent, cred types.Credentials) (apis.AgentConnectionData, error) {
+	query := `{"query":"mutation {\n  userClusterReg(clusterInput: \n    { \n    cluster_name: \"` + agent.AgentName + `\", \n    description: \"` + agent.Description + `\",\n  \tplatform_name: \"` + agent.PlatformName + `\",\n    project_id: \"` + agent.ProjectId + `\",\n    cluster_type: \"` + agent.ClusterType + `\",\n  agent_scope: \"` + agent.Mode + `\",\n    agent_namespace: \"` + agent.Namespace + `\",\n    serviceaccount: \"` + agent.ServiceAccount + `\",\n    skip_ssl: ` + fmt.Sprintf("%t", agent.SkipSSL) + `,\n    agent_ns_exists: ` + fmt.Sprintf("%t", agent.NsExists) + `,\n    agent_sa_exists: ` + fmt.Sprintf("%t", agent.SAExists) + `,\n  }){\n    cluster_id\n    cluster_name\n    token\n  }\n}"}`
+
+	if agent.NodeSelector != "" {
+		query = `{"query":"mutation {\n  userClusterReg(clusterInput: \n    { \n    cluster_name: \"` + agent.AgentName + `\", \n    description: \"` + agent.Description + `\",\n  node_selector: \"` + agent.NodeSelector + `\",\n  \tplatform_name: \"` + agent.PlatformName + `\",\n    project_id: \"` + agent.ProjectId + `\",\n    cluster_type: \"` + agent.ClusterType + `\",\n  agent_scope: \"` + agent.Mode + `\",\n    agent_namespace: \"` + agent.Namespace + `\",\n    skip_ssl: ` + fmt.Sprintf("%t", agent.SkipSSL) + `,\n    serviceaccount: \"` + agent.ServiceAccount + `\",\n    agent_ns_exists: ` + fmt.Sprintf("%t", agent.NsExists) + `,\n    agent_sa_exists: ` + fmt.Sprintf("%t", agent.SAExists) + `,\n  }){\n    cluster_id\n    cluster_name\n    token\n  }\n}"}`
+	}
+
+	if agent.Tolerations != "" {
+		query = `{"query":"mutation {\n  userClusterReg(clusterInput: \n    { \n    cluster_name: \"` + agent.AgentName + `\", \n    description: \"` + agent.Description + `\",\n  \tplatform_name: \"` + agent.PlatformName + `\",\n    project_id: \"` + agent.ProjectId + `\",\n    cluster_type: \"` + agent.ClusterType + `\",\n  agent_scope: \"` + agent.Mode + `\",\n    agent_namespace: \"` + agent.Namespace + `\",\n    serviceaccount: \"` + agent.ServiceAccount + `\",\n    skip_ssl: ` + fmt.Sprintf("%t", agent.SkipSSL) + `,\n    agent_ns_exists: ` + fmt.Sprintf("%t", agent.NsExists) + `,\n    agent_sa_exists: ` + fmt.Sprintf("%t", agent.SAExists) + `,\n tolerations: ` + agent.Tolerations + ` }){\n    cluster_id\n    cluster_name\n    token\n  }\n}"}`
+	}
+
+	if agent.NodeSelector != "" && agent.Tolerations != "" {
+		query = `{"query":"mutation {\n  userClusterReg(clusterInput: \n    { \n    cluster_name: \"` + agent.AgentName + `\", \n    description: \"` + agent.Description + `\",\n  node_selector: \"` + agent.NodeSelector + `\",\n  \tplatform_name: \"` + agent.PlatformName + `\",\n    project_id: \"` + agent.ProjectId + `\",\n    cluster_type: \"` + agent.ClusterType + `\",\n  agent_scope: \"` + agent.Mode + `\",\n    agent_namespace: \"` + agent.Namespace + `\",\n    skip_ssl: ` + fmt.Sprintf("%t", agent.SkipSSL) + `,\n    serviceaccount: \"` + agent.ServiceAccount + `\",\n    agent_ns_exists: ` + fmt.Sprintf("%t", agent.NsExists) + `,\n    agent_sa_exists: ` + fmt.Sprintf("%t", agent.SAExists) + `,\n tolerations: ` + agent.Tolerations + ` }){\n    cluster_id\n    cluster_name\n    token\n  }\n}"}`
+	}
+
+	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: LITMUS_BACKEND_URL + "/query", Token: cred.Token}, []byte(query), "POST")
+	if err != nil {
+		return apis.AgentConnectionData{}, errors.New("Error in registering agent: " + err.Error())
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return apis.AgentConnectionData{}, errors.New("Error in registering agent: " + err.Error())
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var connectAgent apis.AgentConnectionData
+		err = json.Unmarshal(bodyBytes, &connectAgent)
+		if err != nil {
+			return apis.AgentConnectionData{}, errors.New("Error in registering agent: " + err.Error())
+		}
+
+		if len(connectAgent.Errors) > 0 {
+			return apis.AgentConnectionData{}, errors.New(connectAgent.Errors[0].Message)
+		}
+		return connectAgent, nil
+	} else {
+		return apis.AgentConnectionData{}, err
+	}
+}
+
 func createAgent(credentials types.Credentials) {
 	var newAgent types.Agent
 	newAgent.AgentName = AGENT_NAME
 	newAgent.Namespace = NAMESPACE
 	newAgent.Description = AGENT_DESCRIPTION
 	newAgent.ProjectId = LITMUS_PROJECT_ID
-	// Mode
-	// 1. cluster
-	// 2. namespace
-	newAgent.Mode = "cluster"
+	newAgent.Mode = AGENT_MODE
+	newAgent.SkipSSL = true
 
 	// -- OPTIONNAL -- //
-	newAgent.ClusterType = "external"
-	newAgent.NodeSelector = ""
-	// PlatformName
-	// 1. AWS
-	// 2. GKE
-	// 3. Openshift
-	// 4. Rancher
-	// 5. Others
-	newAgent.PlatformName = "Others"
+	newAgent.ClusterType = CLUSTER_TYPE
+	newAgent.NodeSelector = AGENT_NODE_SELECTOR
+	newAgent.PlatformName = PLATFORM_NAME
 	newAgent.ServiceAccount = SERVICE_ACCOUNT_NAME
-	newAgent.SAExists = true
-	newAgent.NsExists = true
+	newAgent.SAExists = AGENT_SA_EXISTS
+	newAgent.NsExists = AGENT_NS_EXISTS
 
-	t := time.Now()
 	configMapData := make(map[string]string)
 	configMapData["SERVER_ADDR"] = LITMUS_BACKEND_URL + "/query"
 	configMapData["VERSION"] = APP_VERSION
 	configMapData["IS_CLUSTER_CONFIRMED"] = "false"
-	configMapData["START_TIME"] = t.Format("20060102150405")
-	test := `["app.kubernetes.io/instance=` + RELEASE_NAME + `"]`
-	configMapData["COMPONENTS"] = "DEPLOYMENTS: " + test
+	configMapData["START_TIME"] = strconv.FormatInt(time.Now().Unix(), 10)
+	selector := `["app.kubernetes.io/instance=` + RELEASE_NAME + `"]`
+	configMapData["COMPONENTS"] = "DEPLOYMENTS: " + selector
 	configMapData["AGENT_SCOPE"] = newAgent.Mode
 
 	var clusterID string
 	agentExist := GetAgentWithName(credentials, newAgent.AgentName)
+	
 	if (agentExist == agentData{}) {
+	
 		utils.White_B.Println("\n🚀 Registering new agent !! 🎉")
-		agent, err := apis.ConnectAgent(newAgent, credentials)
+		
+		fmt.Printf("%+v\n", newAgent)
+		agent, err := ConnectAgent(newAgent, credentials)
 		if err != nil {
 			utils.Red.Println("\n❌ Agent connection failed: " + err.Error() + "\n")
 			os.Exit(1)
@@ -219,44 +305,38 @@ func createAgent(credentials types.Credentials) {
 		// Print error message in case Data field is null in response
 		if (agent.Data == apis.AgentConnect{}) {
 			utils.PrintInJsonFormat(agent)
-			utils.Red.Println("\n❌ Agent connection failed, null response")
+			utils.Red.Println("\n❌ Agent connection failed: unknown error\n")
 			os.Exit(1)
 		}
 		clusterID = agent.Data.UserAgentReg.ClusterID
 		configMapData["CLUSTER_ID"] = clusterID
+		
 		reqCluster := GetAgentWithID(credentials, agent.Data.UserAgentReg.ClusterID)
 		if (reqCluster == agentData{}) {
-			utils.Red.Println("\n❌ Agent Registered failed: " + err.Error() + "\n")
+			utils.Red.Println("\n❌ Agent Registered failed\n")
 			os.Exit(1)
 		}
 
 		// Checking if cluster with given clusterID and accesskey is present
 		configMapData["ACCESS_KEY"] = reqCluster.AccessKey
 
-		utils.White_B.Println("\n🚀 Agent Registered Successful!! 🎉")
-	} else {
-		clusterID = agentExist.ClusterID
-
-		utils.White_B.Println("\n🚀 Agent Already Registered!! 🎉")
-
-		configMapData["CLUSTER_ID"] = clusterID
-		configMapData["ACCESS_KEY"] = agentExist.AccessKey
-                configMapData["IS_CLUSTER_CONFIRMED"] = strconv.FormatBool(agentExist.IsClusterConfirmed)
-
-	}
-
-	createConfigMap(CONFIG_MAP_NAME, configMapData)
-
-	configMapWorkflowController := make(map[string]string)
-	configMapWorkflowController["config"] = `    containerRuntimeExecutor: k8sapi
+    utils.White_B.Println("\n🚀 Agent Registered Successful!! 🎉")
+    createConfigMap(AGENT_CONFIGMAP_NAME, configMapData)
+    
+    configMapWorkflowController := make(map[string]string)
+    configMapWorkflowController["config"] = `    containerRuntimeExecutor: ` + CONTAINER_RUNTIME_EXECUTOR + `
     executor:
       imagePullPolicy: IfNotPresent
     instanceID: ` + clusterID
-	createConfigMap("workflow-controller-configmap", configMapWorkflowController)
+    
+    createConfigMap(WORKFLOW_CONTROLER_CONFIGMAP_NAME, configMapWorkflowController)
 
-	utils.White_B.Println("\n🚀 Agent Configured Successful!! 🎉")
-	utils.White_B.Println("\n🚀 Starting... 🎉")
+    utils.White_B.Println("\n🚀 Agent Configured Successful!! 🎉")
+    utils.White_B.Println("\n🚀 Starting... 🎉")
+	
+	}
 }
+
 
 func deleteAgent(credentials types.Credentials) {
         utils.White_B.Println("\n🚀 Delete cluster!! 🎉")
@@ -264,7 +344,7 @@ func deleteAgent(credentials types.Credentials) {
 	//query := `{"query":"mutation {\n  deleteClusterReg(clusterInput: \n    { \n    cluster_id: \"` + CLUSTER_ID + `\",\n  }){ cluster_id\n }\n}"}`
 	query := `{"operationName":"deleteCluster","variables":{"cluster_id":"` + CLUSTER_ID + `"},"query":"mutation deleteCluster($cluster_id: String\u0021) {\\n  deleteClusterReg(cluster_id: $cluster_id)\\n}\\n"}`
         params := apis.SendRequestParams{Endpoint: LITMUS_BACKEND_URL + "/query", Token: credentials.Token}
-	resp, err := apis.SendRequest(params, []byte(query))
+	resp, err := apis.SendRequest(params, []byte(query), "POST")
 	if err != nil {
 		utils.Red.Println("Error in getting agent list: ", err)
 		os.Exit(1)
@@ -302,23 +382,15 @@ func main() {
 	credentials.Token = resp.AccessToken
 
 	if ACTION == "create" {
-                utils.White_B.Println("\n🚀 Start Pre install hook ... 🎉")
-		createAgent(credentials)
+    utils.White_B.Println("\n🚀 Start Pre install hook ... 🎉")
+    createAgent(credentials)
+    
 	} else if ACTION == "delete" {
-                utils.White_B.Println("\n🚀 Start Pre delete hook ... 🎉")
-		deleteAgent(credentials)
+    utils.White_B.Println("\n🚀 Start Pre delete hook ... 🎉")
+    deleteAgent(credentials)
+		
 	} else {
 		utils.Red.Println("\n❌ Please choose an action, delete or create")
+		
 	}
 }
-
-// agent.AgentName
-// agent.Description
-// agent.PlatformName
-// agent.ProjectId
-// agent.ClusterType
-// agent.Mode
-// agent.Namespace
-// agent.ServiceAccount
-// agent.NsExists
-//agent.SAExists

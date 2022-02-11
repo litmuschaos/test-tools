@@ -3,7 +3,7 @@ FROM golang:1.17-bullseye as build
 WORKDIR /go/src/app
 
 COPY src/go.mod src/go.sum /go/src/app/
-RUN go get -d -v ./...
+RUN go mod download
 
 ADD ./src /go/src/app
 RUN go build -o /go/bin/app

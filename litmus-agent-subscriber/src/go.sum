@@ -268,6 +268,8 @@ github.com/litmuschaos/litmusctl v0.5.0 h1:FC2yiWnhYEyKBXsqAm/ZMRgVlqMttFfJk242h
 github.com/litmuschaos/litmusctl v0.5.0/go.mod h1:r5erxP1Ujn+QsU8PFukpVsZn3arnAlLyDq54Y7v5xd8=
 github.com/litmuschaos/litmusctl v0.6.0 h1:xBtkNKHLYlJ+EZTkxEabG8IgY+mEtonhq2Fnt5YbHes=
 github.com/litmuschaos/litmusctl v0.6.0/go.mod h1:QYoF+nkJbxEHXGIavyMDxMzdpUNwbtZmlY8UvZrm7cM=
+github.com/litmuschaos/litmusctl v0.9.0 h1:aRIyLebz6MTtGfoLn3fLEjGOtc4iVTH2OHWANxNkdkY=
+github.com/litmuschaos/litmusctl v0.9.0/go.mod h1:QYoF+nkJbxEHXGIavyMDxMzdpUNwbtZmlY8UvZrm7cM=
 github.com/magiconair/properties v1.8.5/go.mod h1:y3VJvCyxH9uVvJTWEGAELF3aiYNyPKd5NZ3oSwXrF60=
 github.com/mailru/easyjson v0.0.0-20190614124828-94de47d64c63/go.mod h1:C1wdFJiN94OJF2b5HbByQZoLdCWB1Yqtg26g4irojpc=
 github.com/mailru/easyjson v0.0.0-20190626092158-b2ccc519800e/go.mod h1:C1wdFJiN94OJF2b5HbByQZoLdCWB1Yqtg26g4irojpc=
