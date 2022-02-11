@@ -9,6 +9,6 @@ ADD ./src /go/src/app
 RUN go build -o /go/bin/app
 
 # Now copy it into our base image.
-FROM gcr.io/distroless/base-debian11
+FROM gcr.io/distroless/base-debian11:nonroot
 COPY --from=build /go/bin/app /
 CMD ["/app"]
