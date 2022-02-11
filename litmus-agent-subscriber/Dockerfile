@@ -1,10 +1,11 @@
 FROM golang:1.17-bullseye as build
 
 WORKDIR /go/src/app
-ADD ./src /go/src/app
 
+COPY src/go.mod src/go.sum /go/src/app/
 RUN go get -d -v ./...
 
+ADD ./src /go/src/app
 RUN go build -o /go/bin/app
 
 # Now copy it into our base image.
