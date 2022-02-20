@@ -1,4 +1,4 @@
-FROM alpine:3.11.2
+FROM alpine:3.15.0
 RUN apk update && \
     apk upgrade --update-cache --available
 RUN echo 'http://dl-cdn.alpinelinux.org/alpine/v3.9/main' >> /etc/apk/repositories
