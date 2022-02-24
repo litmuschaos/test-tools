@@ -15,7 +15,7 @@ RUN yum install wget -y
 RUN wget http://apache.stu.edu.tw//jmeter/binaries/apache-jmeter-5.4.2.tgz
 RUN tar -xzf apache-jmeter-5.4.2.tgz 
 RUN mv apache-jmeter-5.4.2/* /opt/apache-jmeter-5.4.2
-RUN rm -r /opt/apache-jmeter-5.2.1/apache-jmeter-5.4.2
+RUN rm -r /opt/apache-jmeter-5.4.2/apache-jmeter-5.4.2
 
 COPY . /opt/apache-jmeter-5.4.2/bin
 COPY postgres /opt/apache-jmeter-5.4.2/lib/
