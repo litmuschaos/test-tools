@@ -1,25 +1,34 @@
-FROM centos:centos8
+FROM alpine:3.15.0
 
 ARG JMETER_VERSION="5.4.2"
 
 ENV JMETER_HOME /opt/apache-jmeter-5.4.2
 ENV JMETER_BIN  /opt/apache-jmeter-5.4.2/bin
 ENV JMETER_DOWNLOAD_URL  https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.4.2.tgz
-ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk/jre
+#ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk/jre
 
 WORKDIR /opt/apache-jmeter-5.4.2
 
-## CentOS Linux 8 had reached the End Of Life (EOL) on December 31st, 2021. It means that CentOS 8 will no longer receive development resources from the official CentOS project. After Dec 31st, 2021, if you need to update your CentOS, you need to change the mirrors to vault.centos.org where they will be archived permanently.
+ENV LANG C.UTF-8
 
+# add a simple script that can auto-detect the appropriate JAVA_HOME value
+# based on whether the JDK or only the JRE is installed
+RUN { \
+		echo '#!/bin/sh'; \
+		echo 'set -e'; \
+		echo; \
+		echo 'dirname "$(dirname "$(readlink -f "$(which javac || which java)")")"'; \
+	} > /usr/local/bin/docker-java-home \
+	&& chmod +x /usr/local/bin/docker-java-home
+ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
+ENV PATH $PATH:/usr/lib/jvm/java-1.8-openjdk/jre/bin:/usr/lib/jvm/java-1.8-openjdk/bin
 
-RUN cd /etc/yum.repos.d/
-RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
-RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+ENV JAVA_VERSION 8u111
+ENV JAVA_ALPINE_VERSION 8.302.08-r2
 
+RUN set -x && apk add --no-cache openjdk8="$JAVA_ALPINE_VERSION" && [ "$JAVA_HOME" = "$(docker-java-home)" ]
 
-RUN yum update -y
-RUN yum install java-1.8.0-openjdk java-1.8.0-openjdk-devel -y
-RUN yum install wget -y
+RUN apk add wget
 RUN wget http://apache.stu.edu.tw//jmeter/binaries/apache-jmeter-5.4.2.tgz
 RUN tar -xzf apache-jmeter-5.4.2.tgz 
 RUN mv apache-jmeter-5.4.2/* /opt/apache-jmeter-5.4.2
