@@ -11,8 +11,6 @@ WORKDIR /opt/apache-jmeter-5.4.2
 
 ENV LANG C.UTF-8
 
-# add a simple script that can auto-detect the appropriate JAVA_HOME value
-# based on whether the JDK or only the JRE is installed
 RUN { \
 		echo '#!/bin/sh'; \
 		echo 'set -e'; \
