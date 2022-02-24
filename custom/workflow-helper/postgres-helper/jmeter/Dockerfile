@@ -9,6 +9,14 @@ ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk/jre
 
 WORKDIR /opt/apache-jmeter-5.4.2
 
+## CentOS Linux 8 had reached the End Of Life (EOL) on December 31st, 2021. It means that CentOS 8 will no longer receive development resources from the official CentOS project. After Dec 31st, 2021, if you need to update your CentOS, you need to change the mirrors to vault.centos.org where they will be archived permanently.
+
+
+RUN cd /etc/yum.repos.d/
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+
+
 RUN yum update -y
 RUN yum install java-1.8.0-openjdk java-1.8.0-openjdk-devel -y
 RUN yum install wget -y
