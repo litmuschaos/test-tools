@@ -7,7 +7,7 @@ ENV JMETER_BIN  /opt/apache-jmeter-5.4.2/bin
 ENV JMETER_DOWNLOAD_URL  https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.4.2.tgz
 ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk/jre
 
-WORKDIR /opt/apache-jmeter-5.2.1
+WORKDIR /opt/apache-jmeter-5.4.2
 
 RUN yum update -y
 RUN yum install java-1.8.0-openjdk java-1.8.0-openjdk-devel -y
