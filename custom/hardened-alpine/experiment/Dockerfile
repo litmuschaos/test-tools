@@ -58,7 +58,7 @@ ENV PUMBA_VERSION="0.8.0"
 RUN curl -L https://github.com/alexei-led/pumba/releases/download/${PUMBA_VERSION}/pumba_linux_${TARGETARCH} --output /usr/local/bin/pumba && chmod +x /usr/local/bin/pumba
 
 #Installing promql cli binaries
-RUN curl -L https://github.com/litmuschaos/test-tools/releases/download/${LITMUS_VERSION}/promql-linux-${TARGETARCH} --output /usr/local/bin/promql && chmod +x /usr/local/bin/promql
+RUN curl -L https://github.com/chaosnative/promql-cli/releases/download/2.6.0/promql_linux_${TARGETARCH} --output /usr/local/bin/promql && chmod +x /usr/local/bin/promql
 
 #Installing nsutil cli binaries
 RUN curl -L https://github.com/litmuschaos/test-tools/releases/download/${LITMUS_VERSION}/nsutil-linux-${TARGETARCH} --output /usr/local/bin/nsutil && chmod +x /usr/local/bin/nsutil
