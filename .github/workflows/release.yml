@@ -132,3 +132,13 @@ jobs:
           context: custom/workflow-helper/app-checker
           platforms: linux/amd64,linux/arm64
           tags: litmuschaos/litmus-git-app-checker:${{ github.event.inputs.release_tag }},litmuschaos/litmus-git-app-checker:latest
+
+
+      - name: Build and push mongo-utils
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          file: custom/mongo-utils/Dockerfile
+          context: custom/mongo-utils/
+          platforms: linux/amd64,linux/arm64
+          tags: litmuschaos/mongo-utils:${{ github.event.inputs.release_tag }},litmuschaos/mongo-utils:latest
