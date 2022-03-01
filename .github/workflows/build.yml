@@ -7,7 +7,7 @@ on:
 
 defaults:
   run:
-    shell: bash        
+    shell: bash
 
 jobs:
   shell-checker:
@@ -20,13 +20,12 @@ jobs:
       - name: checking syntax of shell script
         run: bash -c 'shopt -s globstar nullglob; shellcheck **/*.{sh,ksh,bash}' || true
 
-
   changes:
     runs-on: ubuntu-latest
     # Set job outputs to values from filter step
     # this is done to run the selective jobs based on the code change
     outputs:
-      kafka-deployer: ${{ steps.filter.outputs.kafka-deployer }}       
+      kafka-deployer: ${{ steps.filter.outputs.kafka-deployer }}
       forkbomb: ${{ steps.filter.outputs.forkbomb }}
       fio: ${{ steps.filter.outputs.fio }}
       mysql-client: ${{ steps.filter.outputs.mysql-client }}
@@ -54,19 +53,21 @@ jobs:
       litmus-k8s: ${{ steps.filter.outputs.litmus-k8s }}
       litmus-curl: ${{ steps.filter.outputs.litmus-curl }}
       litmus-checker: ${{ steps.filter.outputs.litmus-checker }}
-      litmus-argocli: ${{ steps.filter.outputs.litmus-argocli }}   
-      workflow-controller: ${{ steps.filter.outputs.workflow-controller }}   
-      argoexec: ${{ steps.filter.outputs.argoexec }}                                                
-      mongo: ${{ steps.filter.outputs.mongo }}   
+      litmus-argocli: ${{ steps.filter.outputs.litmus-argocli }}
+      workflow-controller: ${{ steps.filter.outputs.workflow-controller }}
+      argoexec: ${{ steps.filter.outputs.argoexec }}
+      mongo: ${{ steps.filter.outputs.mongo }}
       litmus-pg-load: ${{ steps.filter.outputs.litmus-pg-load }}
       litmus-experiment-hardened-alpine: ${{ steps.filter.outputs.litmus-experiment-hardened-alpine }}
       litmus-infra-hardened-alpine: ${{ steps.filter.outputs.litmus-infra-hardened-alpine }}
       litmus-pg-jmeter: ${{ steps.filter.outputs.litmus-pg-jmeter }}
-      mongo-utils: ${{ steps.filter.outputs.mongo-utils }}  
+      mongo-utils: ${{ steps.filter.outputs.mongo-utils }}
+      air-gapped-kind: ${{ steps.filter.outputs.air-gapped-kind }}
+
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.pull_request.head.sha }}    
+          ref: ${{ github.event.pull_request.head.sha }}
       - uses: dorny/paths-filter@v2
         id: filter
         with:
@@ -143,6 +144,8 @@ jobs:
               - 'custom/workflow-helper/postgres-helper/jmeter/**'
             mongo-utils:
               - 'custom/mongo-utils/**'
+            air-gapped-kind:
+              - 'custom/air-gapped-kind/**'
 
   litmus-app-deployer:
     runs-on: ubuntu-latest
@@ -273,7 +276,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-                    
+
       - name: Building workflow-controller image
         run: make litmus-argo-workflow-controller
 
@@ -299,7 +302,7 @@ jobs:
 
       - name: Building mongo image
         run: make litmus-mongo
-  
+
   kafka-deployer:
     runs-on: ubuntu-latest
     needs: changes
@@ -310,7 +313,6 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Building kafka-deployer image
         run: make litmus-kafka-deployer
-
 
   mysql-client:
     runs-on: ubuntu-latest
@@ -520,7 +522,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Building fio image
         run: make fio
-  
+
   litmus-pg-load:
     runs-on: ubuntu-latest
     needs: changes
@@ -554,3 +556,26 @@ jobs:
       - name: Building mongo-utils image
         run: |
           make litmus-mongo-utils
+
+  air-gapped-kind:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.air-gapped-kind == 'true'
+    # Note: While updating these envs, make sure update the same in entrypoint-wrapper.sh
+    env:
+      KIND_NODE_IMAGE: "kindest/node:v1.21.1"
+      REGISTRY_IMAGE: "registry:2"
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Pulling Node & Registry images
+        run: |
+          mkdir custom/air-gapped-kind/assets
+          docker pull ${KIND_NODE_IMAGE} && docker save ${KIND_NODE_IMAGE} | gzip > custom/air-gapped-kind/assets/node.tar.gz
+          docker pull ${REGISTRY_IMAGE} && docker save ${REGISTRY_IMAGE} | gzip > custom/air-gapped-kind/assets/registry.tar.gz
+
+      - name: Building air-gapped-kind image
+        run: |
+          make air_gapped_kind

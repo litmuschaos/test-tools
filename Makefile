@@ -405,6 +405,16 @@ _push_litmus_mongo_utils:
 
 litmus-mongo-utils: deps _build_litmus_mongo_utils _push_litmus_mongo_utils
 
+_build_air_gapped_kind:
+	@echo "INFO: Building container image for litmuschaos/air-gapped-kind"
+	cd custom/air-gapped-kind && docker build -t litmuschaos/air-gapped-kind .
+
+_push_air_gapped_kind:
+	@echo "INFO: Publish container litmuschaos/air-gapped-kind"
+	cd custom/air-gapped-kind && ./buildscripts/push
+
+air_gapped_kind: deps _build_air_gapped_kind _push_air_gapped_kind
+
 PHONY: go-build
 go-build: experiment-go-binary
 

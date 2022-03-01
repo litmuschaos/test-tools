@@ -58,11 +58,12 @@ jobs:
       workflow-controller: ${{ steps.filter.outputs.workflow-controller }}
       argoexec: ${{ steps.filter.outputs.argoexec }}
       mongo: ${{ steps.filter.outputs.mongo }}
-      litmus-pg-load: ${{ steps.filter.outputs.litmus-pg-load }} 
+      litmus-pg-load: ${{ steps.filter.outputs.litmus-pg-load }}
       litmus-pg-jmeter: ${{ steps.filter.outputs.litmus-pg-jmeter }}
       litmus-experiment-hardened-alpine: ${{ steps.filter.outputs.litmus-experiment-hardened-alpine }}
       litmus-infra-hardened-alpine: ${{ steps.filter.outputs.litmus-infra-hardened-alpine }}
       mongo-utils: ${{ steps.filter.outputs.mongo-utils }}
+      air-gapped-kind: ${{ steps.filter.outputs.air-gapped-kind }}
 
     steps:
       - uses: actions/checkout@v2
@@ -142,6 +143,8 @@ jobs:
               - 'custom/workflow-helper/postgres-helper/jmeter/**'
             mongo-utils:
               - 'custom/mongo-utils/**'
+            air-gapped-kind:
+              - 'custom/air-gapped-kind/**'
 
   litmus-app-deployer:
     runs-on: ubuntu-latest
@@ -563,7 +566,7 @@ jobs:
         run: |
           make docker.buildx
           make _push_litmus_pg_load
-  
+
   litmus-pg-jmeter:
     runs-on: ubuntu-latest
     needs: changes
@@ -576,7 +579,7 @@ jobs:
         run: |
           make docker.buildx
           make _push_litmus_pg_jmeter
-    
+
   mongo-utils:
     runs-on: ubuntu-latest
     needs: changes
@@ -588,4 +591,28 @@ jobs:
       - name: Building mongo-utils image
         run: |
           make docker.buildx
-          make _push_litmus_mongo_utils 
+          make _push_litmus_mongo_utils
+
+  air-gapped-kind:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.air-gapped-kind == 'true'
+    # Note: While updating these envs, make sure update the same in dockerfile
+    env:
+      KIND_NODE_IMAGE: "kindest/node:v1.21.1"
+      REGISTRY_IMAGE: "registry:2"
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Pulling Node & Registry images
+        run: |
+          mkdir custom/air-gapped-kind/assets
+          docker pull ${KIND_NODE_IMAGE} && docker save ${KIND_NODE_IMAGE} | gzip > custom/air-gapped-kind/assets/node.tar.gz
+          docker pull ${REGISTRY_IMAGE} && docker save ${REGISTRY_IMAGE} | gzip > custom/air-gapped-kind/assets/registry.tar.gz
+
+      - name: Building air-gapped-kind image
+        run: |
+          make docker.buildx
+          make _push_air_gapped_kind
