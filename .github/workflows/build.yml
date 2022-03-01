@@ -46,10 +46,7 @@ jobs:
       cassandra-client: ${{ steps.filter.outputs.cassandra-client }}
       litmus-app-deployer: ${{ steps.filter.outputs.litmus-app-deployer }}
       litmus-qps-cmd: ${{ steps.filter.outputs.litmus-qps-cmd }}
-      pod-delete: ${{ steps.filter.outputs.pod-delete }}
-      pod-delete-helper: ${{ steps.filter.outputs.pod-delete-helper }}
       container-killer: ${{ steps.filter.outputs.container-killer }}
-      container-kill-helper: ${{ steps.filter.outputs.pod-delete }}
       litmus-git-app-checker: ${{ steps.filter.outputs.litmus-git-app-checker }}
       litmus-k8s: ${{ steps.filter.outputs.litmus-k8s }}
       litmus-curl: ${{ steps.filter.outputs.litmus-curl }}
@@ -113,14 +110,8 @@ jobs:
               - 'custom/workflow-helper/app-deployer/**'
             litmus-qps-cmd:
               - 'custom/workflow-helper/app-qps-test/**'
-            pod-delete:
-              - 'experiments/pod-delete/**'
-            pod-delete-helper:
-              - 'experiments/generic/pod-delete/**'
             container-killer:
               - 'containerd/crictl/**'
-            container-kill-helper:
-              - 'experiments/generic/container-kill/**'
             litmus-git-app-checker:
               - 'custom/workflow-helper/app-checker/**'
             litmus-k8s:
@@ -455,28 +446,6 @@ jobs:
       - name: Building nfs-client image
         run: make nfs-client
 
-  pod-delete:
-    runs-on: ubuntu-latest
-    needs: changes
-    if: needs.changes.outputs.pod-delete == 'true'
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-      - name: Building pod-delete image
-        run: make pod-delete
-
-  pod-delete-helper:
-    runs-on: ubuntu-latest
-    needs: changes
-    if: needs.changes.outputs.pod-delete-helper == 'true'
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-      - name: Building pod-delete-helper image
-        run: make pod-delete-go
-
   container-killer:
     runs-on: ubuntu-latest
     needs: changes
@@ -487,17 +456,6 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Building container-killer image
         run: make container-killer
-
-  container-kill-helper:
-    runs-on: ubuntu-latest
-    needs: changes
-    if: needs.changes.outputs.container-kill-helper == 'true'
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-      - name: Building container-kill-helper image
-        run: make container-kill-go
 
   forkbomb:
     runs-on: ubuntu-latest
