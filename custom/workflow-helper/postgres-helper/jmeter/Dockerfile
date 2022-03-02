@@ -27,7 +27,7 @@ ENV JAVA_ALPINE_VERSION 8.302.08-r2
 RUN set -x && apk add --no-cache openjdk8="$JAVA_ALPINE_VERSION" && [ "$JAVA_HOME" = "$(docker-java-home)" ]
 
 RUN apk add wget
-RUN wget http://apache.stu.edu.tw//jmeter/binaries/apache-jmeter-5.4.2.tgz
+RUN wget http://dlcdn.apache.org/jmeter/binaries/apache-jmeter-5.4.2.tgz
 RUN tar -xzf apache-jmeter-5.4.2.tgz 
 RUN mv apache-jmeter-5.4.2/* /opt/apache-jmeter-5.4.2
 RUN rm -r /opt/apache-jmeter-5.4.2/apache-jmeter-5.4.2
