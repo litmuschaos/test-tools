@@ -31,7 +31,8 @@ RUN apk --update add \
         stress-ng\
         openssh-client\
 #        libc6-compat \
-        sshpass
+        sshpass \
+        expat-doc
 
 RUN set -ex && \
      apk --update add libstdc++ curl ca-certificates && \
