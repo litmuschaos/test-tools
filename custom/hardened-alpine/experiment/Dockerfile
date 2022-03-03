@@ -31,8 +31,8 @@ RUN apk --update add \
         stress-ng\
         openssh-client\
 #        libc6-compat \
-        sshpass \
-        expat-doc
+        sshpass
+
 RUN set -ex && \
      apk --update add libstdc++ curl ca-certificates && \
      for pkg in glibc-${GLIBC_VERSION} glibc-bin-${GLIBC_VERSION}; \
