@@ -60,7 +60,8 @@ jobs:
       litmus-infra-hardened-alpine: ${{ steps.filter.outputs.litmus-infra-hardened-alpine }}
       litmus-pg-jmeter: ${{ steps.filter.outputs.litmus-pg-jmeter }}
       mongo-utils: ${{ steps.filter.outputs.mongo-utils }}
-      litmus-redis-load: ${{ steps.filter.outputs.litmus-redis-load }}  
+      litmus-redis-load: ${{ steps.filter.outputs.litmus-redis-load }} 
+      litmus-snyk-image:  ${{ steps.filter.outputs.litmus-snyk-image }} 
     steps:
       - uses: actions/checkout@v2
         with:
@@ -137,6 +138,8 @@ jobs:
               - 'custom/mongo-utils/**'
             litmus-redis-load:
               - 'custom/workflow-helper/redis-helper/load-gen/**'
+            litmus-snyk-image:
+              - 'custom/security/snyk/**'
 
   litmus-app-deployer:
     runs-on: ubuntu-latest
@@ -247,6 +250,17 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Building cassandra-client image
         run: make cassandra-client
+
+  litmus-snyk-image:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.litmus-snyk-image == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building litmus-snyk-image image
+        run: make litmus-snyk-image
 
   litmus-argocli:
     runs-on: ubuntu-latest
