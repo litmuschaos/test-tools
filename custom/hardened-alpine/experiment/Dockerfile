@@ -72,6 +72,10 @@ RUN curl -L https://github.com/litmuschaos/test-tools/releases/download/${LITMUS
 
 COPY --from=docker:19.03 /usr/local/bin/docker /usr/local/bin/
 
+# Installing toxiproxy binaries
+RUN curl -L https://github.com/Shopify/toxiproxy/releases/download/v2.4.0/toxiproxy-cli-linux-${TARGETARCH} --output /usr/local/bin/toxiproxy-cli && chmod +x /usr/local/bin/toxiproxy-cli && \
+     curl -L https://github.com/Shopify/toxiproxy/releases/download/v2.4.0/toxiproxy-server-linux-${TARGETARCH} --output /usr/local/bin/toxiproxy-server && chmod +x /usr/local/bin/toxiproxy-server
+
 # The user the app should run as
 ENV APP_USER=litmus
 # The home directory
