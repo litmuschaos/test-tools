@@ -407,7 +407,7 @@ litmus-mongo-utils: deps _build_litmus_mongo_utils _push_litmus_mongo_utils
 
 _build_litmusctl:
 	@echo "INFO: Building container image for litmuschaos/litmusctl"
-	cd custom/litmusctl && docker build -t litmuschaos/litmusctl .
+	cd custom/litmusctl && docker build -t litmuschaos/litmusctl . --build-arg TARGETARCH=amd64 
 
 _push_litmusctl:
 	@echo "INFO: Publish container litmuschaos/litmusctl"
