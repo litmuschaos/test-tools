@@ -63,6 +63,7 @@ jobs:
       litmus-experiment-hardened-alpine: ${{ steps.filter.outputs.litmus-experiment-hardened-alpine }}
       litmus-infra-hardened-alpine: ${{ steps.filter.outputs.litmus-infra-hardened-alpine }}
       mongo-utils: ${{ steps.filter.outputs.mongo-utils }}
+      litmusctl: ${{ steps.filter.outputs.litmusctl }}
       litmus-redis-load: ${{ steps.filter.outputs.litmus-redis-load }}  
       litmus-snyk-image:  ${{ steps.filter.outputs.litmus-snyk-image }} 
 
@@ -144,6 +145,8 @@ jobs:
               - 'custom/workflow-helper/postgres-helper/jmeter/**'
             mongo-utils:
               - 'custom/mongo-utils/**'
+            litmusctl:
+              - 'custom/litmusctl/**'
             litmus-redis-load:
               - 'custom/workflow-helper/redis-helper/load-gen/**'
             litmus-snyk-image:
@@ -606,6 +609,19 @@ jobs:
         run: |
           make docker.buildx
           make _push_litmus_mongo_utils 
+
+  litmusctl:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.litmusctl == 'true'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Building litmusctl image
+        run: |
+          make docker.buildx
+          make _push_litmusctl 
 
   litmus-redis-load:
     runs-on: ubuntu-latest
