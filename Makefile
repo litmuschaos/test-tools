@@ -405,6 +405,16 @@ _push_litmus_mongo_utils:
 
 litmus-mongo-utils: deps _build_litmus_mongo_utils _push_litmus_mongo_utils
 
+_build_litmusctl:
+	@echo "INFO: Building container image for litmuschaos/litmusctl"
+	cd custom/litmusctl && docker build -t litmuschaos/litmusctl . --build-arg TARGETARCH=amd64 
+
+_push_litmusctl:
+	@echo "INFO: Publish container litmuschaos/litmusctl"
+	cd custom/litmusctl && ./buildscripts/push
+
+litmusctl: deps _build_litmusctl _push_litmusctl
+
 _build_litmus_redis_load:
 	@echo "INFO: Building container image for litmuschaos/litmus-redis-load"
 	cd custom/workflow-helper/redis-helper/load-gen && docker build -t litmuschaos/litmus-redis-load:latest .
