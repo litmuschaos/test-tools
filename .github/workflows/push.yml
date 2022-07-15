@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - toxiproxy
 
 defaults:
   run:
