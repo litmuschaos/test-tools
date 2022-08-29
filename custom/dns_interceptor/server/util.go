@@ -101,5 +101,5 @@ func updateResolvConf(resolvConfPath string, originalData *string) (string, erro
 
 func checkValidUpstream(server string) bool {
 	serverIp := net.ParseIP(server)
-	return !serverIp.IsLoopback() && !net.IPv4zero.Equal(serverIp) && !net.IPv6zero.Equal(serverIp)
+	return !net.IPv4zero.Equal(serverIp) && !net.IPv6zero.Equal(serverIp)
 }
