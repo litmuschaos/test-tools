@@ -13,6 +13,7 @@ spec:
       containers:
       - name: fortio
         image: fortio/fortio
+        # provide the url of the target service
         command: ["fortio", "load", "-t", "60s", "-qps", "2000", http://35.188.165.74]
         volumeMounts:
         - name: shared
