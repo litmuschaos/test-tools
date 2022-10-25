@@ -2,6 +2,8 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: fortio
+  labels:
+    app: fortio
 spec:
   template:
     spec:
@@ -11,7 +13,8 @@ spec:
       containers:
       - name: fortio
         image: fortio/fortio
-        command: ["fortio", "load", "-t", "60s", "-qps", "2000", http://192.168.49.2:30007/]
+        # provide the url of the target service
+        command: ["fortio", "load", "-t", "60s", "-qps", "2000", http://35.188.165.74]
         volumeMounts:
         - name: shared
           mountPath: /shared              
