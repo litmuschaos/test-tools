@@ -65,7 +65,7 @@ mysql_db_init_check()
  ts_echo "Waiting for mysql server to start accepting connections"
 
  for i in `seq 1 $I_R_C`; do
-   timeout -t 5 mysql -h $1 -u$2 -p$3 -e 'status' > /dev/null 2>&1
+   timeout 5 mysql -h $1 -u$2 -p$3 -e 'status' > /dev/null 2>&1
    rc=$?
    [ $rc -eq 0 ] && break
    sleep $I_W_D
@@ -83,7 +83,7 @@ $(($I_R_C * $I_W_D))s, exiting"
 # Kill the query after 1s if hung/stuck (typically seen w/ disconnects) 
 liveness_check()
 {
- timeout -t 5 mysql -h $1 -u$2 -p$3 -e 'select 1' > /dev/null 2>&1
+ timeout 5 mysql -h $1 -u$2 -p$3 -e 'select 1' > /dev/null 2>&1
  rc=$?
 }
 
