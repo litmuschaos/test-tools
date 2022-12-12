@@ -455,3 +455,15 @@ docker.buildx:
 		docker buildx use multibuilder;\
 		docker run --rm --privileged multiarch/qemu-user-static --reset -p yes;\
 	fi
+
+litmus-helm-agent: deps _build_litmus_helm_agent _push_litmus_helm_agent
+
+_build_litmus_helm_agent:
+	@echo "INFO: Building container image for litmuschaos/litmus-helm-agent"
+	cd custom/litmus-helm-agent/ && docker build -t litmuschaos/litmus-helm-agent .
+
+_push_litmus_helm_agent:
+	@echo "INFO: Publish container litmuschaos/litmus-helm-agent"
+	cd custom/litmus-helm-agent/ && ./buildscripts/push
+
+litmus-snyk-image: deps _build_litmus_snyk _push_litmus_snyk
