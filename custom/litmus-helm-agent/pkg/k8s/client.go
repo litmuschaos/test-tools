@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"os"
 
@@ -10,24 +11,15 @@ import (
 	metav1r "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	// "k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
-func connectKubeApi() *kubernetes.Clientset {
-	config, err := rest.InClusterConfig()
+func ConnectKubeApi() *kubernetes.Clientset {
+	config, err := getKubeConfig()
 	if err != nil {
-		fmt.Printf("❌ Cannot create config from incluster: " + err.Error() + "\n")
+		fmt.Printf("❌ Cannot create config: " + err.Error() + "\n")
 		os.Exit(1)
 	}
-	// creates the clientset
-	// kubeConfigPath := "/home/erse9980/.kube/configs/config_pov-sddc"
-	// fmt.Printf("Using kubeconfig: %s\n", kubeConfigPath)
-
-	// config, err := clientcmd.BuildConfigFromFlags("", kubeConfigPath)
-	// if err != nil {
-	// 	fmt.Printf("error getting Kubernetes config: %v\n", err)
-	// 	os.Exit(1)
-	// }
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		fmt.Printf("❌ Cannot create clientset: " + err.Error() + "\n")
@@ -36,8 +28,7 @@ func connectKubeApi() *kubernetes.Clientset {
 	return clientset
 }
 
-func CreateConfigMap(configmapName string, configMapData map[string]string, NAMESPACE string) {
-	clientset := connectKubeApi()
+func CreateConfigMap(configmapName string, configMapData map[string]string, NAMESPACE string, clientset *kubernetes.Clientset) {
 	configMap := corev1r.ConfigMap{
 		TypeMeta: metav1r.TypeMeta{
 			Kind:       "ConfigMap",
@@ -57,8 +48,7 @@ func CreateConfigMap(configmapName string, configMapData map[string]string, NAME
 	}
 }
 
-func CreateSecret(secretName string, secretData map[string][]byte, NAMESPACE string) {
-	clientset := connectKubeApi()
+func CreateSecret(secretName string, secretData map[string][]byte, NAMESPACE string, clientset *kubernetes.Clientset) {
 	secret := corev1r.Secret{
 		TypeMeta: metav1r.TypeMeta{
 			Kind:       "Secret",
@@ -79,4 +69,15 @@ func CreateSecret(secretName string, secretData map[string][]byte, NAMESPACE str
 		os.Exit(1)
 	}
 	_ = sec
+}
+
+func getKubeConfig() (*rest.Config, error) {
+	kubeconfig := flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+	flag.Parse()
+	// Use in-cluster config if kubeconfig path is not specified
+	if *kubeconfig == "" {
+		return rest.InClusterConfig()
+	}
+
+	return clientcmd.BuildConfigFromFlags("", *kubeconfig)
 }

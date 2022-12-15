@@ -8,15 +8,13 @@ ARG TARGETARCH
 RUN export GOOS=${TARGETOS} && \
     export GOARCH=${TARGETARCH}
 
-# Create application directory
-RUN mkdir -p /go/src/app
-WORKDIR /go/src/app
+ADD . /litmus
+WORKDIR /litmus
 
-ADD .  /go/src/app
-RUN go build -o /go/bin/app
+RUN CGO_ENABLED=0 go build -o /output/litmus-agent ./main.go
 
-FROM gcr.io/distroless/base-debian11:nonroot
+FROM litmuschaos/infra-alpine:latest
 
-COPY --from=build /go/bin/app /
+COPY --from=build /output/ /litmus
 
-CMD ["/app"]
+CMD ["./litmus-agent"]

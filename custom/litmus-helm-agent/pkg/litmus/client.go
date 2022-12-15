@@ -139,14 +139,15 @@ func CreateAgent(credentials types.Credentials) {
 			os.Exit(1)
 		}
 
+		clientset := kubernetes.ConnectKubeApi()
 		configMap := prepareAgentConfigMap()
-		kubernetes.CreateConfigMap(os.Getenv("AGENT_CONFIGMAP_NAME"), configMap, os.Getenv("NAMESPACE"))
+		kubernetes.CreateConfigMap(os.Getenv("AGENT_CONFIGMAP_NAME"), configMap, os.Getenv("NAMESPACE"), clientset)
 
 		secret := prepareAgentSecret(connectionData.Data, accessKey)
-		kubernetes.CreateSecret(os.Getenv("AGENT_SECRET_NAME"), secret, os.Getenv("NAMESPACE"))
+		kubernetes.CreateSecret(os.Getenv("AGENT_SECRET_NAME"), secret, os.Getenv("NAMESPACE"), clientset)
 
 		workflowConfigMap := prepareWorkflowControllerConfigMap(connectionData.Data.UserAgentReg.ClusterID)
-		kubernetes.CreateConfigMap(os.Getenv("WORKFLOW_CONTROLER_CONFIGMAP_NAME"), workflowConfigMap, os.Getenv("NAMESPACE"))
+		kubernetes.CreateConfigMap(os.Getenv("WORKFLOW_CONTROLER_CONFIGMAP_NAME"), workflowConfigMap, os.Getenv("NAMESPACE"), clientset)
 
 		fmt.Printf("Agent Successfully declared, starting...\n")
 	} else {
@@ -196,33 +197,6 @@ func validateAgent(token string, endpoint string) (string, error) {
 		}
 	}
 	return accessKey, err
-}
-
-func DeleteAgent(credentials types.Credentials) {
-	_ = credentials
-	fmt.Println("Eeeeh aurevoir")
-	// // projectID := os.Getenv("LITMUS_PROJECT_ID")
-	// clusterID := os.Getenv("CLUSTER_ID")
-
-	// utils.White_B.Println("\n🚀 Delete cluster!! 🎉")
-
-	// //query := `{"query":"mutation {\n  deleteClusterReg(clusterInput: \n    { \n    clusterID: \"` + CLUSTER_ID + `\",\n  }){ clusterID\n }\n}"}`
-	// query := `{"operationName":"deleteCluster","variables":{"clusterID":"` + clusterID + `"},"query":"mutation deleteCluster($clusterID: String\u0021) {\\n  deleteClusterReg(clusterID: $clusterID)\\n}\\n"}`
-	// params := apis.SendRequestParams{Endpoint: LITMUS_FRONTEND_URL + "/api/query", Token: credentials.Token}
-	// resp, err := apis.SendRequest(params, []byte(query), string(types.Post))
-	// if err != nil {
-	// 	utils.Red.Println("Error in getting agent list: ", err)
-	// 	os.Exit(1)
-	// }
-
-	// bodyBytes, err := ioutil.ReadAll(resp.Body)
-	// defer resp.Body.Close()
-	// if err != nil {
-	// 	utils.Red.Println("Error in getting agent list: ", err)
-	// 	os.Exit(1)
-	// }
-	// _ = bodyBytes
-	// utils.White_B.Println("\n🚀 Agent deleted Successful!! 🎉")
 }
 
 func Login(LITMUS_FRONTEND_URL string, LITMUS_USERNAME string, LITMUS_PASSWORD string) types.Credentials {
