@@ -25,7 +25,7 @@ func prepareNewAgent() types.Agent {
 	newAgent.Description = os.Getenv("AGENT_DESCRIPTION")
 	newAgent.ProjectId = os.Getenv("LITMUS_PROJECT_ID")
 	newAgent.Mode = os.Getenv("AGENT_MODE")
-	newAgent.SkipSSL = true
+	newAgent.SkipSSL, _ = strconv.ParseBool(os.Getenv("SKIP_SSL"))
 
 	// -- OPTIONAL -- //
 	newAgent.ClusterType = os.Getenv("CLUSTER_TYPE")
@@ -46,7 +46,7 @@ func prepareAgentConfigMap() map[string]string {
 	selector := `["litmuschaos.io/app=chaos-exporter", "litmuschaos.io/app=chaos-operator", "litmuschaos.io/app=event-tracker", "litmuschaos.io/app=workflow-controller"]`
 	configMapData["COMPONENTS"] = "DEPLOYMENTS: " + selector
 	configMapData["AGENT_SCOPE"] = os.Getenv("AGENT_MODE")
-	configMapData["SKIP_SSL_VERIFY"] = "true"
+	configMapData["SKIP_SSL_VERIFY"] = os.Getenv("SKIP_SSL")
 	return configMapData
 }
 

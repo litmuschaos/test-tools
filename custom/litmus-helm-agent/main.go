@@ -1,9 +1,11 @@
 package main
 
 import (
+	"crypto/tls"
 	"flag"
 	"fmt"
 	litmus "litmus-helm-agent/pkg/litmus"
+	"net/http"
 	"os"
 )
 
@@ -17,6 +19,11 @@ var (
 func init() {
 	flag.StringVar(&ACTION, "action", "", "create|delete litmus agent")
 	flag.Parse()
+
+	// For all litmus-helm-agent to ChaosCenter communications, This will apply to all requests.
+	if os.Getenv("SKIP_SSL") == "true" {
+		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	}
 
 	LITMUS_FRONTEND_URL = os.Getenv("LITMUS_FRONTEND_URL")
 	LITMUS_USERNAME = os.Getenv("LITMUS_USERNAME")
