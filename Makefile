@@ -427,7 +427,7 @@ litmus-redis-load: deps _build_litmus_redis_load _push_litmus_redis_load
 
 _build_litmus_snyk:
 	@echo "INFO: Building container image for litmuschaos/snyk"
-	cd custom/security/snyk/ && docker build -t litmuschaos/snyk:1.0 . --build-arg SNYK_TOKEN=${SNYK_TOKEN}
+	cd custom/security/snyk/ && docker build -t litmuschaos/snyk:1.0 .
 
 _push_litmus_snyk:
 	@echo "INFO: Publish container litmuschaos/litmuschaos/snyk"

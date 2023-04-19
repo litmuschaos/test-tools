@@ -271,8 +271,6 @@ jobs:
       - uses: actions/checkout@v2
       - name: Building litmus-snyk-image image
         run: make litmus-snyk-image
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
   litmus-k8s:
     runs-on: ubuntu-latest
