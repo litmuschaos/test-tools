@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - graceful-shutdown-litmus-checker
 
 defaults:
   run:
