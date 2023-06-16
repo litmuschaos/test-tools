@@ -46,9 +46,11 @@ func main() {
 		Namespace: resp.GetNamespace(),
 		Selectors: "",
 	}
+
+	// Required, While aborting a Chaos Experiment, wait-container (argo-exec) sends SIGTERM signal to other (main) containers for aborting Argo-Workflow Pod
 	go func() {
 		<-signalChannel
-		log.Print("SIGNAL TERM SIGNAL RECEIVED")
+		log.Print("SIGTERM SIGNAL RECEIVED, Shutting down litmus-checker...")
 		os.Exit(0)
 	}()
 
