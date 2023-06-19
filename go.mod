@@ -1,6 +1,6 @@
 module github.com/litmuschaos/test-tools
 
-go 1.17
+go 1.19
 
 require github.com/minio/minio-go v6.0.14+incompatible
 
