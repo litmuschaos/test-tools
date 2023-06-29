@@ -1,7 +1,7 @@
 FROM alpine:3.18.0
 ARG TARGETARCH
 
-ENV KUBECTL_VERSION="v1.27.2"
+ENV KUBECTL_VERSION="v1.27.3"
 
 LABEL maintainer="LitmusChaos"
 
