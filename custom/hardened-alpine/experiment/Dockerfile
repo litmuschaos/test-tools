@@ -1,7 +1,7 @@
 # This Dockerfile contains the hardened alpine image with all the
 # litmus experiment dependencies installed.
 # It is also made non-root, sudo-enabled with default litmus directory.
-FROM alpine:3.17.4
+FROM alpine:3.18.0
 
 LABEL maintainer="LitmusChaos"
 
@@ -13,7 +13,7 @@ RUN echo "https://alpine.global.ssl.fastly.net/alpine/v$(cut -d . -f 1,2 < /etc/
 	&& echo "https://alpine.global.ssl.fastly.net/alpine/v$(cut -d . -f 1,2 < /etc/alpine-release)/community" >> /etc/apk/repositories
 
 ENV GLIBC_REPO=https://github.com/sgerrand/alpine-pkg-glibc
-ENV GLIBC_VERSION=2.30-r0
+ENV GLIBC_VERSION=2.35-r1
 ARG TARGETARCH
 ARG LITMUS_VERSION
 
