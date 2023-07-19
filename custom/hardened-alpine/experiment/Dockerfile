@@ -51,7 +51,7 @@ RUN curl -L https://storage.googleapis.com/kubernetes-release/release/${KUBE_LAT
     chmod +x /usr/local/bin/kubectl
 
 #Installing crictl binaries
-RUN curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.16.0/crictl-v1.27.0-linux-${TARGETARCH}.tar.gz --output crictl-v1.27.0-linux-${TARGETARCH}.tar.gz && \
+RUN curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.27.0/crictl-v1.27.0-linux-${TARGETARCH}.tar.gz --output crictl-v1.27.0-linux-${TARGETARCH}.tar.gz && \
     tar zxvf crictl-v1.27.0-linux-${TARGETARCH}.tar.gz -C /usr/local/bin
 
 #Installing promql cli binaries
