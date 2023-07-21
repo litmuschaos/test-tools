@@ -5,7 +5,7 @@ if [ ! -z "${DNAME}" ] && [ ! -z "${DPASS}" ];
 then
   docker login -u "${DNAME}" -p "${DPASS}";
   #Push to docker hub repository with latest tag
-  docker buildx build . -f Dockerfile --progress plane --push --no-cache --platform linux/amd64,linux/arm64 --tag litmuschaos/litmus-redis-load:latest
+  docker buildx build . -f Dockerfile --progress plain --push --no-cache --platform linux/amd64,linux/arm64 --tag litmuschaos/litmus-redis-load:latest
 else
   echo "No docker credentials provided. Skip uploading litmuschaos/litmus-redis-load:latest to docker hub";
 fi;
