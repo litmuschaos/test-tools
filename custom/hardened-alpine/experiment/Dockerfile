@@ -1,7 +1,7 @@
 # This Dockerfile contains the hardened alpine image with all the
 # litmus experiment dependencies installed.
 # It is also made non-root, sudo-enabled with default litmus directory.
-FROM alpine:3.18.0
+FROM alpine:3.16.2
 
 LABEL maintainer="LitmusChaos"
 
@@ -13,7 +13,7 @@ RUN echo "https://alpine.global.ssl.fastly.net/alpine/v$(cut -d . -f 1,2 < /etc/
 	&& echo "https://alpine.global.ssl.fastly.net/alpine/v$(cut -d . -f 1,2 < /etc/alpine-release)/community" >> /etc/apk/repositories
 
 ENV GLIBC_REPO=https://github.com/sgerrand/alpine-pkg-glibc
-ENV GLIBC_VERSION=2.35-r1
+ENV GLIBC_VERSION=2.30-r0
 ARG TARGETARCH
 ARG LITMUS_VERSION
 
@@ -46,13 +46,13 @@ RUN set -ex && \
 RUN sed -i -e "s/bin\/ash/bin\/bash/" /etc/passwd   
 
 #Installing Kubectl
-ENV KUBE_LATEST_VERSION="v1.27.3"
+ENV KUBE_LATEST_VERSION="v1.21.2"
 RUN curl -L https://storage.googleapis.com/kubernetes-release/release/${KUBE_LATEST_VERSION}/bin/linux/${TARGETARCH}/kubectl -o     /usr/local/bin/kubectl && \
     chmod +x /usr/local/bin/kubectl
 
 #Installing crictl binaries
-RUN curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.27.0/crictl-v1.27.0-linux-${TARGETARCH}.tar.gz --output crictl-v1.27.0-linux-${TARGETARCH}.tar.gz && \
-    tar zxvf crictl-v1.27.0-linux-${TARGETARCH}.tar.gz -C /usr/local/bin
+RUN curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.16.0/crictl-v1.16.0-linux-${TARGETARCH}.tar.gz --output crictl-v1.16.0-linux-${TARGETARCH}.tar.gz && \
+    tar zxvf crictl-v1.16.0-linux-${TARGETARCH}.tar.gz -C /usr/local/bin
 
 #Installing promql cli binaries
 RUN curl -L https://github.com/chaosnative/promql-cli/releases/download/3.0.0-beta2/promql_linux_${TARGETARCH} --output /usr/local/bin/promql && chmod +x /usr/local/bin/promql
