@@ -4,7 +4,7 @@ set -e
 if [ ! -z "${DNAME}" ] && [ ! -z "${DPASS}" ];
 then
   docker login -u "${DNAME}" -p "${DPASS}";
-  docker buildx build . -f Dockerfile --progress plane --push --no-cache --platform linux/amd64,linux/arm64 --tag litmuschaos/infra-alpine:latest
+  docker buildx build . -f Dockerfile --progress plain --push --no-cache --platform linux/amd64,linux/arm64 --tag litmuschaos/infra-alpine:latest
 else
   echo "No docker credentials provided. Skip uploading litmuschaos/infra-alpine:latest to docker hub";
 fi;
