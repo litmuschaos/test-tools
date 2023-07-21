@@ -1,10 +1,10 @@
 module github.com/litmuschaos/dns_interceptor
 
-go 1.19
+go 1.20
 
 require (
 	github.com/miekg/dns v1.1.41
-	github.com/sirupsen/logrus v1.8.1
+	github.com/sirupsen/logrus v1.9.3
 )
 
 require (

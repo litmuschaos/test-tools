@@ -1,6 +1,6 @@
 module github.com/gdsoumya/resourceChecker
 
-go 1.19
+go 1.20
 
 require (
 	k8s.io/apimachinery v0.21.2
