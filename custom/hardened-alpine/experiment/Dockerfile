@@ -55,7 +55,7 @@ RUN curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.16
     tar zxvf crictl-v1.16.0-linux-${TARGETARCH}.tar.gz -C /usr/local/bin
 
 #Installing promql cli binaries
-RUN curl -L https://github.com/chaosnative/promql-cli/releases/download/3.0.0-beta2/promql_linux_${TARGETARCH} --output /usr/local/bin/promql && chmod +x /usr/local/bin/promql
+COPY --from=ghcr.io/nalbury/promql-cli /promql /usr/local/bin/
 
 #Installing nsutil cli binaries
 RUN curl -L https://github.com/litmuschaos/test-tools/releases/download/${LITMUS_VERSION}/nsutil-linux-${TARGETARCH} --output /usr/local/bin/nsutil && chmod +x /usr/local/bin/nsutil
