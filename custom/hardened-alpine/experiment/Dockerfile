@@ -43,7 +43,7 @@ RUN set -ex && \
      /usr/glibc-compat/sbin/ldconfig /lib /usr/glibc-compat/lib
 
 # Change default shell from ash to bash
-RUN sed -i -e "s/bin\/ash/bin\/bash/" /etc/passwd   
+RUN sed -i -e "s/bin\/ash/bin\/bash/" /etc/passwd
 
 #Installing Kubectl
 ENV KUBE_LATEST_VERSION="v1.21.2"
@@ -55,7 +55,7 @@ RUN curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.28
     tar zxvf crictl-v1.28.0-linux-${TARGETARCH}.tar.gz -C /usr/local/bin
 
 #Installing promql cli binaries
-RUN curl -L https://github.com/chaosnative/promql-cli/releases/download/3.0.0-beta2/promql_linux_${TARGETARCH} --output /usr/local/bin/promql && chmod +x /usr/local/bin/promql
+RUN curl -L https://github.com/chaosnative/promql-cli/releases/download/3.0.0/promql_linux_${TARGETARCH} --output /usr/local/bin/promql && chmod +x /usr/local/bin/promql
 
 #Installing nsutil cli binaries
 RUN curl -L https://github.com/litmuschaos/test-tools/releases/download/${LITMUS_VERSION}/nsutil-linux-${TARGETARCH} --output /usr/local/bin/nsutil && chmod +x /usr/local/bin/nsutil
@@ -151,7 +151,7 @@ RUN find /bin /etc /lib /sbin /usr -xdev \( \
   -iname od -o \
   -iname strings -o \
   -iname su -o \
-  # -iname sudo \ 
+  # -iname sudo \
   \) -delete
 
 # Remove init scripts since we do not use them.
