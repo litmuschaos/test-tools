@@ -1,3 +1,3 @@
-FROM alpine:3.15.0
+FROM alpine:latest
 COPY main /usr/local/bin/.
 ENTRYPOINT ["/usr/local/bin/main"]
