@@ -2,6 +2,8 @@ package chaos_checker
 
 import (
 	"log"
+	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -13,9 +15,22 @@ func CheckChaos(kubeconfig *string, res k8s.ResourceDef) {
 	if err != nil {
 		log.Fatal("ERROR : ", err)
 	}
-	log.Print("Starting Chaos Checker in 1min")
+
+	checkerInterval := int64(60)
+
+	// poll interval in seconds
+	intervalEnv := os.Getenv("CHECK_INTERVAL")
+	if intervalEnv != "" {
+		checkerInterval, err = strconv.ParseInt(intervalEnv, 10, 64)
+		if err != nil {
+			log.Fatal("ERROR failed to parse checker interval seconds: ", err)
+		}
+	}
+
+	log.Printf("Starting Chaos Checker in %v seconds", checkerInterval)
+
 	for {
-		time.Sleep(time.Minute * 1)
+		time.Sleep(time.Second * time.Duration(checkerInterval))
 		log.Print("Checking if Engine Completed or Stopped")
 		data, err := k8s.GetResourceDetails(dc, dyn, res)
 		if err != nil {
