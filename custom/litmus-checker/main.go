@@ -4,6 +4,9 @@ import (
 	"flag"
 	"io/ioutil"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	chaos_checker "github.com/gdsoumya/resourceChecker/pkg/chaos-checker"
 	"github.com/gdsoumya/resourceChecker/pkg/k8s"
@@ -11,6 +14,8 @@ import (
 )
 
 func main() {
+	signalChannel := make(chan os.Signal)
+	signal.Notify(signalChannel, os.Interrupt, syscall.SIGTERM)
 	kubeconfig := flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
 	file := flag.String("file", "", "absolute path to the chaosengine yaml")
 	engineFile := flag.String("saveName", "", "absolute path to the output file")
@@ -41,6 +46,14 @@ func main() {
 		Namespace: resp.GetNamespace(),
 		Selectors: "",
 	}
+
+	// Required, While aborting a Chaos Experiment, wait-container (argo-exec) sends SIGTERM signal to other (main) containers for aborting Argo-Workflow Pod
+	go func() {
+		<-signalChannel
+		log.Print("SIGTERM SIGNAL RECEIVED, Shutting down litmus-checker...")
+		os.Exit(0)
+	}()
+
 	log.Print("Created Resource Details: \n", resDef)
 	chaos_checker.CheckChaos(kubeconfig, resDef)
 }

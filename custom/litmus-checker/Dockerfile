@@ -1,5 +1,5 @@
 #Build Stage
-FROM golang:1.14 AS builder
+FROM golang:1.20 AS builder
 
 LABEL maintainer="LitmusChaos"
 
@@ -17,7 +17,7 @@ RUN go env
 RUN CGO_ENABLED=0 go build -o /output/checker -v
 
 #Deploy Stage
-FROM alpine:latest
+FROM alpine:3.18.0
 
 LABEL maintainer="LitmusChaos"
 

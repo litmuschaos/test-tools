@@ -425,16 +425,6 @@ _push_litmus_redis_load:
 
 litmus-redis-load: deps _build_litmus_redis_load _push_litmus_redis_load
 
-_build_litmus_snyk:
-	@echo "INFO: Building container image for litmuschaos/snyk"
-	cd custom/security/snyk/ && docker build -t litmuschaos/snyk:1.0 . --build-arg SNYK_TOKEN=${SNYK_TOKEN}
-
-_push_litmus_snyk:
-	@echo "INFO: Publish container litmuschaos/litmuschaos/snyk"
-	cd custom/security/snyk/ && ./buildscripts/push
-
-litmus-snyk-image: deps _build_litmus_snyk _push_litmus_snyk
-
 PHONY: go-build
 go-build: experiment-go-binary
 
@@ -455,3 +445,13 @@ docker.buildx:
 		docker buildx use multibuilder;\
 		docker run --rm --privileged multiarch/qemu-user-static --reset -p yes;\
 	fi
+
+litmus-helm-agent: deps _build_litmus_helm_agent _push_litmus_helm_agent
+
+_build_litmus_helm_agent:
+	@echo "INFO: Building container image for litmuschaos/litmus-helm-agent"
+	cd custom/litmus-helm-agent/ && docker build -t litmuschaos/litmus-helm-agent .
+
+_push_litmus_helm_agent:
+	@echo "INFO: Publish container litmuschaos/litmus-helm-agent"
+	cd custom/litmus-helm-agent/ && ./buildscripts/push

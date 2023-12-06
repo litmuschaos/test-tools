@@ -4,10 +4,11 @@ import (
 	"bufio"
 	"encoding/json"
 	"errors"
-	log "github.com/sirupsen/logrus"
 	"net"
 	"os"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // getInterceptorSettings generates the interceptor settings from the env

@@ -1,7 +1,7 @@
 # This Dockerfile contains the hardened alpine image with all the
 # litmus experiment dependencies installed.
 # It is also made non-root, sudo-enabled with default litmus directory.
-FROM alpine:3.15.0
+FROM alpine:3.16.2
 
 LABEL maintainer="LitmusChaos"
 
@@ -43,7 +43,7 @@ RUN set -ex && \
      /usr/glibc-compat/sbin/ldconfig /lib /usr/glibc-compat/lib
 
 # Change default shell from ash to bash
-RUN sed -i -e "s/bin\/ash/bin\/bash/" /etc/passwd   
+RUN sed -i -e "s/bin\/ash/bin\/bash/" /etc/passwd
 
 #Installing Kubectl
 ENV KUBE_LATEST_VERSION="v1.21.2"
@@ -51,15 +51,11 @@ RUN curl -L https://storage.googleapis.com/kubernetes-release/release/${KUBE_LAT
     chmod +x /usr/local/bin/kubectl
 
 #Installing crictl binaries
-RUN curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.16.0/crictl-v1.16.0-linux-${TARGETARCH}.tar.gz --output crictl-v1.16.0-linux-${TARGETARCH}.tar.gz && \
-    tar zxvf crictl-v1.16.0-linux-${TARGETARCH}.tar.gz -C /usr/local/bin
-    
-#Installing pumba binaries
-ENV PUMBA_VERSION="0.8.0"
-RUN curl -L https://github.com/alexei-led/pumba/releases/download/${PUMBA_VERSION}/pumba_linux_${TARGETARCH} --output /usr/local/bin/pumba && chmod +x /usr/local/bin/pumba
+RUN curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.28.0/crictl-v1.28.0-linux-${TARGETARCH}.tar.gz --output crictl-v1.28.0-linux-${TARGETARCH}.tar.gz && \
+    tar zxvf crictl-v1.28.0-linux-${TARGETARCH}.tar.gz -C /usr/local/bin
 
 #Installing promql cli binaries
-RUN curl -L https://github.com/chaosnative/promql-cli/releases/download/2.6.0/promql_linux_${TARGETARCH} --output /usr/local/bin/promql && chmod +x /usr/local/bin/promql
+RUN curl -L https://github.com/chaosnative/promql-cli/releases/download/3.0.0/promql_linux_${TARGETARCH} --output /usr/local/bin/promql && chmod +x /usr/local/bin/promql
 
 #Installing nsutil cli binaries
 RUN curl -L https://github.com/litmuschaos/test-tools/releases/download/${LITMUS_VERSION}/nsutil-linux-${TARGETARCH} --output /usr/local/bin/nsutil && chmod +x /usr/local/bin/nsutil
@@ -155,7 +151,7 @@ RUN find /bin /etc /lib /sbin /usr -xdev \( \
   -iname od -o \
   -iname strings -o \
   -iname su -o \
-  # -iname sudo \ 
+  # -iname sudo \
   \) -delete
 
 # Remove init scripts since we do not use them.
