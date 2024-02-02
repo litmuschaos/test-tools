@@ -2,6 +2,7 @@ package client
 
 import (
 	"fmt"
+	"reflect"
 	"io/ioutil"
 	kubernetes "litmus-helm-agent/pkg/k8s"
 	"net/http"
@@ -9,54 +10,57 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
+	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/buger/jsonparser"
 	ymlToJson "github.com/ghodss/yaml"
 	"github.com/golang-jwt/jwt"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
+	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 	types "github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 )
 
-func prepareNewAgent() types.Agent {
-	var newAgent types.Agent
-	newAgent.AgentName = os.Getenv("AGENT_NAME")
-	newAgent.Namespace = os.Getenv("NAMESPACE")
-	newAgent.Description = os.Getenv("AGENT_DESCRIPTION")
-	newAgent.ProjectId = os.Getenv("LITMUS_PROJECT_ID")
-	newAgent.Mode = os.Getenv("AGENT_MODE")
-	newAgent.SkipSSL, _ = strconv.ParseBool(os.Getenv("SKIP_SSL"))
+func prepareNewInfra() types.Infra {
+	var newInfra types.Infra
+	newInfra.InfraName = os.Getenv("INFRA_NAME")
+	newInfra.Namespace = os.Getenv("NAMESPACE")
+	newInfra.EnvironmentID = os.Getenv("LITMUS_ENVIRONMENT_ID")
+	newInfra.Description = os.Getenv("INFRA_DESCRIPTION")
+	newInfra.ProjectId = os.Getenv("LITMUS_PROJECT_ID")
+	newInfra.Mode = os.Getenv("INFRA_MODE")
+	newInfra.SkipSSL, _ = strconv.ParseBool(os.Getenv("SKIP_SSL"))
 
 	// -- OPTIONAL -- //
-	newAgent.ClusterType = os.Getenv("CLUSTER_TYPE")
-	newAgent.NodeSelector = os.Getenv("AGENT_NODE_SELECTOR")
-	newAgent.PlatformName = os.Getenv("PLATFORM_NAME")
-	newAgent.ServiceAccount = os.Getenv("SERVICE_ACCOUNT_NAME")
-	newAgent.SAExists, _ = strconv.ParseBool(os.Getenv("SA_EXISTS"))
-	newAgent.NsExists, _ = strconv.ParseBool(os.Getenv("NS_EXISTS"))
-	return newAgent
+	newInfra.InfraType = os.Getenv("INFRA_TYPE")
+	newInfra.NodeSelector = os.Getenv("INFRA_NODE_SELECTOR")
+	newInfra.PlatformName = os.Getenv("PLATFORM_NAME")
+	newInfra.ServiceAccount = os.Getenv("SERVICE_ACCOUNT_NAME")
+	newInfra.SAExists, _ = strconv.ParseBool(os.Getenv("SA_EXISTS"))
+	newInfra.NsExists, _ = strconv.ParseBool(os.Getenv("NS_EXISTS"))
+	return newInfra
 }
 
-func prepareAgentConfigMap() map[string]string {
+func prepareInfraConfigMap() map[string]string {
 	configMapData := make(map[string]string)
 	configMapData["SERVER_ADDR"] = os.Getenv("LITMUS_BACKEND_URL")
 	configMapData["VERSION"] = os.Getenv("APP_VERSION")
-	configMapData["IS_CLUSTER_CONFIRMED"] = "false"
+	configMapData["IS_INFRA_CONFIRMED"] = "false"
 	configMapData["START_TIME"] = strconv.FormatInt(time.Now().Unix(), 10)
 	selector := `["litmuschaos.io/app=chaos-exporter", "litmuschaos.io/app=chaos-operator", "litmuschaos.io/app=event-tracker", "litmuschaos.io/app=workflow-controller"]`
 	configMapData["COMPONENTS"] = "DEPLOYMENTS: " + selector
-	configMapData["AGENT_SCOPE"] = os.Getenv("AGENT_MODE")
+	//TODO fix this line
+	configMapData["INFRA_SCOPE"] = os.Getenv("INFRA_MODE")
 	configMapData["SKIP_SSL_VERIFY"] = os.Getenv("SKIP_SSL")
+
 	return configMapData
 }
 
-func prepareAgentSecret(agentConnect apis.AgentConnect, accessKey string) map[string][]byte {
+func prepareInfraSecret(infraConnect infrastructure.RegisterInfra, accessKey string) map[string][]byte {
 	secretData := make(map[string][]byte)
-	clusterID := agentConnect.UserAgentReg.ClusterID
-	secretData["CLUSTER_ID"] = []byte(clusterID)
+	InfraID := infraConnect.RegisterInfraDetails.InfraID
+	secretData["INFRA_ID"] = []byte(InfraID)
 	secretData["ACCESS_KEY"] = []byte(accessKey)
 
-	//secretData["ACCESS_KEY"] = []byte(agentConnect.UserAgentReg.Token)
 	return secretData
 }
 
@@ -93,69 +97,73 @@ func GetProjectID(credentials types.Credentials) string {
 	return result
 }
 
-func GetAgentWithName(credentials types.Credentials, searchAgent types.Agent) (apis.AgentDetails, error) {
-	agents, err := apis.GetAgentList(credentials, searchAgent.ProjectId)
+func GetInfraWithName(credentials types.Credentials, searchInfra types.Infra) (models.Infra, error) {
+	infras, err := infrastructure.GetInfraList(credentials, searchInfra.ProjectId, models.ListInfraRequest{})
 	if err != nil {
-		return apis.AgentDetails{}, err
+		return models.Infra{}, err
 	}
-	for _, agent := range agents.Data.GetAgent {
-		if agent.AgentName == searchAgent.AgentName {
-			return agent, nil
+	for _, infra := range infras.Data.ListInfraDetails.Infras {
+		if infra.Name == searchInfra.InfraName {
+			return *infra, nil
 		}
 	}
-	return apis.AgentDetails{}, nil
+	return models.Infra{}, nil
 }
 
-func CreateAgent(credentials types.Credentials) {
-	newAgent := prepareNewAgent()
+func CreateInfra(credentials types.Credentials) {
+	newInfra := prepareNewInfra()
 
-	if newAgent.ProjectId == "" {
-		newAgent.ProjectId = GetProjectID(credentials)
+	if newInfra.ProjectId == "" {
+		newInfra.ProjectId = GetProjectID(credentials)
 	}
 
-	agentExist, err := GetAgentWithName(credentials, newAgent)
+	infraExist, err := GetInfraWithName(credentials, newInfra)
 	if err != nil {
-		utils.Red.Printf("\n❌ Error, cannot search if agent exist: %v", err.Error())
+		utils.Red.Printf("\n❌ Error, cannot search if infrastructure exist: %v", err.Error())
 		os.Exit(1)
 	}
+	
+	if (reflect.ValueOf(infraExist).IsZero()) {
+		connectionData, err := infrastructure.ConnectInfra(newInfra, credentials)
 
-	if (agentExist == apis.AgentDetails{}) {
-		connectionData, err := apis.ConnectAgent(newAgent, credentials)
 		if err != nil {
-			utils.Red.Println("\n❌ Chaos Delegate registration failed: " + err.Error() + "\n")
+			utils.Red.Println("\n❌ Infrastructure registration failed: " + err.Error() + "\n")
 			os.Exit(1)
 		}
-		if (connectionData.Data == apis.AgentConnect{}) {
+		if (connectionData.Data == infrastructure.RegisterInfra{}) {
 			fmt.Printf("❌ Agent empty: Registration failed did graphql change ? \n")
 			os.Exit(1)
 		}
-		if connectionData.Data.UserAgentReg.Token == "" {
-			utils.Red.Println("\n❌ failed to get the agent registration token: " + "\n")
+	
+		if connectionData.Data.RegisterInfraDetails.Token == "" {
+			utils.Red.Println("\n❌ failed to get the infrastructure registration token: " + "\n")
 			os.Exit(1)
 		}
-		accessKey, err := validateAgent(connectionData.Data.UserAgentReg.Token, credentials.Endpoint)
+
+		accessKey, err := validateInfra(connectionData.Data.RegisterInfraDetails.Token, credentials.Endpoint)
+		
 		if err != nil {
-			utils.Red.Println("❌ Error validate agent: ", err)
+			utils.Red.Println("❌ Error validate infrastructure: ", err)
 			os.Exit(1)
 		}
-
+		
 		clientset := kubernetes.ConnectKubeApi()
-		configMap := prepareAgentConfigMap()
-		kubernetes.CreateConfigMap(os.Getenv("AGENT_CONFIGMAP_NAME"), configMap, os.Getenv("NAMESPACE"), clientset)
+		configMap := prepareInfraConfigMap()
+		kubernetes.CreateConfigMap(os.Getenv("INFRA_CONFIGMAP_NAME"), configMap, os.Getenv("NAMESPACE"), clientset)
+		
+		secret := prepareInfraSecret(connectionData.Data, accessKey)
+		kubernetes.CreateSecret(os.Getenv("INFRA_SECRET_NAME"), secret, os.Getenv("NAMESPACE"), clientset)
 
-		secret := prepareAgentSecret(connectionData.Data, accessKey)
-		kubernetes.CreateSecret(os.Getenv("AGENT_SECRET_NAME"), secret, os.Getenv("NAMESPACE"), clientset)
-
-		workflowConfigMap := prepareWorkflowControllerConfigMap(connectionData.Data.UserAgentReg.ClusterID)
+		workflowConfigMap := prepareWorkflowControllerConfigMap(connectionData.Data.RegisterInfraDetails.InfraID)
 		kubernetes.CreateConfigMap(os.Getenv("WORKFLOW_CONTROLER_CONFIGMAP_NAME"), workflowConfigMap, os.Getenv("NAMESPACE"), clientset)
 
-		fmt.Printf("Agent Successfully declared, starting...\n")
+		fmt.Printf("Infra Successfully declared, starting...\n")
 	} else {
-		fmt.Printf("Agent already exist, starting...\n")
+		fmt.Printf("Infra already exist, starting...\n")
 	}
 }
 
-func validateAgent(token string, endpoint string) (string, error) {
+func validateInfra(token string, endpoint string) (string, error) {
 	var accessKey string
 
 	path := fmt.Sprintf("%s/%s/%s.yaml", endpoint, utils.ChaosYamlPath, token)
@@ -187,7 +195,7 @@ func validateAgent(token string, endpoint string) (string, error) {
 			if err != nil {
 				return accessKey, err
 			}
-			if string(fieldName) == "agent-secret" && string(fieldKind) == "Secret" {
+			if string(fieldName) == "subscriber-secret" && string(fieldKind) == "Secret" {
 				if fieldData, _, _, err := jsonparser.Get([]byte(jsonValue), "stringData", "ACCESS_KEY"); err != nil {
 					return accessKey, err
 				} else {
@@ -235,6 +243,7 @@ func Login(LITMUS_FRONTEND_URL string, LITMUS_USERNAME string, LITMUS_PASSWORD s
 	var credentials types.Credentials
 	credentials.Username = authInput.Username
 	credentials.Endpoint = authInput.Endpoint
+	credentials.ServerEndpoint  = authInput.Endpoint
 	credentials.Token = resp.AccessToken
 
 	return credentials

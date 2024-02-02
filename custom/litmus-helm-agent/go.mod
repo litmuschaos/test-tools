@@ -6,9 +6,10 @@ require (
 	github.com/buger/jsonparser v1.1.1
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
 	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/litmuschaos/litmusctl v0.12.1-0.20221121121306-e59872117d16
-	k8s.io/api v0.23.3
-	k8s.io/apimachinery v0.23.3
+	github.com/litmuschaos/litmus/chaoscenter/graphql/server v0.0.0-20240125062731-0aceec530150 // indirect
+	github.com/litmuschaos/litmusctl v0.12.1-0.20240117072315-5a7722d61894
+	k8s.io/api v0.26.0
+	k8s.io/apimachinery v0.26.0
 	k8s.io/client-go v12.0.0+incompatible
 )
 
