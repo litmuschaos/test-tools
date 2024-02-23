@@ -636,4 +636,4 @@ jobs:
       - name: Building litmus-helm-agent image
         run: |
           make docker.buildx 
-          make _push_litmus_agent
+          make _push_litmus_helm_agent
