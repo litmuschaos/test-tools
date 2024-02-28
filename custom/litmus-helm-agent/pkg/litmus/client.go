@@ -2,18 +2,19 @@ package client
 
 import (
 	"fmt"
-	"reflect"
 	"io/ioutil"
 	kubernetes "litmus-helm-agent/pkg/k8s"
 	"net/http"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
-	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
+
 	"github.com/buger/jsonparser"
 	ymlToJson "github.com/ghodss/yaml"
 	"github.com/golang-jwt/jwt"
+	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 	types "github.com/litmuschaos/litmusctl/pkg/types"
@@ -122,8 +123,8 @@ func CreateInfra(credentials types.Credentials) {
 		utils.Red.Printf("\n❌ Error, cannot search if infrastructure exist: %v", err.Error())
 		os.Exit(1)
 	}
-	
-	if (reflect.ValueOf(infraExist).IsZero()) {
+
+	if reflect.ValueOf(infraExist).IsZero() {
 		connectionData, err := infrastructure.ConnectInfra(newInfra, credentials)
 
 		if err != nil {
@@ -134,23 +135,23 @@ func CreateInfra(credentials types.Credentials) {
 			fmt.Printf("❌ Agent empty: Registration failed did graphql change ? \n")
 			os.Exit(1)
 		}
-	
+
 		if connectionData.Data.RegisterInfraDetails.Token == "" {
 			utils.Red.Println("\n❌ failed to get the infrastructure registration token: " + "\n")
 			os.Exit(1)
 		}
 
 		accessKey, err := validateInfra(connectionData.Data.RegisterInfraDetails.Token, credentials.Endpoint)
-		
+
 		if err != nil {
 			utils.Red.Println("❌ Error validate infrastructure: ", err)
 			os.Exit(1)
 		}
-		
+
 		clientset := kubernetes.ConnectKubeApi()
 		configMap := prepareInfraConfigMap()
 		kubernetes.CreateConfigMap(os.Getenv("INFRA_CONFIGMAP_NAME"), configMap, os.Getenv("NAMESPACE"), clientset)
-		
+
 		secret := prepareInfraSecret(connectionData.Data, accessKey)
 		kubernetes.CreateSecret(os.Getenv("INFRA_SECRET_NAME"), secret, os.Getenv("NAMESPACE"), clientset)
 
@@ -243,7 +244,7 @@ func Login(LITMUS_FRONTEND_URL string, LITMUS_USERNAME string, LITMUS_PASSWORD s
 	var credentials types.Credentials
 	credentials.Username = authInput.Username
 	credentials.Endpoint = authInput.Endpoint
-	credentials.ServerEndpoint  = authInput.Endpoint
+	credentials.ServerEndpoint = authInput.Endpoint
 	credentials.Token = resp.AccessToken
 
 	return credentials

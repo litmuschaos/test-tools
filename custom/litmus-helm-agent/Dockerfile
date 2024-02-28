@@ -1,9 +1,8 @@
 # Build Image
-FROM golang:1.18.3 AS build
+FROM golang:1.20 AS build
 
 ARG TARGETOS=linux
 ARG TARGETARCH
-
 
 RUN export GOOS=${TARGETOS} && \
     export GOARCH=${TARGETARCH}
