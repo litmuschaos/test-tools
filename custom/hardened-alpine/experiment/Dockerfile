@@ -19,6 +19,8 @@ ARG LITMUS_VERSION
 
 RUN rm -rf /var/lib/apt/lists/*
 
+RUN apk add --no-cache util-linux=2.38-r1
+
 # Install generally useful things
 RUN apk --update add \
         sudo \
