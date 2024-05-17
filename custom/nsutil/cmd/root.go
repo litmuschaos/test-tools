@@ -15,10 +15,12 @@ import (
 )
 
 // user and mnt ns not supported
-var ns = []string{"net", "pid", "cgroup", "uts", "ipc"}
-var nsSelected = make([]bool, 6)
-
-var t int // target pid
+var (
+	ns         = []string{"net", "pid", "cgroup", "uts", "ipc", "mnt"}
+	nsSelected = make([]bool, 7)
+	t          int // target pid
+	libPath    string
+)
 
 // rootCmd represents the base command
 var rootCmd = &cobra.Command{
@@ -41,7 +43,9 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&nsSelected[2], "cgroup", "c", false, "cgroup namespace to enter")
 	rootCmd.PersistentFlags().BoolVarP(&nsSelected[3], "uts", "u", false, "uts namespace to enter")
 	rootCmd.PersistentFlags().BoolVarP(&nsSelected[4], "ipc", "i", false, "ipc namespace to enter")
+	rootCmd.PersistentFlags().BoolVarP(&nsSelected[5], "mnt", "m", false, "mnt namespace to enter")
 	rootCmd.PersistentFlags().IntVarP(&t, "target", "t", 0, "target process id (required)")
+	rootCmd.PersistentFlags().StringVar(&libPath, "lib-path", "/usr/local/lib/nsutil.so", "shared library path to be preloaded")
 	err := rootCmd.MarkPersistentFlagRequired("target")
 	if err != nil {
 		log.WithError(err).Fatal("Failed to mark required flag")
@@ -55,6 +59,9 @@ func nsutil(cmd *cobra.Command, args []string) {
 	// target command
 	nCmd := exec.Command(args[0], args[1:]...)
 	nCmd.Env = os.Environ()
+	if nsSelected[5] {
+		nCmd.Env = append(nCmd.Env, fmt.Sprintf("LD_PRELOAD=%s", libPath), fmt.Sprintf("MNT_PATH=%s", fmt.Sprintf("/proc/"+strconv.Itoa(t)+"/ns/mnt")))
+	}
 	nCmd.Stdin = os.Stdin
 	nCmd.Stdout = os.Stdout
 	nCmd.Stderr = os.Stderr
@@ -97,7 +104,7 @@ func nsutil(cmd *cobra.Command, args []string) {
 func getNSFiles() map[string]*os.File {
 	nsMap := map[string]*os.File{}
 	for i, n := range ns {
-		if !nsSelected[i] {
+		if !nsSelected[i] || n == "mnt" {
 			continue
 		}
 		file, err := getFileFromNS("/proc/" + strconv.Itoa(t) + "/ns/" + n)
