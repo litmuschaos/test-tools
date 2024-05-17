@@ -3,7 +3,7 @@ name: release
 
 on:
   workflow_dispatch:
-    inputs:   
+    inputs:
       release_tag:
         description: 'release tag'
         required: true
@@ -11,7 +11,7 @@ on:
         description: 'release title'
         required: false
       release_notes:
-        description: 'release notes'     
+        description: 'release notes'
         required: false
         default: ''
 
@@ -22,6 +22,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+        with:
+          qemu-version: '6.0.0'
+
       - name: Build go binary for pause
         run : ./../../build/go-multiarch-build.sh "go build -o ./../../build/_output/pause-linux"
         working-directory: custom/pause
@@ -30,15 +35,30 @@ jobs:
         run : ./../../build/go-multiarch-build.sh "go build -o ./../../build/_output/nsutil-linux"
         working-directory: custom/nsutil
 
+      - name: Build shared libraries for nsutil amd64
+        run: gcc -shared -fPIC nsutil.c -o ./../../build/_output/nsutil_amd64.so
+        working-directory: custom/nsutil
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build arm64 Docker image
+        run: docker buildx build --platform linux/arm64 -t myapp-arm64 --load .
+        working-directory: custom/nsutil
+
+      - name: Extract compiled binary
+        run: docker create --name myapp-arm64-container myapp-arm64 && docker cp myapp-arm64-container:/app/nsutil.so ./../../build/_output/nsutil_arm64.so
+        working-directory: custom/nsutil
+
       - name: Build go binary for promql-cli
         run : |
           cp custom/promql-cli/promql-linux-amd64 build/_output/
           cp custom/promql-cli/promql-linux-arm64 build/_output/
-          
+
       - name: Build go binary for dns_interceptor
         run : go build -o ./../../build/_output/dns_interceptor
         working-directory: custom/dns_interceptor
-      
+
       - name: create release along with artifact
         uses: ncipollo/release-action@v1
         with:

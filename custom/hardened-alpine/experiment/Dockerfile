@@ -60,6 +60,9 @@ RUN curl -L https://github.com/chaosnative/promql-cli/releases/download/3.0.0/pr
 #Installing nsutil cli binaries
 RUN curl -L https://github.com/litmuschaos/test-tools/releases/download/${LITMUS_VERSION}/nsutil-linux-${TARGETARCH} --output /usr/local/bin/nsutil && chmod +x /usr/local/bin/nsutil
 
+#Installing nsutil shared lib
+RUN curl -L https://github.com/litmuschaos/test-tools/releases/download/${LITMUS_VERSION}/nsutil-${TARGETARCH}.so --output /usr/local/lib/nsutil.so && chmod +x /usr/local/lib/nsutil.so
+
 #Installing pause cli binaries
 RUN curl -L https://github.com/litmuschaos/test-tools/releases/download/${LITMUS_VERSION}/pause-linux-${TARGETARCH} --output /usr/local/bin/pause && chmod +x /usr/local/bin/pause
 
