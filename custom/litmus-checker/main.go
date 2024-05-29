@@ -2,16 +2,20 @@ package main
 
 import (
 	"flag"
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
-	chaos_checker "github.com/gdsoumya/resourceChecker/pkg/chaos-checker"
-	"github.com/gdsoumya/resourceChecker/pkg/k8s"
-	"github.com/gdsoumya/resourceChecker/pkg/util"
+	chaos_checker "github.com/litmuschaos/test-tools/custom/litmus-checker/pkg/chaos-checker"
+	"github.com/litmuschaos/test-tools/custom/litmus-checker/pkg/k8s"
+	"github.com/litmuschaos/test-tools/custom/litmus-checker/pkg/util"
 )
+
+func init() {
+	logrus.SetFormatter(&logrus.JSONFormatter{})
+}
 
 func main() {
 	signalChannel := make(chan os.Signal)
@@ -20,23 +24,33 @@ func main() {
 	file := flag.String("file", "", "absolute path to the chaosengine yaml")
 	engineFile := flag.String("saveName", "", "absolute path to the output file")
 	flag.Parse()
-	if *file == "" {
-		log.Fatal("Error Engine Artefact path not specified")
+
+	if file == nil || *file == "" {
+		logrus.Fatal("Error Engine Artefact path not specified")
 	}
+
 	data, err := ioutil.ReadFile(*file)
 	if err != nil {
-		log.Fatal("Error Reading Artefact : ", err)
+		logrus.Fatalf("Error Reading Artefact : %v", err)
 	}
-	resp, err := k8s.CreateChaosDeployment(data, kubeconfig)
+
+	dc, dyn, err := k8s.GetDynamicClient(kubeconfig)
 	if err != nil {
-		log.Fatal("Error Creating Resource : ", err)
+		logrus.Fatalf("Error Getting Dynamic Client : %v", err)
 	}
+
+	resp, err := k8s.CreateChaosDeployment(data, dc, dyn)
+	if err != nil {
+		logrus.Fatalf("Error Creating Resource : %v", err)
+	}
+
 	engineName := resp.GetName()
-	log.Print("\n\nChaosEngine Name : ", engineName, "\n\n")
-	err = util.WriteToFile(*engineFile, engineName)
-	if err != nil {
-		log.Print("ERROR : cannot write engine-name - ", err)
+	logrus.Infof("ChaosEngine Name : %s", engineName)
+
+	if err = util.WriteToFile(*engineFile, engineName); err != nil {
+		logrus.Infof("ERROR: cannot write engine-name  %v", err)
 	}
+
 	gvk := resp.GroupVersionKind()
 	resDef := k8s.ResourceDef{
 		Name:      engineName,
@@ -50,10 +64,10 @@ func main() {
 	// Required, While aborting a Chaos Experiment, wait-container (argo-exec) sends SIGTERM signal to other (main) containers for aborting Argo-Workflow Pod
 	go func() {
 		<-signalChannel
-		log.Print("SIGTERM SIGNAL RECEIVED, Shutting down litmus-checker...")
+		logrus.Info("SIGTERM SIGNAL RECEIVED, Shutting down litmus-checker...")
 		os.Exit(0)
 	}()
 
-	log.Print("Created Resource Details: \n", resDef)
-	chaos_checker.CheckChaos(kubeconfig, resDef)
+	logrus.Infof("Created Resource Details: %v", resDef)
+	chaos_checker.CheckChaos(resDef, dc, dyn)
 }
