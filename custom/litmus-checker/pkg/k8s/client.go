@@ -28,20 +28,18 @@ type ResourceDef struct {
 
 var decUnstructured = yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme)
 
-func CreateChaosDeployment(manifest []byte, kubeconfig *string) (*unstructured.Unstructured, error) {
-	dc, dyn, err := GetDynamicClient(kubeconfig)
-	if err != nil {
-		return nil, err
-	}
+func CreateChaosDeployment(manifest []byte, dc discovery.DiscoveryInterface, dyn dynamic.Interface) (*unstructured.Unstructured, error) {
+
 	mapper := restmapper.NewDeferredDiscoveryRESTMapper(memory.NewMemCacheClient(dc))
 	// Decode YAML manifest into unstructured.Unstructured
 	obj := &unstructured.Unstructured{}
-	_, gvk, err := decUnstructured.Decode([]byte(manifest), nil, obj)
+	_, gvk, err := decUnstructured.Decode(manifest, nil, obj)
 	if err != nil {
 		return nil, err
 	}
+
 	if obj.GetKind() != "ChaosEngine" {
-		return nil, errors.New("Not A ChaosEngine Spec")
+		return nil, errors.New("not a ChaosEngine Spec")
 	}
 	// Find GVR
 	mapping, err := mapper.RESTMapping(gvk.GroupKind(), gvk.Version)
@@ -84,10 +82,7 @@ func GetResourceDetails(dc discovery.DiscoveryInterface, dyn dynamic.Interface, 
 func GetKubeConfig(kubeconfig *string) (*rest.Config, error) {
 	// Use in-cluster config if kubeconfig path is specified
 	if *kubeconfig == "" {
-		config, err := rest.InClusterConfig()
-		if err != nil {
-			return config, err
-		}
+		return rest.InClusterConfig()
 	}
 	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
 	if err != nil {

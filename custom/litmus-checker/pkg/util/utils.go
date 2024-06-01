@@ -1,13 +1,13 @@
 package util
 
 import (
-	"log"
+	"github.com/sirupsen/logrus"
 	"os"
 )
 
 func WriteToFile(engine, engineName string) error {
 	if engine == "" {
-		log.Print("No output file provided skipping write")
+		logrus.Info("No output file provided skipping write")
 		return nil
 	}
 	f, err := os.Create(engine)

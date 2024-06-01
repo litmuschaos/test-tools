@@ -1,8 +1,9 @@
-module github.com/gdsoumya/resourceChecker
+module github.com/litmuschaos/test-tools/custom/litmus-checker
 
 go 1.20
 
 require (
+	github.com/sirupsen/logrus v1.9.3
 	k8s.io/apimachinery v0.21.2
 	k8s.io/client-go v0.21.2
 )
