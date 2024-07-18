@@ -40,6 +40,7 @@ RUN set -ex && \
          do curl -sSL ${GLIBC_REPO}/releases/download/${GLIBC_VERSION}/${pkg}.apk -o /tmp/${pkg}.apk; done && \
      apk add --allow-untrusted --force overwrite /tmp/*.apk && \
      rm -v /tmp/*.apk && \
+     ln -sf /usr/glibc-compat/lib/ld-linux-x86-64.so.2 /lib && \
      /usr/glibc-compat/sbin/ldconfig /lib /usr/glibc-compat/lib
 
 # Change default shell from ash to bash
