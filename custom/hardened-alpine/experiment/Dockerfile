@@ -1,7 +1,7 @@
 # This Dockerfile contains the hardened alpine image with all the
 # litmus experiment dependencies installed.
 # It is also made non-root, sudo-enabled with default litmus directory.
-FROM alpine:3.16.2
+FROM alpine:3.16.9
 
 LABEL maintainer="LitmusChaos"
 
@@ -38,7 +38,7 @@ RUN set -ex && \
      apk --update add libstdc++ curl ca-certificates && \
      for pkg in glibc-${GLIBC_VERSION} glibc-bin-${GLIBC_VERSION}; \
          do curl -sSL ${GLIBC_REPO}/releases/download/${GLIBC_VERSION}/${pkg}.apk -o /tmp/${pkg}.apk; done && \
-     apk add --allow-untrusted /tmp/*.apk && \
+     apk add --allow-untrusted --force-overwrite /tmp/*.apk && \
      rm -v /tmp/*.apk && \
      /usr/glibc-compat/sbin/ldconfig /lib /usr/glibc-compat/lib
 
