@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:xenial-20201014
 
 RUN apt-get update && apt-get -y --force-yes install \
     python \
