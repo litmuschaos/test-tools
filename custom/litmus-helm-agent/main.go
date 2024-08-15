@@ -10,10 +10,9 @@ import (
 )
 
 var (
-	ACTION              string
-	LITMUS_FRONTEND_URL string
-	LITMUS_USERNAME     string
-	LITMUS_PASSWORD     string
+	ACTION     string
+	INFRA_ID   string
+	ACCESS_KEY string
 )
 
 func init() {
@@ -25,18 +24,15 @@ func init() {
 		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
 
-	LITMUS_FRONTEND_URL = os.Getenv("LITMUS_FRONTEND_URL")
-	LITMUS_USERNAME = os.Getenv("LITMUS_USERNAME")
-	LITMUS_PASSWORD = os.Getenv("LITMUS_PASSWORD")
+	INFRA_ID = os.Getenv("INFRA_ID")
+	ACCESS_KEY = os.Getenv("ACCESS_KEY")
 }
 
 func main() {
 
-	credentials := litmus.Login(LITMUS_FRONTEND_URL, LITMUS_USERNAME, LITMUS_PASSWORD)
-
 	if ACTION == "create" {
 		fmt.Println("\n🚀 Start Pre install hook ... 🎉")
-		litmus.CreateInfra(credentials)
+		litmus.CreateInfra(INFRA_ID, ACCESS_KEY)
 	} else {
 		fmt.Println("\n❌ Please provide a valid action")
 	}
