@@ -14,6 +14,7 @@ func prepareNewInfra() types.Infra {
 	var newInfra types.Infra
 	newInfra.Namespace = os.Getenv("NAMESPACE")
 	newInfra.SkipSSL, _ = strconv.ParseBool(os.Getenv("SKIP_SSL"))
+	newInfra.Mode = os.Getenv("INFRA_MODE")
 
 	// -- OPTIONAL -- //
 	newInfra.InfraType = os.Getenv("INFRA_TYPE")
