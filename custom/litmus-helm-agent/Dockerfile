@@ -12,8 +12,14 @@ WORKDIR /litmus
 
 RUN CGO_ENABLED=0 go build -o /output/litmus-agent ./main.go
 
-FROM litmuschaos/infra-alpine:latest
+FROM registry.access.redhat.com/ubi9/ubi-minimal:9.4
 
-COPY --from=build /output/ /litmus
+ENV APP_DIR="/litmus"
+
+COPY --from=build /output/ $APP_DIR/
+RUN chown 65534:0 $APP_DIR/litmus-agent && chmod 755 $APP_DIR/litmus-agent
+
+WORKDIR /litmus
+USER 65534
 
 CMD ["./litmus-agent"]
