@@ -41,14 +41,6 @@ func prepareInfraConfigMap() map[string]string {
 	return configMapData
 }
 
-func prepareInfraSecret(infraID, accessKey string) map[string][]byte {
-	secretData := make(map[string][]byte)
-	secretData["INFRA_ID"] = []byte(infraID)
-	secretData["ACCESS_KEY"] = []byte(accessKey)
-
-	return secretData
-}
-
 func prepareWorkflowControllerConfigMap(clusterID string) map[string]string {
 	configMapWorkflowController := make(map[string]string)
 	configMapWorkflowController["config"] = (`    containerRuntimeExecutor: ` + os.Getenv("CONTAINER_RUNTIME_EXECUTOR") + `
@@ -64,9 +56,6 @@ func CreateInfra(infraID, accessKey string) {
 
 	configMap := prepareInfraConfigMap()
 	kubernetes.CreateConfigMap(os.Getenv("INFRA_CONFIGMAP_NAME"), configMap, os.Getenv("NAMESPACE"), clientset)
-
-	secret := prepareInfraSecret(infraID, accessKey)
-	kubernetes.CreateSecret(os.Getenv("INFRA_SECRET_NAME"), secret, os.Getenv("NAMESPACE"), clientset)
 
 	workflowConfigMap := prepareWorkflowControllerConfigMap(infraID)
 	kubernetes.CreateConfigMap(os.Getenv("WORKFLOW_CONTROLER_CONFIGMAP_NAME"), workflowConfigMap, os.Getenv("NAMESPACE"), clientset)
