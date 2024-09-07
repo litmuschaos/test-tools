@@ -1,4 +1,4 @@
-FROM postgres:latest
+FROM postgres:16.4-bookworm
 
 RUN apt-get update && \
     apt-get -y --force-yes install --no-install-recommends expect \
