@@ -2,9 +2,7 @@ package client
 
 import (
 	"fmt"
-	"io/ioutil"
 	kubernetes "litmus-helm-agent/pkg/k8s"
-	"net/http"
 	"os"
 	"reflect"
 	"strconv"
@@ -92,7 +90,7 @@ func GetProjectID(credentials types.Credentials) string {
 		}
 	}
 	if result == "" {
-		utils.Red.Println("\n❌ No project found with owner or editor access to current user" + "\n")
+		utils.Red.Println("\n❌ No project found with owner or editor access to current user")
 		os.Exit(1)
 	}
 	return result
@@ -137,11 +135,11 @@ func CreateInfra(credentials types.Credentials) {
 		}
 
 		if connectionData.Data.RegisterInfraDetails.Token == "" {
-			utils.Red.Println("\n❌ failed to get the infrastructure registration token: " + "\n")
+			utils.Red.Println("\n❌ failed to get the infrastructure registration token: ")
 			os.Exit(1)
 		}
 
-		accessKey, err := validateInfra(connectionData.Data.RegisterInfraDetails.Token, credentials.Endpoint)
+		accessKey, err := validateInfra(connectionData.Data.RegisterInfraDetails.Manifest)
 
 		if err != nil {
 			utils.Red.Println("❌ Error validate infrastructure: ", err)
@@ -160,52 +158,38 @@ func CreateInfra(credentials types.Credentials) {
 
 		fmt.Printf("Infra Successfully declared, starting...\n")
 	} else {
-		fmt.Printf("Infra already exist, starting...\n")
+		fmt.Printf("Infra already exist\n")
 	}
 }
 
-func validateInfra(token string, endpoint string) (string, error) {
-	var accessKey string
+func validateInfra(manifest string) (string, error) {
 
-	path := fmt.Sprintf("%s/%s/%s.yaml", endpoint, utils.ChaosYamlPath, token)
-	req, err := http.NewRequest("GET", path, nil)
-	if err != nil {
-		return accessKey, err
-	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return accessKey, err
-	}
-	defer resp.Body.Close()
-	resp_body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return accessKey, err
-	}
-	manifests := strings.Split(string(resp_body), "---")
+	manifests := strings.Split(manifest, "---")
 	for _, manifest := range manifests {
 		if len(strings.TrimSpace(manifest)) > 0 {
 			jsonValue, err := ymlToJson.YAMLToJSON([]byte(manifest))
 			if err != nil {
-				return accessKey, err
+				return "", err
 			}
 			fieldName, _, _, err := jsonparser.Get([]byte(jsonValue), "metadata", "name")
 			if err != nil {
-				return accessKey, err
+				return "", err
 			}
 			fieldKind, _, _, err := jsonparser.Get([]byte(jsonValue), "kind")
 			if err != nil {
-				return accessKey, err
+				return "", err
 			}
 			if string(fieldName) == "subscriber-secret" && string(fieldKind) == "Secret" {
 				if fieldData, _, _, err := jsonparser.Get([]byte(jsonValue), "stringData", "ACCESS_KEY"); err != nil {
-					return accessKey, err
+					return "", err
 				} else {
-					accessKey = string(fieldData)
+					return string(fieldData), nil
 				}
 			}
 		}
 	}
-	return accessKey, err
+
+	return "", fmt.Errorf("Subscriber Secret not found")
 }
 
 func Login(LITMUS_FRONTEND_URL string, LITMUS_USERNAME string, LITMUS_PASSWORD string) types.Credentials {
