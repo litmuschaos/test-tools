@@ -65,12 +65,12 @@ func prepareInfraSecret(infraConnect infrastructure.RegisterInfra, accessKey str
 
 func prepareWorkflowControllerConfigMap(clusterID string) map[string]string {
 	configMapWorkflowController := make(map[string]string)
-	configMapWorkflowController["config"] = (`    containerRuntimeExecutor: ` + os.Getenv("CONTAINER_RUNTIME_EXECUTOR") + `
-    executor:
-      imagePullPolicy: IfNotPresent
-    instanceID: ` + clusterID)
-	return configMapWorkflowController
 
+	configMapWorkflowController["containerRuntimeExecutor"] = os.Getenv("CONTAINER_RUNTIME_EXECUTOR")
+	configMapWorkflowController["instanceID"] = clusterID
+	configMapWorkflowController["executor"] = "imagePullPolicy: IfNotPresent\n"
+
+	return configMapWorkflowController
 }
 
 func GetProjectID(credentials types.Credentials) string {
