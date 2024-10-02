@@ -148,13 +148,13 @@ func CreateInfra(credentials types.Credentials) {
 
 		clientset := kubernetes.ConnectKubeApi()
 		configMap := prepareInfraConfigMap()
-		kubernetes.CreateConfigMap(os.Getenv("INFRA_CONFIGMAP_NAME"), configMap, os.Getenv("NAMESPACE"), clientset)
+		kubernetes.PatchConfigMap(os.Getenv("INFRA_CONFIGMAP_NAME"), configMap, os.Getenv("NAMESPACE"), clientset)
 
 		secret := prepareInfraSecret(connectionData.Data, accessKey)
 		kubernetes.CreateSecret(os.Getenv("INFRA_SECRET_NAME"), secret, os.Getenv("NAMESPACE"), clientset)
 
 		workflowConfigMap := prepareWorkflowControllerConfigMap(connectionData.Data.RegisterInfraDetails.InfraID)
-		kubernetes.CreateConfigMap(os.Getenv("WORKFLOW_CONTROLER_CONFIGMAP_NAME"), workflowConfigMap, os.Getenv("NAMESPACE"), clientset)
+		kubernetes.PatchConfigMap(os.Getenv("WORKFLOW_CONTROLER_CONFIGMAP_NAME"), workflowConfigMap, os.Getenv("NAMESPACE"), clientset)
 
 		fmt.Printf("Infra Successfully declared, starting...\n")
 	} else {
