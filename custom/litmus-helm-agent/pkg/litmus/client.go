@@ -68,7 +68,6 @@ func prepareWorkflowControllerConfigMap(clusterID string) map[string]string {
 
 	configMapWorkflowController["containerRuntimeExecutor"] = os.Getenv("CONTAINER_RUNTIME_EXECUTOR")
 	configMapWorkflowController["instanceID"] = clusterID
-	configMapWorkflowController["executor"] = "imagePullPolicy: IfNotPresent\n"
 
 	return configMapWorkflowController
 }
