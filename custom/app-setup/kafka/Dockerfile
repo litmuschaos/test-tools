@@ -1,4 +1,4 @@
-FROM alpine:3.15.0
+FROM alpine:3.19.6
 
 LABEL maintainer="ChaosNative"
 
