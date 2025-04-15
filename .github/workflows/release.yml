@@ -18,7 +18,7 @@ on:
 jobs:
   create_release:
     name: create_release
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
 
@@ -69,7 +69,7 @@ jobs:
           tag: ${{ github.event.inputs.release_tag }}
 
   push:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: create_release
     steps:
       - uses: actions/checkout@v2
