@@ -7,8 +7,9 @@ import (
 	"os"
 
 	corev1r "k8s.io/api/core/v1"
-
+	"encoding/json"
 	metav1r "k8s.io/apimachinery/pkg/apis/meta/v1"
+	types "k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -28,20 +29,18 @@ func ConnectKubeApi() *kubernetes.Clientset {
 	return clientset
 }
 
-func CreateConfigMap(configmapName string, configMapData map[string]string, NAMESPACE string, clientset *kubernetes.Clientset) {
-	configMap := corev1r.ConfigMap{
-		TypeMeta: metav1r.TypeMeta{
-			Kind:       "ConfigMap",
-			APIVersion: "v1",
-		},
-		ObjectMeta: metav1r.ObjectMeta{
-			Name:      configmapName,
-			Namespace: NAMESPACE,
-		},
-		Data: configMapData,
+func PatchConfigMap(configmapName string, configMapData map[string]string, NAMESPACE string, clientset *kubernetes.Clientset) {
+	jsonStr, err := json.Marshal(configMapData)
+	if err != nil {
+		fmt.Printf("❌ Error when converting " + configmapName + " data to json: " + err.Error() + "\n")
+		os.Exit(1)
 	}
+	patchPayload := `
+	{
+		"data": ` + string(jsonStr) + `
+	}`
 
-	_, err := clientset.CoreV1().ConfigMaps(NAMESPACE).Update(context.TODO(), &configMap, metav1r.UpdateOptions{})
+	_, err = clientset.CoreV1().ConfigMaps(NAMESPACE).Patch(context.TODO(), configmapName, types.StrategicMergePatchType, []byte(patchPayload), metav1r.PatchOptions{})
 	if err != nil {
 		fmt.Printf("❌ Cannot update configmap " + configmapName + " : " + err.Error() + "\n")
 		os.Exit(1)
