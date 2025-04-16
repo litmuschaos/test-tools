@@ -22,7 +22,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
-        image:  gdsoumya/podtato-main-js:v0.1.0
+        image:  litmuschaos/podtato-main-js:v0.1.0
         imagePullPolicy: Always
         ports:
         - containerPort: 9000
@@ -79,7 +79,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
         - name: server
-          image:  gdsoumya/podtato-hats:v0.1.0
+          image:  litmuschaos/podtato-hats:v0.1.0
           imagePullPolicy: Always
           ports:
             - containerPort: 9000
@@ -131,7 +131,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
         - name: server
-          image:  gdsoumya/podtato-left-leg:v0.1.0
+          image:  litmuschaos/podtato-left-leg:v0.1.0
           imagePullPolicy: Always
           ports:
             - containerPort: 9000
@@ -183,7 +183,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
         - name: server
-          image:  gdsoumya/podtato-left-arm:v0.1.0
+          image:  litmuschaos/podtato-left-arm:v0.1.0
           imagePullPolicy: Always
           ports:
             - containerPort: 9000
@@ -235,7 +235,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
         - name: server
-          image:  gdsoumya/podtato-right-leg:v0.1.0
+          image:  litmuschaos/podtato-right-leg:v0.1.0
           imagePullPolicy: Always
           ports:
             - containerPort: 9000
@@ -287,7 +287,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
         - name: server
-          image:  gdsoumya/podtato-right-arm:v0.1.0
+          image:  litmuschaos/podtato-right-arm:v0.1.0
           imagePullPolicy: Always
           ports:
             - containerPort: 9000
@@ -338,7 +338,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
         - name: server
-          image:  gdsoumya/podtato-hats:v0.1.4
+          image:  litmuschaos/podtato-hats:v0.1.4
           imagePullPolicy: Always
           ports:
             - containerPort: 9000
