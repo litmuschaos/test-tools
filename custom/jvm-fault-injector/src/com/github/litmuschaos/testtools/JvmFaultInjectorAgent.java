@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class JvmFaultInjectorAgent {
+	private static final int BYTES_PER_MB = 1024 * 1024;
 	private static AtomicBoolean alive = new AtomicBoolean(false);
 
 	// This method will be called when the jar is installed as an agent
@@ -61,13 +62,13 @@ public class JvmFaultInjectorAgent {
 			// Memory parameter cannot be more than 2047 MiB. Setting it to 2047.
 			memory = 2047;
 		}
-		int amountOfBytesToAllocate = 1024 * 1024 * memory;
+		int amountOfBytesToAllocate = BYTES_PER_MB * memory;
 		// Time to sleep for each iteration, in milliseconds
 		int sleepMillis = parseIntArg(argsList, "-s", 2000);
 		// Total duration in seconds
 		int duration = parseIntArg(argsList, "-d", 60);
 		long stopTime = System.currentTimeMillis() + (duration * 1000);
-		ArrayList<ByteBuffer> keepReferences = new ArrayList<ByteBuffer>();
+		ArrayList<ByteBuffer> keepReferences = new ArrayList<>();
 		new Thread(() -> {
 			boolean allocateMemory = true;
 			while (alive.get() && System.currentTimeMillis() < stopTime) {
@@ -90,7 +91,15 @@ public class JvmFaultInjectorAgent {
 
 	private static int parseIntArg(List<String> args, String argName, int defaultValue) {
 		if (args.contains(argName)) {
-			return Integer.parseInt(args.get(args.indexOf(argName) + 1));
+			int index = args.indexOf(argName);
+			if (index + 1 >= args.size()) {
+				throw new IllegalArgumentException("Missing value for argument: " + argName);
+			}
+			try {
+				return Integer.parseInt(args.get(index + 1));
+			} catch (NumberFormatException e) {
+				throw new IllegalArgumentException("Invalid integer value for argument " + argName + ": " + args.get(index + 1));
+			}
 		}
 		return defaultValue;
 	}
