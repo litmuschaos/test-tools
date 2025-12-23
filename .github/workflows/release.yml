@@ -56,7 +56,7 @@ jobs:
           cp custom/promql-cli/promql-linux-arm64 build/_output/
 
       - name: Build go binary for dns_interceptor
-        run : go build -o ./../../build/_output/dns_interceptor
+        run : ./../../build/go-multiarch-build.sh "go build -o ./../../build/_output/dns_interceptor"
         working-directory: custom/dns_interceptor
 
       - name: create release along with artifact
