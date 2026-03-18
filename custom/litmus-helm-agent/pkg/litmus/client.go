@@ -45,7 +45,7 @@ func prepareInfraConfigMap() map[string]string {
 	configMapData["VERSION"] = os.Getenv("APP_VERSION")
 	configMapData["IS_INFRA_CONFIRMED"] = "false"
 	configMapData["START_TIME"] = strconv.FormatInt(time.Now().Unix(), 10)
-	selector := `["litmuschaos.io/app=chaos-exporter", "litmuschaos.io/app=chaos-operator", "litmuschaos.io/app=event-tracker", "litmuschaos.io/app=workflow-controller"]`
+	selector := `["app=chaos-exporter", "name=chaos-operator", "app=event-tracker", "app=workflow-controller"]`
 	configMapData["COMPONENTS"] = "DEPLOYMENTS: " + selector
 	//TODO fix this line
 	configMapData["INFRA_SCOPE"] = os.Getenv("INFRA_MODE")
