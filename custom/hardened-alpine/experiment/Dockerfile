@@ -73,11 +73,11 @@ COPY --from=docker:19.03 /usr/local/bin/docker /usr/local/bin/
 
 # Installing toxiproxy binaries
 RUN curl -L https://github.com/chaosnative/toxiproxy/releases/download/v2.6.0/toxiproxy-cli-linux-${TARGETARCH}.tar.gz --output toxiproxy-cli-linux-${TARGETARCH}.tar.gz && \
-    tar zxvf toxiproxy-cli-linux-${TARGETARCH}.tar.gz -C /sbin/ && \
-    chmod 755 /sbin/toxiproxy-cli
+    tar zxvf toxiproxy-cli-linux-${TARGETARCH}.tar.gz -C //usr/local/bin/ && \
+    chmod +x /usr/local/bin/toxiproxy-cli
 RUN curl -L https://github.com/chaosnative/toxiproxy/releases/download/v2.6.0/toxiproxy-server-linux-${TARGETARCH}.tar.gz --output toxiproxy-server-linux-${TARGETARCH}.tar.gz && \
-    tar zxvf toxiproxy-server-linux-${TARGETARCH}.tar.gz -C /sbin/ && \
-    chmod 755 /sbin/toxiproxy-server
+    tar zxvf toxiproxy-server-linux-${TARGETARCH}.tar.gz -C //usr/local/bin/ && \
+    chmod +x /usr/local/bin/toxiproxy-server
 
 # The user the app should run as
 ENV APP_USER=litmus
