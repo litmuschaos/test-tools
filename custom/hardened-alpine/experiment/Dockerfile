@@ -72,11 +72,11 @@ RUN curl -L https://github.com/litmuschaos/test-tools/releases/download/${LITMUS
 COPY --from=docker:19.03 /usr/local/bin/docker /usr/local/bin/
 
 # Installing toxiproxy binaries
-RUN curl -L https://litmus-http-proxy.s3.amazonaws.com/cli/toxiproxy-cli-linux-${TARGETARCH}.tar.gz --output toxiproxy-cli-linux-${TARGETARCH}.tar.gz && \
-    tar zxvf toxiproxy-cli-linux-${TARGETARCH}.tar.gz -C /usr/local/bin/ && \
+RUN curl -L https://github.com/chaosnative/toxiproxy/releases/download/v2.6.0/toxiproxy-cli-linux-${TARGETARCH}.tar.gz --output toxiproxy-cli-linux-${TARGETARCH}.tar.gz && \
+    tar zxvf toxiproxy-cli-linux-${TARGETARCH}.tar.gz -C //usr/local/bin/ && \
     chmod +x /usr/local/bin/toxiproxy-cli
-RUN curl -L https://litmus-http-proxy.s3.amazonaws.com/server/toxiproxy-server-linux-${TARGETARCH}.tar.gz --output toxiproxy-server-linux-${TARGETARCH}.tar.gz && \
-    tar zxvf toxiproxy-server-linux-${TARGETARCH}.tar.gz -C /usr/local/bin/ && \
+RUN curl -L https://github.com/chaosnative/toxiproxy/releases/download/v2.6.0/toxiproxy-server-linux-${TARGETARCH}.tar.gz --output toxiproxy-server-linux-${TARGETARCH}.tar.gz && \
+    tar zxvf toxiproxy-server-linux-${TARGETARCH}.tar.gz -C //usr/local/bin/ && \
     chmod +x /usr/local/bin/toxiproxy-server
 
 # The user the app should run as
