@@ -23,6 +23,8 @@ func main() {
 	kubeconfig := flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
 	file := flag.String("file", "", "absolute path to the chaosengine yaml")
 	engineFile := flag.String("saveName", "", "absolute path to the output file")
+	qps := flag.Float64("qps", 5, "QPS for the Kubernetes client")
+	burst := flag.Int("burst", 10, "Burst for the Kubernetes client")
 	flag.Parse()
 
 	if file == nil || *file == "" {
@@ -34,7 +36,7 @@ func main() {
 		logrus.Fatalf("Error Reading Artefact : %v", err)
 	}
 
-	dc, dyn, err := k8s.GetDynamicClient(kubeconfig)
+	dc, dyn, err := k8s.GetDynamicClient(kubeconfig, *qps, *burst)
 	if err != nil {
 		logrus.Fatalf("Error Getting Dynamic Client : %v", err)
 	}

@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"errors"
+	"sync"
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,9 +29,21 @@ type ResourceDef struct {
 
 var decUnstructured = yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme)
 
+var (
+	globalMapper *restmapper.DeferredDiscoveryRESTMapper
+	mapperOnce   sync.Once
+)
+
+func getMapper(dc discovery.DiscoveryInterface) *restmapper.DeferredDiscoveryRESTMapper {
+	mapperOnce.Do(func() {
+		globalMapper = restmapper.NewDeferredDiscoveryRESTMapper(memory.NewMemCacheClient(dc))
+	})
+	return globalMapper
+}
+
 func CreateChaosDeployment(manifest []byte, dc discovery.DiscoveryInterface, dyn dynamic.Interface) (*unstructured.Unstructured, error) {
 
-	mapper := restmapper.NewDeferredDiscoveryRESTMapper(memory.NewMemCacheClient(dc))
+	mapper := getMapper(dc)
 	// Decode YAML manifest into unstructured.Unstructured
 	obj := &unstructured.Unstructured{}
 	_, gvk, err := decUnstructured.Decode(manifest, nil, obj)
@@ -61,7 +74,7 @@ func CreateChaosDeployment(manifest []byte, dc discovery.DiscoveryInterface, dyn
 }
 
 func GetResourceDetails(dc discovery.DiscoveryInterface, dyn dynamic.Interface, res ResourceDef) (*unstructured.Unstructured, error) {
-	mapper := restmapper.NewDeferredDiscoveryRESTMapper(memory.NewMemCacheClient(dc))
+	mapper := getMapper(dc)
 	// Find GVR
 	mapping, err := mapper.RESTMapping(schema.GroupKind{Group: res.Group, Kind: res.Kind}, res.Version)
 	if err != nil {
@@ -91,8 +104,10 @@ func GetKubeConfig(kubeconfig *string) (*rest.Config, error) {
 	return config, err
 }
 
-func GetDynamicClient(kubeconfig *string) (discovery.DiscoveryInterface, dynamic.Interface, error) {
+func GetDynamicClient(kubeconfig *string, qps float64, burst int) (discovery.DiscoveryInterface, dynamic.Interface, error) {
 	cfg, err := GetKubeConfig(kubeconfig)
+	cfg.QPS = float32(qps)
+	cfg.Burst = burst
 	if err != nil {
 		return nil, nil, err
 	}
