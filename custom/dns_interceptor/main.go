@@ -4,7 +4,7 @@ package main
 
 /*
 #cgo CFLAGS: -Werror -I/usr/include
-#cgo LDFLAGS: -L/usr/lib64/ -L/usr/lib/x86_64-linux-gnu/ -ldl
+#cgo LDFLAGS: -ldl
 #define _GNU_SOURCE
 #include <sched.h>
 #include <stdio.h>

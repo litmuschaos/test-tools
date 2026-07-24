@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 package=$1
+cgo_flag=${2:-0}
 if [[ -z "$package" ]]; then
-  echo "usage: $0 <package-name>"
+  echo "usage: $0 <package-name> [cgo-flag]"
   exit 1
 fi
 package_split=(${package//\// })
@@ -16,7 +17,7 @@ do
     GOOS=${platform_split[0]}
     GOARCH=${platform_split[1]}
 
-    env GOOS=$GOOS GOARCH=$GOARCH CGO_ENABLED=0 $package-$GOARCH
+    env GOOS=$GOOS GOARCH=$GOARCH CGO_ENABLED=$cgo_flag $package-$GOARCH
     if [ $? -ne 0 ]; then
         echo 'An error has occurred! Aborting the script execution...'
         exit 1
