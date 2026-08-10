@@ -17,7 +17,7 @@ RUN go env
 RUN CGO_ENABLED=0 go build -o /output/checker -v
 
 #Deploy Stage
-FROM alpine:3.18.0
+FROM alpine:3.21.2
 
 LABEL maintainer="LitmusChaos"
 
