@@ -9,7 +9,7 @@ itsdangerous==2.0.1
 Jinja2==3.0.1
 kubernetes==18.20.0
 MarkupSafe==2.0.1
-oauthlib==3.1.1
+oauthlib==3.2.2
 psycopg2-binary==2.9.1
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
