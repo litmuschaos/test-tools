@@ -1,4 +1,4 @@
-FROM postgres:latest
+FROM postgres:15.1
 
 RUN apt-get update && \
     apt-get -y --force-yes install --no-install-recommends expect \
