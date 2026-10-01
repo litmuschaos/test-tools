@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/litmuschaos/test-tools/pkg/log"
+	"test-tools/release/qpslitmus/qps/QPS/pkg/log"
 )
 
 //QPSVars will carry all the params for functionality of end point

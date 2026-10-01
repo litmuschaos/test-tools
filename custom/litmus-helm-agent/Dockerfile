@@ -1,5 +1,5 @@
 # Build Image
-FROM golang:1.20 AS build
+FROM golang:1.26.8 AS build
 
 ARG TARGETOS=linux
 ARG TARGETARCH

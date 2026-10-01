@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"flag"
 	"fmt"
 	logs "log"
@@ -9,8 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/litmuschaos/test-tools/pkg/log"
-	"github.com/openebs/maya/pkg/util/retry"
+	"git-app-deployer/pkg/log"
+	"git-app-deployer/pkg/retry"
+
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	v1 "k8s.io/api/core/v1"
@@ -123,13 +125,13 @@ func GetData() (*AppVars, error) {
 // CreateNamespace creates a namespace
 func CreateNamespace(clientset *kubernetes.Clientset, namespaceName string) error {
 	nsSpec := &v1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: namespaceName}}
-	_, err := clientset.CoreV1().Namespaces().Create(nsSpec)
+	_, err := clientset.CoreV1().Namespaces().Create(context.TODO(), nsSpec, metav1.CreateOptions{})
 	return err
 }
 
 // DeleteNamespace deletes a namespace
 func DeleteNamespace(clientset *kubernetes.Clientset, namespaceName string) error {
-	return clientset.CoreV1().Namespaces().Delete(namespaceName, &metav1.DeleteOptions{})
+	return clientset.CoreV1().Namespaces().Delete(context.TODO(), namespaceName, metav1.DeleteOptions{})
 }
 
 //CreateApp create the application
@@ -225,7 +227,7 @@ func CheckPodStatusForRevert(appNs, appLabel string, timeout, delay int, clients
 		Times(uint(timeout / delay)).
 		Wait(time.Duration(delay) * time.Second).
 		Try(func(attempt uint) error {
-			podSpec, err := clientset.CoreV1().Pods(appNs).List(metav1.ListOptions{LabelSelector: appLabel})
+			podSpec, err := clientset.CoreV1().Pods(appNs).List(context.TODO(), metav1.ListOptions{LabelSelector: appLabel})
 			if err != nil {
 				return errors.Errorf("Unable to find the pods in namespace, err: %v", err)
 			}
@@ -243,7 +245,7 @@ func CheckPodStatus(appNs, appLabel string, timeout, delay int, clientset *kuber
 		Times(uint(timeout / delay)).
 		Wait(time.Duration(delay) * time.Second).
 		Try(func(attempt uint) error {
-			podSpec, err := clientset.CoreV1().Pods(appNs).List(metav1.ListOptions{LabelSelector: appLabel})
+			podSpec, err := clientset.CoreV1().Pods(appNs).List(context.TODO(), metav1.ListOptions{LabelSelector: appLabel})
 			if err != nil || len(podSpec.Items) == 0 {
 				return errors.Errorf("Unable to find the pods with matching labels, err: %v", err)
 			}
@@ -264,7 +266,7 @@ func CheckContainerStatus(appNs, appLabel string, timeout, delay int, clientset 
 		Times(uint(timeout / delay)).
 		Wait(time.Duration(delay) * time.Second).
 		Try(func(attempt uint) error {
-			podSpec, err := clientset.CoreV1().Pods(appNs).List(metav1.ListOptions{LabelSelector: appLabel})
+			podSpec, err := clientset.CoreV1().Pods(appNs).List(context.TODO(), metav1.ListOptions{LabelSelector: appLabel})
 			if err != nil || len(podSpec.Items) == 0 {
 				return errors.Errorf("Unable to find the pods with matching labels, err: %v", err)
 			}

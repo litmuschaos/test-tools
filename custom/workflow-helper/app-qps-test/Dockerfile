@@ -1,4 +1,4 @@
-FROM golang:alpine
+FROM golang:1.26.8-alpine
 
 LABEL maintainer="LitmusChaos"
 

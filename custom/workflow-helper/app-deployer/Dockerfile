@@ -1,5 +1,5 @@
 #Build Stage
-FROM golang:1.14 AS builder
+FROM golang:1.26.8 AS builder
 
 LABEL maintainer="LitmusChaos"
 
